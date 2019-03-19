@@ -30,7 +30,7 @@
         "patientHIVTestInformation": {
                 "title": "patientHIVTestInformation",
                 "translationKey": "REGISTRATION_HIVTEST_INFO_KEY",
-                "attributes": ["DateofHIVDiagnosis","Typeoftest","TestResult","Patient Status"],
+                "attributes": ["DateofHIVDiagnosis","Typeoftest","TEST_RESULT","PATIENT_STATUS","LOCATION_OF_TEST","SECTOR_SELECT","ATIP_SELECT"],
                 "order" : 4,
                 "expanded": true
         },
@@ -43,6 +43,7 @@
                     "class": "General",
                     "TestResult": "HIV_Positive",
                     "Patient Status": "Pre TARV",
+                    "TEST_RESULT": "Positive",
                     "landHolding": 2
                 }
             },
