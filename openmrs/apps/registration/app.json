@@ -110,7 +110,7 @@
                 },
                 "personAttributes": {
                     "fields": [
-                            "NICK_NAME"
+                            "NICK_NAME", "PATIENT_STATUS","PRIMARY_CONTACT_NUMBER_1"
                     ]
                 }
             },		
