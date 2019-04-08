@@ -65,6 +65,8 @@
             "isLastNameMandatory": true,
             "showSaveConfirmDialog": false,
             "showBirthTime": false,
+            "mozambicanIdentifiers":["BI","NUIC","NUIT","Passporte Moçambicano","Cédula de Nascimento","Cartão de Eleitor"],
+            "foreignerIdentifiers":["Passporte Estrangeiro","DIRE","NUIT"],
             "disablePhotoCapture": true,
             "showCasteSameAsLastNameCheckbox": false,
             "printOptions": [
