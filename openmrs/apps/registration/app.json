@@ -144,7 +144,7 @@
 		"customAttributes": { 
                  "label": "Alcunha",
                     "placeholder": "Alcunha",
-                    "fields": ["NICK_NAME"]
+                    "fields": ["NICK_NAME","PRIMARY_CONTACT_NUMBER_1"]
         }
         	}    
         }
