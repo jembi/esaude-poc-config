@@ -1,151 +1,208 @@
 {
-        "id": "bahmni.registration",
-        "instanceOf":"bahmni.template.registration",
-        "description": "Bahmni Patient Registration App",
-        "extensionPoints": [
-            {
-                "id": "org.bahmni.registration.patient.search.result.action",
-                "description": "Bahmni Patient Search Result Action"
-            },
-            {
-                "id": "org.bahmni.registration.patient.next",
-                "description": "After Bahmni Patient Registration, forward url configuration"
-            }
-        ],
-        "contextModel": [
-            "patientUuid",
-            "activeVisitUuid"
-        ],
-        "config" : {
-                "patientInformation": {
-
-        "patientProfessionInformation": {
+    "id": "bahmni.registration",
+    "instanceOf": "bahmni.template.registration",
+    "description": "Bahmni Patient Registration App",
+    "extensionPoints": [
+        {
+            "id": "org.bahmni.registration.patient.search.result.action",
+            "description": "Bahmni Patient Search Result Action"
+        },
+        {
+            "id": "org.bahmni.registration.patient.next",
+            "description": "After Bahmni Patient Registration, forward url configuration"
+        }
+    ],
+    "contextModel": [
+        "patientUuid",
+        "activeVisitUuid"
+    ],
+    "config": {
+        "patientInformation": {
+            "patientProfessionInformation": {
                 "title": "patientProfessionInformation",
                 "translationKey": "REGISTRATION_PROFESSIONAL_INFORMATION",
-                "attributes": ["PATIENT_OCCUPATION","PATIENT_EDUCATION"],
-                "order" : 1,
+                "attributes": [
+                    "PATIENT_OCCUPATION",
+                    "PATIENT_EDUCATION"
+                ],
+                "order": 1,
                 "expanded": true
-        },
-
-        "patientContactInformation": {
+            },
+            "patientContactInformation": {
                 "title": "patientContactInformation",
                 "translationKey": "REGISTRATION_CONTACT_INFORMATION",
-                "attributes": ["PRIMARY_CONTACT_NUMBER_1","ALTERNATIVE_CONTACT_NUMBER_1","ALTERNATIVE_CONTACT_NUMBER_2"],
-                "order" : 2,
+                "attributes": [
+                    "PRIMARY_CONTACT_NUMBER_1",
+                    "ALTERNATIVE_CONTACT_NUMBER_1",
+                    "ALTERNATIVE_CONTACT_NUMBER_2"
+                ],
+                "order": 2,
                 "expanded": true
-        },
-             	
-        "patientTransferenceInformation": {
+            },
+            "patientTransferenceInformation": {
                 "title": "patientTransferenceInformation",
                 "translationKey": "REGISTRATION_TRANSFERENCE_INFO_KEY",
-                "attributes": ["Transferred from another HF","Date of transference","Transferred out HF name","PATIENT_STATUS"],
-                "order" : 3,
+                "attributes": [
+                    "Transferred from another HF",
+                    "Date of transference",
+                    "Transferred out HF name",
+                    "PATIENT_STATUS"
+                ],
+                "order": 3,
                 "expanded": true
-        },
-
-        "patientHIVTestInformation": {
+            },
+            "patientHIVTestInformation": {
                 "title": "patientHIVTestInformation",
                 "translationKey": "REGISTRATION_HIVTEST_INFO_KEY",
-                "attributes": ["DateofHIVDiagnosis","Typeoftest","TEST_RESULT","PATIENT_STATUS","LOCATION_OF_TEST","SECTOR_SELECT","ATIP_SELECT","HEALTH_FACILITY_NAME","HEALTH_FACILITY_DISTRICT","HEALTH_FACILITY_PROVINCE"],
-                "order" : 4,
+                "attributes": [
+                    "DateofHIVDiagnosis",
+                    "Typeoftest",
+                    "TEST_RESULT",
+                    "PATIENT_STATUS",
+                    "LOCATION_OF_TEST",
+                    "SECTOR_SELECT",
+                    "ATIP_SELECT",
+                    "HEALTH_FACILITY_NAME",
+                    "HEALTH_FACILITY_DISTRICT",
+                    "HEALTH_FACILITY_PROVINCE"
+                ],
+                "order": 4,
                 "expanded": true
+            },
+            "hidden": {
+                "attributes": [
+                    "primaryContact",
+                    "TEST_RESULT"
+                ]
+            },
+            "defaults": {
+                "class": "General",
+                "TEST_RESULT": "Positive",
+                "PATIENT_STATUS": "Pre TARV",
+                "landHolding": 2
+            }
         },
-                     "hidden": {
-                    "attributes": [
-                        "primaryContact",
-                        "TEST_RESULT"
-                    ]
-                },
-                "defaults":  {
-                    "class": "General",
-                    "TEST_RESULT": "Positive",
-                    "PATIENT_STATUS": "Pre TARV",
-                    "landHolding": 2
-                }
+        "addressHierarchy": {
+            "showAddressFieldsTopDown": true,
+            "strictAutocompleteFromLevel": "address1"
+        },
+        "relationshipTypeMap": {
+            "Doctor": "provider",
+            "Parent": "patient"
+        },
+        "autoCompleteFields": [
+            "familyName",
+            "caste"
+        ],
+        "defaultIdentifierPrefix": "MOZ",
+        "extraIdentifiersToDisplay": "NID (SERVIÇO TARV)",
+        "defaultVisitType": "FIRST CONSULTATION",
+        "searchByIdForwardUrl": "/patient/{{patientUuid}}",
+        "afterVisitSaveForwardUrl": "../registration/index.html#/search",
+        "showMiddleName": true,
+        "showLastName": true,
+        "isLastNameMandatory": true,
+        "showSaveConfirmDialog": false,
+        "showBirthTime": false,
+        "disablePhotoCapture": true,
+        "showCasteSameAsLastNameCheckbox": false,
+        "printOptions": [
+            {
+                "translationKey": "REGISTRATION_PRINT_REG_CARD_KEY",
+                "templateUrl": "/bahmni_config/openmrs/apps/registration/registrationCardLayout/print.html",
+                "shortcutKey": "p"
             },
-            "addressHierarchy": {
-                "showAddressFieldsTopDown": true,
-                "strictAutocompleteFromLevel": "address1"
+            {
+                "translationKey": "REGISTRATION_PRINT_WITH_BARCODE",
+                "templateUrl": "/bahmni_config/openmrs/apps/registration/registrationCardLayout/printWithBarcode.html",
+                "shortcutKey": "c"
+            }
+        ],
+        "conceptSetUI": {
+            "REGISTRATION FEES": {
+                "required": true,
+                "label": "Fee"
             },
-            "relationshipTypeMap": {
-                "Doctor":"provider",
-                "Parent":"patient"
+            "FHS": {
+                "buttonSelect": true
             },
-            "autoCompleteFields":["familyName", "caste"],
-            "defaultIdentifierPrefix": "MOZ",
-	        "extraIdentifiersToDisplay" : "NID (SERVIÇO TARV)",
-            "defaultVisitType": "FIRST CONSULTATION",
-            "searchByIdForwardUrl": "/patient/{{patientUuid}}",
-	        "afterVisitSaveForwardUrl": "../registration/index.html#/search",
-            "showMiddleName": true,
-            "showLastName": true,
-            "isLastNameMandatory": true,
-            "showSaveConfirmDialog": false,
-            "showBirthTime": false,
-            "disablePhotoCapture": true,
-            "showCasteSameAsLastNameCheckbox": false,
-            "printOptions": [
-                {
-                    "translationKey": "REGISTRATION_PRINT_REG_CARD_KEY",
-                    "templateUrl": "/bahmni_config/openmrs/apps/registration/registrationCardLayout/print.html",
-                    "shortcutKey": "p"
-                },
-                {
-                    "translationKey": "REGISTRATION_PRINT_WITH_BARCODE",
-                    "templateUrl": "/bahmni_config/openmrs/apps/registration/registrationCardLayout/printWithBarcode.html",
-                    "shortcutKey": "c"
-                }
-            ],
-            "conceptSetUI": {
-                "REGISTRATION FEES": {
-                    "required": true,
-                    "label": "Fee"
-                },
-                "FHS": {
-                    "buttonSelect": true
-                },
-                 "Home equipment": {
+            "Home equipment": {
                 "dropdown": true,
                 "disableAddNotes": true
             },
-
-                "defaults":{
-                    "FHS": "Present"
-                }
+            "defaults": {
+                "FHS": "Present"
+            }
+        },
+        "fieldValidation": {
+            "primaryContact": {
+                "pattern": "[0-9]{8,10}",
+                "errorMessage": "Should be 12 characters starting with 91 (country code)"
             },
-            "fieldValidation" : {
-                "primaryContact" : {"pattern" : "[0-9]{8,10}", "errorMessage" : "Should be 12 characters starting with 91 (country code)"},
-                "landHolding" : {"pattern" : "[0-9]{0,3}", "errorMessage" : "Should be between 1 to 999 acres"},
-                "familyName" : {"pattern" : "[a-záàãâéèêẽíìóòõôúùçA-ZÁÀÃÂÉÈÊẼÍÌÓÒÔÕÚÙÇ]{0,}", "errorMessage" : "Should contain characters"},
-                "givenName" : {"pattern" : "[a-záàãâéèêẽíìóòõôúùçA-ZÁÀÃÂÉÈÊẼÍÌÓÒÔÕÚÙÇ]{0,}", "errorMessage" : "Should contain characters"},
-                "middleName" : {"pattern" : "[a-záàãâéèêẽíìóòõôúùçA-ZÁÀÃÂÉÈÊẼÍÌÓÒÔÕÚÙÇ]{0,}", "errorMessage" : "Should contain characters"},
-                "latitude" : {"pattern" : "[a-zA-Z]{0,}", "errorMessage" : "Should contain characters"},
-                "address3" : {"pattern" : "[a-zA-Z0-9\\s]{0,}", "errorMessage" : "Should contain Characters, Numbers"},
-                "address4" : {"pattern" : "[a-zA-Z0-9\\s)-(]{0,}", "errorMessage" : "Should contain Characters, Numbers,-,(,)"},
-                "address5" : {"pattern" : "[a-zA-Z0-9\\s-]{0,}", "errorMessage" : "Should contain Characters, Numbers, -"},
-                "address6" : {"pattern" : "[a-zA-Z0-9\\s-]{0,}", "errorMessage" : "Should contain Characters, Numbers, -"},
-                "postalCode" : {"pattern" : "[a-zA-Z0-9\\s)-(]{0,}", "errorMessage" : "Should contain Characters, Numbers,-,(,)"}
+            "landHolding": {
+                "pattern": "[0-9]{0,3}",
+                "errorMessage": "Should be between 1 to 999 acres"
             },
-            "patientSearchResults": {
-                "address": {
-                    "fields" : []
-                },
-                "personAttributes": {
-                    "fields": [
-                            "NICK_NAME",
-                            "PATIENT_STATUS",
-                            "PRIMARY_CONTACT_NUMBER_1",
-                            "US_REG_DATE"
-                    ]
-                }
-            },		
-            "patientSearch": {
-                "address": {},
-		"customAttributes": { 
-                 "label": "Alcunha",
-                    "placeholder": "Alcunha",
-                    "fields": ["NICK_NAME","PRIMARY_CONTACT_NUMBER_1"]
+            "familyName": {
+                "pattern": "[a-záàãâéèêẽíìóòõôúùçA-ZÁÀÃÂÉÈÊẼÍÌÓÒÔÕÚÙÇ]{0,}",
+                "errorMessage": "Should contain characters"
+            },
+            "givenName": {
+                "pattern": "[a-záàãâéèêẽíìóòõôúùçA-ZÁÀÃÂÉÈÊẼÍÌÓÒÔÕÚÙÇ]{0,}",
+                "errorMessage": "Should contain characters"
+            },
+            "middleName": {
+                "pattern": "[a-záàãâéèêẽíìóòõôúùçA-ZÁÀÃÂÉÈÊẼÍÌÓÒÔÕÚÙÇ]{0,}",
+                "errorMessage": "Should contain characters"
+            },
+            "latitude": {
+                "pattern": "[a-zA-Z]{0,}",
+                "errorMessage": "Should contain characters"
+            },
+            "address3": {
+                "pattern": "[a-zA-Z0-9\\s]{0,}",
+                "errorMessage": "Should contain Characters, Numbers"
+            },
+            "address4": {
+                "pattern": "[a-zA-Z0-9\\s)-(]{0,}",
+                "errorMessage": "Should contain Characters, Numbers,-,(,)"
+            },
+            "address5": {
+                "pattern": "[a-zA-Z0-9\\s-]{0,}",
+                "errorMessage": "Should contain Characters, Numbers, -"
+            },
+            "address6": {
+                "pattern": "[a-zA-Z0-9\\s-]{0,}",
+                "errorMessage": "Should contain Characters, Numbers, -"
+            },
+            "postalCode": {
+                "pattern": "[a-zA-Z0-9\\s)-(]{0,}",
+                "errorMessage": "Should contain Characters, Numbers,-,(,)"
+            }
+        },
+        "patientSearchResults": {
+            "address": {
+                "fields": []
+            },
+            "personAttributes": {
+                "fields": [
+                    "NICK_NAME",
+                    "PATIENT_STATUS",
+                    "PRIMARY_CONTACT_NUMBER_1",
+                    "US_REG_DATE"
+                ]
+            }
+        },
+        "patientSearch": {
+            "address": {},
+            "customAttributes": {
+                "label": "Alcunha/Contacto Principal",
+                "placeholder": "Alcunha/Contacto Principal",
+                "fields": [
+                    "NICK_NAME",
+                    "PRIMARY_CONTACT_NUMBER_1"
+                ]
+            }
         }
-        	}    
-        }
+    }
 }
