@@ -1,27 +1,28 @@
 Bahmni.ConceptSet.FormConditions.rules = {
-    'Diastolic Data' : function (formName, formFieldValues) {
-        var systolic = formFieldValues['Systolic'];
-        var diastolic = formFieldValues['Diastolic'];
-        if (systolic || diastolic) {
+    'Reference_Other_Services' : function (formName, formFieldValues) {
+        var value = formFieldValues['Reference_Other_Services'];
+        
+        if (value == 'Reference_Other') {
             return {
-                enable: ["Posture"]
+                show: ["Reference_Other_Text"]
             }
         } else {
             return {
-                disable: ["Posture"]
+                hide: ["Reference_Other_Text"]
             }
         }
     },
-    'Systolic Data' : function (formName, formFieldValues) {
-        var systolic = formFieldValues['Systolic'];
-        var diastolic = formFieldValues['Diastolic'];
-        if (systolic || diastolic) {
+
+    'Reference_Eligible' : function (formName, formFieldValues) {
+        var value = formFieldValues['Reference_Eligible'];
+        
+        if (value) {
             return {
-                enable: ["Posture"]
+                show: ["Reference_GA","Reference_AF","Reference_CA","Reference_PU","Reference_FR","Reference_DT","Reference_DC","Reference_MDC_Other"]
             }
         } else {
             return {
-                disable: ["Posture"]
+                hide: ["Reference_GA","Reference_AF","Reference_CA","Reference_PU","Reference_FR","Reference_DT","Reference_DC","Reference_MDC_Other"]
             }
         }
     }
