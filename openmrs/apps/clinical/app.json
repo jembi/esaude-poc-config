@@ -124,6 +124,18 @@
             "Accepted Family Planning methods": {
                 "multiSelect": true
             },
+            "PT_Destination Health Facility": {
+            	"dropdown": true
+            },
+            "PT_Province": {
+            	"dropdown": true
+            },
+            "PT_District": {
+            	"dropdown": true
+            },
+            "PT_Name of Health Facility": {
+            	"dropdown": true
+            },
             "defaults": {
                 "Number of living children": 1,
                 "Accepted Family Planning methods": [
