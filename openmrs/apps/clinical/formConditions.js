@@ -1,8 +1,8 @@
 Bahmni.ConceptSet.FormConditions.rules = {
     'Reference_Other_Services' : function (formName, formFieldValues) {
-        var value = formFieldValues['Reference_Other_Services'];
+        var value = formFieldValues["Reference_Other_Services"];
         
-        if (value == 'Reference_Other') {
+        if (value === "Reference_Other") {
             return {
                 show: ["Reference_Other_Text"]
             }
@@ -12,9 +12,8 @@ Bahmni.ConceptSet.FormConditions.rules = {
             }
         }
     },
-
     'Reference_Eligible' : function (formName, formFieldValues) {
-        var value = formFieldValues['Reference_Eligible'];
+        var value = formFieldValues["Reference_Eligible"];
         
         if (value) {
             return {
