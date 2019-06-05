@@ -196,13 +196,12 @@
         "patientSearch": {
             "address": {},
             "customAttributes": {
-                "label": "Alcunha/Contacto Principal",
-                "placeholder": "Alcunha/Contacto Principal",
+                "label": "Contacto Principal",
+                "placeholder": "Contacto Principal",
                 "fields": [
-                    "NICK_NAME",
                     "PRIMARY_CONTACT_NUMBER_1"
                 ]
             }
         }
-    }
+}
 }
