@@ -55,9 +55,9 @@
             "translationKey": "PATIENT_OBS_INFORMATION_LOCALE_KEY",
             "required":true
         },
-        "order": 2,
+      "order": 2,
         "requiredPrivilege": "Edit Visits"
-    }, 
+    },
     "nutritionalValue":{
         "id": "bahmni.registration.conceptSetGroup.nutritionalValue",
         "extensionPointId": "org.bahmni.registration.conceptSetGroup.observations",
