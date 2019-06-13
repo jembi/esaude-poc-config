@@ -41,20 +41,21 @@
                     "ageLimit": 100
                 },
                 "ID_Number": {
-                    "required" : true
+                    "required" : false
                 },
                 "Co-morbidites": {
-                    "excludeFrom": ["HIV Program"]
+                    "excludeFrom": ["HIV","TB","TARV"]
                 },
                 "Doctor": {
-                    "excludeFrom": ["TB Program"]
+                    "excludeFrom": ["HIV","TB","TARV"]
+                },
+                "Stage": {
+                    "excludeFrom": ["HIV","TB","TARV"]
                 }
             },
             "patientContext": {
                 "programAttributes": [
-                    "Id_Number",
-                    "Doctor",
-                    "Stage"
+
                 ],
                 "personAttributes": [
                     
@@ -67,7 +68,11 @@
         "obsIgnoreList": [
             "REGISTRATION FEES",
             "COMMENTS",
-            "Patient file"
+            "Patient file",
+            "Id_Number",
+            "Doctor",
+            "Stage"
+        
         ],
         "otherInvestigationsMap": {
                     },
@@ -112,10 +117,41 @@
                   "disableAddNotes": true
             },
             "Probable delivery date": {
-               "allowFutureDates":true
-           },
-            "Probable delivery date": {
-               "allowFutureDates":true
+               "allowFutureDates":true,
+               "disableAddNotes": true
+            },
+            "Last Menstruation Date": {
+                "disableAddNotes": true
+            },
+            "Pregnancy_Yes_No": {
+                "disableAddNotes": true
+            },
+            "Date of Delivery": {
+                "disableAddNotes": true
+            },
+            "Number of Alive Babies Born": {
+                "disableAddNotes": true
+            },
+            "Number of Still Babies Born": {
+                "disableAddNotes": true
+            },
+            "Breastfeeding_ANA": {
+                "disableAddNotes": true
+            },
+            "Pain during sexual intercourse": {
+                "disableAddNotes": true
+            },
+            "Vaginal bleeding after sexual intercourse": {
+                "disableAddNotes": true
+            },
+            "Vaginal bleeding between menstruation_NA": {
+                "disableAddNotes": true
+            },
+            "Pain below the belly_NA": {
+                "disableAddNotes": true
+            },
+            "Referred to for cervical cancer screening": {
+                "disableAddNotes": true
             },
             "Symptoms_Prophylaxis": {
                "required": true,
@@ -124,6 +160,7 @@
             },
            "Symptoms Prophylaxis_New": {
                "disableAddNotes": true,
+               "multiSelect" : true,
                "required": true
             },
             "Date of Diagnosis": {
@@ -139,6 +176,11 @@
                "required": true
             },
             "TB Type is Extrapulmonary": {
+               "disableAddNotes": true,
+               "required": true,
+               "buttonSelect": true
+            },
+            "TB Type is Extrapulmonary_Sensitive": {
                "disableAddNotes": true,
                "required": true,
                "buttonSelect": true
