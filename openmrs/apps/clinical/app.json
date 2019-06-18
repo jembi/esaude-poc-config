@@ -292,7 +292,8 @@
                 "disableAddNotes": true
             },
             "Respiratory frequency_VS1": {
-                "disableAddNotes": true
+                "disableAddNotes": true,
+                "hideAbnormalButton": true
             },
             "Tuberculosis, Adverse Effects" :{
                 "multiSelect" : true,
