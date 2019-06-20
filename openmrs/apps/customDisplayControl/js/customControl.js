@@ -178,8 +178,14 @@ angular.module('bahmni.common.displaycontrol.custom')
         };
         $q.all([getUpcomingAppointments(), getPastAppointments()]).then(function (response) {
             $scope.upcomingAppointments = response[0].data;
+            for(let i=0; i < $scope.upcomingAppointments.length; i++){
+              delete $scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_PROVIDER_KEY;
+            }
             $scope.upcomingAppointmentsHeadings = _.keys($scope.upcomingAppointments[0]);
             $scope.pastAppointments = response[1].data;
+            for(let i=0; i < $scope.pastAppointments.length; i++){
+                delete $scope.pastAppointments[i].DASHBOARD_APPOINTMENTS_PROVIDER_KEY;
+            }
             $scope.pastAppointmentsHeadings = _.keys($scope.pastAppointments[0]);
         });
 
