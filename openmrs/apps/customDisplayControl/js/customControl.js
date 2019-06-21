@@ -3,7 +3,6 @@
 angular.module('bahmni.common.displaycontrol.custom')
     .directive('birthCertificate', ['observationsService', 'appService', 'spinner', function (observationsService, appService, spinner) {
             var link = function ($scope) {
-                console.log("inside birth certificate");
                 var conceptNames = ["HEIGHT"];
                 $scope.contentUrl = appService.configBaseUrl() + "/customDisplayControl/views/birthCertificate.html";
                 spinner.forPromise(observationsService.fetch($scope.patient.uuid, conceptNames, "latest", undefined, $scope.visitUuid, undefined).then(function (response) {
@@ -183,7 +182,6 @@ angular.module('bahmni.common.displaycontrol.custom')
                 $scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_SLOT_KEY = $scope.setBlock($scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_SLOT_KEY)
                 $scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_STATUS_KEY = $scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_STATUS_KEY.toUpperCase()
             }
-            console.log($scope.upcomingAppointments);
             $scope.upcomingAppointmentsHeadings = _.keys($scope.upcomingAppointments[0]);
             $scope.pastAppointments = response[1].data;
             for(let i=0; i < $scope.pastAppointments.length; i++){
