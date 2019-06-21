@@ -179,12 +179,14 @@ angular.module('bahmni.common.displaycontrol.custom')
         $q.all([getUpcomingAppointments(), getPastAppointments()]).then(function (response) {
             $scope.upcomingAppointments = response[0].data;
             for(let i=0; i < $scope.upcomingAppointments.length; i++){
-              delete $scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_PROVIDER_KEY;
+                delete $scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_PROVIDER_KEY;
+                $scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_SLOT_KEY = $scope.setBlock($scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_SLOT_KEY)
             }
             $scope.upcomingAppointmentsHeadings = _.keys($scope.upcomingAppointments[0]);
             $scope.pastAppointments = response[1].data;
             for(let i=0; i < $scope.pastAppointments.length; i++){
                 delete $scope.pastAppointments[i].DASHBOARD_APPOINTMENTS_PROVIDER_KEY;
+                $scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_SLOT_KEY = $scope.setBlock($scope.upcomingAppointments[i].DASHBOARD_APPOINTMENTS_SLOT_KEY)
             }
             $scope.pastAppointmentsHeadings = _.keys($scope.pastAppointments[0]);
         });
@@ -192,6 +194,20 @@ angular.module('bahmni.common.displaycontrol.custom')
         $scope.goToListView = function () {
             $window.open('/bahmni/appointments/#/home/manage/appointments/list');
         };
+
+        $scope.setBlock = function (timeInterval) {
+            if(timeInterval === "12:00 AM - 8:59 PM" || timeInterval === "12:00 AM - 08:59 PM"){
+                return "APP_BLOCK_1"
+            } else
+            if(timeInterval === "9:00 AM - 11:59 PM" || timeInterval === "09:00 AM - 11:59 PM"){
+                return "APP_BLOCK_2"
+            } else
+            if(timeInterval === "12:00 AM - 3:29 PM" || timeInterval === "12:00 AM - 03:29 PM" ){
+                return "APP_BLOCK_3"
+            } else {
+                return "APP_BLOCK_4"
+            }
+        }
     };
     return {
         restrict: 'E',
