@@ -19,14 +19,14 @@ Bahmni.Registration.customValidator = {
     },
     "FATHER_NAME" : {
         method: function (name, value, personAttributeDetails) {
-            var regexCharacters = '^[a-záàãâéèêẽíìóòõôúùçA-ZÁÀÃÂÉÈÊẼÍÌÓÒÔÕÚÙÇ ]+$';
+            var regexCharacters = "^[a-záàãâéèêẽíìóòõôúùçA-ZÁÀÃÂÉÈÊẼÍÌÓÒÔÕÚÙÇ ]+$";
             return value.match(regexCharacters);
         },
         errorMessage: "REGISTRATION_INVALID_FATHER_NAME_FIELD"
     },
     "MOTHER_NAME" : {
         method: function (name, value, personAttributeDetails) {
-            var regexCharacters = '^[a-záàãâéèêẽíìóòõôúùçA-ZÁÀÃÂÉÈÊẼÍÌÓÒÔÕÚÙÇ ]+$';
+            var regexCharacters = "^[a-záàãâéèêẽíìóòõôúùçA-ZÁÀÃÂÉÈÊẼÍÌÓÒÔÕÚÙÇ ]+$";
             return value.match(regexCharacters);
         },
         errorMessage: "REGISTRATION_INVALID_MOTHER_NAME_FIELD"
