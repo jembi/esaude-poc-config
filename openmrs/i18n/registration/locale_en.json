@@ -42,10 +42,5 @@
   "REGISTRATION_CONTACT_INFORMATION":"Contact Information",
   "REGISTRATION_INVALID_MOTHER_NAME_FIELD" : "MOTHER NAME should contain characters only",
   "REGISTRATION_INVALID_FATHER_NAME_FIELD" : "FATHER NAME should contain characters only.",
-  "REGISTRATION_INVALID_LATITUDE_FIELD" : "POVOADO/ALDEIA should not contain symbols",
-  "REGISTRATION_INVALID_ADDRESS3_FIELD" : "BLOCK should not contain symbols",
-  "REGISTRATION_INVALID_ADDRESS4_FIELD" : "AVENUE/STREET should not contain symbols",
-  "REGISTRATION_INVALID_ADDRESS5_FIELD" : "HOUSE NUMBER should not contain symbols",
-  "REGISTRATION_INVALID_ADDRESS6_FIELD" : "FLOOR/FLAT should not contain symbols",
-  "REGISTRATION_INVALID_POSTAL_CODE_FIELD" : "CLOSE OF should not contain symbols"
+  "REGISTRATION_INVALID_MIDDLE_NAME_FIELD" : "MIDDLE NAME should contain characters only"
 }

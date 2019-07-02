@@ -22,7 +22,6 @@
 	"PATIENT_OBS_INFORMATION_LOCALE_KEY":"Informação do paciente",
 	"NUTRITIONAL_VALUES_LOCALE_KEY":"Dados Antropométricos",
 	"REGISTRATION_PRINT_WITH_BARCODE":"Imprimir com <u>C</u>ódigo de Barras",
-
     "REGISTRATION_ADDITIONAL_INFO_KEY": "Informação Adicional ao Paciente",
 	"REGISTRATION_REFERENCE_INFO_KEY":"Confidente",
 	"REGISTRATION_TRANSFERENCE_INFO_KEY": "Proveniência",
@@ -43,10 +42,5 @@
 	"REGISTRATION_CONTACT_INFORMATION":"Contactos",
 	"REGISTRATION_INVALID_MOTHER_NAME_FIELD" : "NOME DA MÃE deve conter caracteres apenas",
 	"REGISTRATION_INVALID_FATHER_NAME_FIELD" : "NOME DO PAI deve conter caracteres apenas.",
-	"REGISTRATION_INVALID_LATITUDE_FIELD" : "POVOADO/ALDEIA não deve conter símbolos",
-	"REGISTRATION_INVALID_ADDRESS3_FIELD" : "QUARTEIRÃO não deve conter símbolos",
-	"REGISTRATION_INVALID_ADDRESS4_FIELD" : "AVENIDA/RUA não deve conter símbolos",
-	"REGISTRATION_INVALID_ADDRESS5_FIELD" : "Nº DA CASA não deve conter símbolos",
-	"REGISTRATION_INVALID_ADDRESS6_FIELD" : "ANDAR/FLAT não deve conter símbolos",
-	"REGISTRATION_INVALID_POSTAL_CODE_FIELD" : "PERTO DE não deve conter símbolos"
+	"REGISTRATION_INVALID_MIDDLE_NAME_FIELD": "NOME DO MEIO deve conter caracteres apenas."
 }
