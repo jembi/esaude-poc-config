@@ -25,12 +25,12 @@
                 "showCertainty":true,
                 "showOrder":true,
                 "showDetailsButton":true,
-                "displayOrder":1
+                "displayOrder":3
             },
             "allergies": {
                 "translationKey":"ALLERGIES_LIST_DISPLAY_CONTROL_TITLE",
                 "type": "allergiesList",
-                "displayOrder":1
+                "displayOrder":4
             },
             "navigationLinksControl":{
                 "translationKey":"DASHBOARD_TITLE_NAVIGATION_LINKS_CONTROL_KEY",
@@ -46,7 +46,7 @@
             "treatments":{
                 "translationKey":"DASHBOARD_TITLE_TREATMENTS_KEY",
                 "type":"treatment",
-                "displayOrder":5,
+                "displayOrder":7,
                 "dashboardConfig":{
                     "showFlowSheet":true,
                     "showListView":true,
@@ -90,13 +90,14 @@
                 "translationKey":"DASHBOARD_TITLE_NUTRITIONAL_VALUES_KEY",
                 "type":"vitals",
                 "isObservation":true,
-                "displayOrder":4,
+                "displayOrder":6,
                 "dashboardConfig":{
                     "conceptNames":[
                         "HEIGHT",
                         "Weight",
                         "BMI Data",
-                        "BMI Status Data"
+                        "BMI Status Data",
+                        "Brachial_perimeter_new"
                     ],
                     "showDetailsButton":true,
                     "numberOfVisits":2
@@ -106,10 +107,10 @@
                         "HEIGHT",
                         "Weight",
                         "BMI",
-                        "BMI STATUS"
+                        "BMI STATUS",
+                        "Brachial_perimeter_new"
                     ],
                     "numberOfVisits":2,
-                    "scope":"latest",
                     "showDetailsButton":true,
                     "pivotTable":{
 
@@ -120,7 +121,7 @@
                 "translationKey":"DASHBOARD_TITLE_VITALS_KEY",
                 "type":"vitals",
                 "isObservation":true,
-                "displayOrder":6,
+                "displayOrder":8,
                 "dashboardConfig":{
                     "showDetailsButton":true,
                     "conceptNames":[
@@ -163,7 +164,7 @@
                 "translationKey": "DASHBOARD_TITLE_WHO_STAGE",
                 "type": "vitals",
                 "isObservation": true,
-                "displayOrder": 4,
+                "displayOrder": 10,
                 "dashboardConfig": {
                     "conceptNames": [
                     "HTC, WHO Staging"
@@ -191,7 +192,7 @@
             "visits":{
                 "translationKey":"DASHBOARD_TITLE_VISITS_KEY",
                 "type":"visits",
-                "displayOrder":7,
+                "displayOrder":9,
                 "dashboardConfig":{
                     "title":null,
                     "maximumNoOfVisits":8,
@@ -240,7 +241,7 @@
 
             "formsDisplay": {
                 "type": "forms",
-                "displayOrder": 8,
+                "displayOrder": 12,
                 "dashboardConfig": {
                     "title": null,
                     "maximumNoOfVisits": 10
@@ -250,7 +251,7 @@
             },
             "patientAppointments": {
                 "type": "custom",
-                "displayOrder": 9,
+                "displayOrder": 11,
                 "config": {
                     "title": "DASHBOARD_TITLE_APPOINTMENTS_KEY",
                     "template": "<patient-appointments-dashboard section='config' patient='patient'></patient-appointments-dashboard>"
