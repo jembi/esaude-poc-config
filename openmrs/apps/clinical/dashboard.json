@@ -195,7 +195,7 @@
                 "displayOrder":9,
                 "dashboardConfig":{
                     "title":null,
-                    "maximumNoOfVisits":8,
+                    "maximumNoOfVisits":3,
                     "groupByVisits":true
                 }
             },
