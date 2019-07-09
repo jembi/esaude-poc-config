@@ -340,6 +340,17 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             }
         }
     },
+    "Gynecology/Obstetrics" (formName, formFieldValues, patient) {
+        if (patient.gender === "F") {
+            return {
+                showForm: ["Gynecology/Obstetrics"]
+            }
+        } else {
+            return {
+                hideForm: ["Gynecology/Obstetrics"]
+                }
+        }
+    },
     "Pregnancy_Yes_No" (formName, formFieldValues) {
         var pregValue = formFieldValues["Pregnancy_Yes_No"];
 
