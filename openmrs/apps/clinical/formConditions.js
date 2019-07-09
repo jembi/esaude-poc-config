@@ -74,25 +74,45 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
     if (dia === true) {
         return {
 
-            show: ["Received nutritional education"]
+            show: ["Received nutritional education", "Nutrition Supplement"]
         }
     } else {
         return {
-            hide: ["Received nutritional education"]
+            hide: ["Received nutritional education", "Nutrition Supplement"]
         }
     }
 },
-"STI Diagnosis_Prophylaxis" (formName, formFieldValues) {
-    var dia = formFieldValues["STI Diagnosis_Prophylaxis"];
+"Nutrition Supplement" (formName, formFieldValues) {
+    var dia = formFieldValues["Nutrition Supplement"];
 
-    if (dia === "Syndromic Approach") {
+    if (dia) {
         return {
 
-            show: ["Syndromic Approach_STI"]
+            show: ["Quantity of Nutritional Supplement", "SP_Measurement_Unit"]
         }
     } else {
         return {
-            hide: ["Syndromic Approach_STI"]
+            hide: ["Quantity of Nutritional Supplement", "SP_Measurement_Unit"]
+        }
+    }
+},
+"STI Diagnosis_Prophylaxis" (formName, formFieldValues, patient) {
+    var dia = formFieldValues["STI Diagnosis_Prophylaxis"];
+    console.log(dia);
+
+    if (dia === "Syndromic Approach" && patient.gender == "M") {
+        return {
+
+            show: ["Syndromic Approach_STI_M"]
+        }
+    } else if (dia === "Syndromic Approach" && patient.gender == "F"){
+        return {
+            show: ["Syndromic Approach_STI_F"]
+        }
+    }
+    else {
+        return {
+            hide:["Syndromic Approach_STI_M", "Syndromic Approach_STI_F"]
         }
     }
 },
@@ -373,5 +393,32 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
                 hide: ["Number of Alive Babies Born", "Number of Still Babies Born"]
             }
         }
+    },
+    "Nutrition_Prophylaxis" (formName, formFieldValues, patient) {
+        if (patient.age < 5) {
+            return {
+                show: ["Infants Odema_Prophylaxis"]
+            }
+        } else {
+            return {
+                hide: ["Infants Odema_Prophylaxis"]
+            }
+        }
+        
+    },
+    "SP_Side_Effects" (formName, formFieldValues, patient) {
+        var answer = formFieldValues["SP_Side_Effects"];
+
+        if (answer) {
+            return {
+                show: ["SP_Side_Effects_Text"]
+            }
+        } else {
+            return {
+                hide: ["SP_Side_Effects_Text"]
+            }
+        }
+        
     }
+
 };
