@@ -104,16 +104,14 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
 
             show: ["Syndromic Approach_STI_M"]
         }
-    } 
-    if (dia === "Syndromic Approach" && patient.gender === "F"){
+    } else if (dia === "Syndromic Approach" && patient.gender === "F"){
         return {
             show: ["Syndromic Approach_STI_F"]
         }
     }
-    else {
-        return {
-            hide:["Syndromic Approach_STI_M", "Syndromic Approach_STI_F"]
-        }
+
+    return {
+        hide:["Syndromic Approach_STI_M", "Syndromic Approach_STI_F"]
     }
 },
 "Type_Prophylaxis" (formName, formFieldValues) {
