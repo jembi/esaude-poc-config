@@ -98,20 +98,24 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
 },
 "STI Diagnosis_Prophylaxis" (formName, formFieldValues, patient) {
     var dia = formFieldValues["STI Diagnosis_Prophylaxis"];
+    var returnShowValue = [];
+    var returnHideValue = [];
 
     if (dia === "Syndromic Approach" && patient.gender === "M") {
-        return {
-
-            show: ["Syndromic Approach_STI_M"]
-        }
+            returnShowValue.push("Syndromic Approach_STI_M");
+            returnHideValue.push("Syndromic Approach_STI_F");
+        
     } else if (dia === "Syndromic Approach" && patient.gender === "F"){
-        return {
-            show: ["Syndromic Approach_STI_F"]
-        }
+            returnShowValue.push("Syndromic Approach_STI_F");
+            returnHideValue.push("Syndromic Approach_STI_M");
     }
-
+    else {
+        returnHideValue.push("Syndromic Approach_STI_M", "Syndromic Approach_STI_F");
+    }
     return {
-        hide:["Syndromic Approach_STI_M", "Syndromic Approach_STI_F"]
+
+            show: returnShowValue,
+            hide: returnHideValue
     }
 },
 "Type_Prophylaxis" (formName, formFieldValues) {
