@@ -101,21 +101,21 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
     var returnShowValue = [];
     var returnHideValue = [];
 
-    if (dia === "Syndromic Approach" && patient.gender === "M") {
-            returnShowValue.push("Syndromic Approach_STI_M");
-            returnHideValue.push("Syndromic Approach_STI_F");
-        
-    } else if (dia === "Syndromic Approach" && patient.gender === "F"){
-            returnShowValue.push("Syndromic Approach_STI_F");
-            returnHideValue.push("Syndromic Approach_STI_M");
-    }
-    else {
-        returnHideValue.push("Syndromic Approach_STI_M", "Syndromic Approach_STI_F");
-    }
-    return {
+    if (dia === "Syndromic Approach") {
+        if (patient.gender === "M") {
+            return {
 
-            show: returnShowValue,
-            hide: returnHideValue
+                show: ["Syndromic Approach_STI_M"]
+            }
+        } else {
+            return {
+                show: ["Syndromic Approach_STI_F"]
+            }
+        }
+    } else {
+        return {
+            hide:["Syndromic Approach_STI_M", "Syndromic Approach_STI_F"]
+        }
     }
 },
 "Type_Prophylaxis" (formName, formFieldValues) {
