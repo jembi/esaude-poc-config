@@ -81,7 +81,7 @@
         "visitTypeForRetrospectiveEntries": "Special OPD",
         "maxConceptSetLevels": 3,
         "allowOnlyCodedDiagnosis": false,
-        "clinicalProviderForms": ["Clinical_Observation_form", "Group V-Screening / Prophylaxis", "Group_Priority_Population_obs_form", "Group IV-Anamneses", "Group_VIII_Conduct_obs_form", "Reference_Form","CONFIDENT_FORM","DI_Death Information Form" ],
+        "clinicalProviderForms": ["Clinical_Observation_form", "Group V-Screening / Prophylaxis", "Group_Priority_Population_obs_form", "Group IV-Anamneses", "Group_VIII_Family_Planning_obs_form", "Reference_Form","CONFIDENT_FORM","DI_Death Information Form" ],
         "APSSProviderForms": ["Group_Priority_Population_obs_form", "Reference_Form", "Apss_obs_form"],
         "conceptSetUI": {
             "Chief Complaint Data": {
@@ -113,6 +113,9 @@
             },
             "Brachial_perimeter_new": {
                   "disableAddNotes": true
+            },
+            "BMI": {
+            "disableAddNotes": true
             },
             "Nutritional_States_new": {
 
@@ -401,37 +404,34 @@
             "Reference_Eligible": {
                 "disableAddNotes": true
             },
-            "Conduct_Family_planning": {
+            "Family_Planning_Contraceptive_Methods_PRES_Condom_button": {
                 "disableAddNotes": true
             },
-            "Conduct_Contraceptive_Methods_PRES_Condom_button": {
+            "Family_Planning_Contraceptive_Methods_PIL_Oral_Contraceptive_button": {
                 "disableAddNotes": true
             },
-            "Conduct_Contraceptive_Methods_PIL_Oral_Contraceptive_button": {
+            "Family_Planning_Contraceptive_Methods_INJ_Injection_button": {
                 "disableAddNotes": true
             },
-            "Conduct_Contraceptive_Methods_INJ_Injection_button": {
+            "Family_Planning_Contraceptive_Methods_IMP_Implant_button": {
                 "disableAddNotes": true
             },
-            "Conduct_Contraceptive_Methods_IMP_Implant_button": {
+            "Family_Planning_Contraceptive_Methods_DIU_Intra_button": {
                 "disableAddNotes": true
             },
-            "Conduct_Contraceptive_Methods_DIU_Intra_button": {
+            "Family_Planning_Contraceptive_Methods_Uterine_device_button": {
                 "disableAddNotes": true
             },
-            "Conduct_Contraceptive_Methods_Uterine_device_button": {
+            "Family_Planning_Contraceptive_Methods_LT_Tubal_Ligation_button": {
                 "disableAddNotes": true
             },
-            "Conduct_Contraceptive_Methods_LT_Tubal_Ligation_button": {
+            "Family_Planning_Contraceptive_Methods_VAS_Vasectomy_button": {
                 "disableAddNotes": true
             },
-            "Conduct_Contraceptive_Methods_VAS_Vasectomy_button": {
+            "Family_Planning_Contraceptive_Methods_MAL_Lactational_Amenorrhea_Method_button": {
                 "disableAddNotes": true
             },
-            "Conduct_Contraceptive_Methods_MAL_Lactational_Amenorrhea_Method_button": {
-                "disableAddNotes": true
-            },
-            "Conduct_Contraceptive_Methods_OUT_Other_button": {
+            "Family_Planning_Contraceptive_Methods_OUT_Other_button": {
                 "disableAddNotes": true
             },
             "CONFIDENT_NAME": {
@@ -442,6 +442,10 @@
              },
              "CONFIDENT_AGE": {
                 "disableAddNotes": true
+             },
+             "CONFIDENT_AGE_TYPE": {
+                "disableAddNotes": true,
+                "dropdown": true
              },
              "CONFIDENT_RELATIONSHIP": {
                 "disableAddNotes": true,
@@ -550,6 +554,15 @@
             "Apss_Adherence_follow_up_Who_administers_Relationship": {
                   "disableAddNotes": true
             },
+            "Apss_Adherence_follow_up_Adherence_Plan": {
+                "disableAddNotes": true
+            },
+            "Apss_Adherence_follow_up_Side_Effects": {
+                "disableAddNotes": true
+            },
+            "Apss_Adherence_follow_up_Adherence_TARV": {
+                "disableAddNotes": true
+            },
             "Apss_Support_Groups_Disclosed_Children": {
                   "disableAddNotes": true
             },
@@ -617,7 +630,7 @@
             "Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact": {
                   "disableAddNotes": true,
                   "multiSelect" : true
-            },            
+            },
             "defaults": {
                 "Number of living children": 1,
                 "Accepted Family Planning methods": [
