@@ -101,8 +101,7 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
     var returnShowValue = [];
     var returnHideValue = [];
     
-
-        if (dia.includes("INH")) {
+    if (dia === "INH") {
 
             returnShowValue.push("INH_Details");
 
@@ -110,7 +109,7 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             returnHideValue.push("INH_Details");
 
         }
-        if (dia.includes("CTZ")) {
+        if (dia === "CTZ") {
 
             returnShowValue.push("CTZ_Details");
 
@@ -118,7 +117,7 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             returnHideValue.push("CTZ_Details");
 
         }
-        if (dia.includes("Fluconazol")) {
+        if (dia ==="Fluconazol") {
 
             returnShowValue.push("Fluconazol_Details");
 
@@ -136,24 +135,28 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
     
     
 },
-"Conduct_Family_planning" (formName, formFieldValues) {
-        var yes = formFieldValues["Conduct_Family_planning"];
-        if (yes ===  "Conduct_Family_planning_Yes") {
-            return {
-                show: ["Conduct_Contraceptive_Methods_PRES_Condom_button","Conduct_Contraceptive_Methods_PIL_Oral_Contraceptive_button",
-"Conduct_Contraceptive_Methods_INJ_Injection_button","Conduct_Contraceptive_Methods_IMP_Implant_button","Conduct_Contraceptive_Methods_DIU_Intra_button",
-"Conduct_Contraceptive_Methods_Uterine_device_button","Conduct_Contraceptive_Methods_LT_Tubal_Ligation_button","Conduct_Contraceptive_Methods_VAS_Vasectomy_button",
-"Conduct_Contraceptive_Methods_MAL_Lactational_Amenorrhea_Method_button","Conduct_Contraceptive_Methods_OUT_Other_button"]
-            }
-        } else {
-            return {
-                hide: ["Conduct_Contraceptive_Methods_PRES_Condom_button","Conduct_Contraceptive_Methods_PIL_Oral_Contraceptive_button",
-"Conduct_Contraceptive_Methods_INJ_Injection_button","Conduct_Contraceptive_Methods_IMP_Implant_button","Conduct_Contraceptive_Methods_DIU_Intra_button",
-"Conduct_Contraceptive_Methods_Uterine_device_button","Conduct_Contraceptive_Methods_LT_Tubal_Ligation_button","Conduct_Contraceptive_Methods_VAS_Vasectomy_button",
-"Conduct_Contraceptive_Methods_MAL_Lactational_Amenorrhea_Method_button","Conduct_Contraceptive_Methods_OUT_Other_button"]
-            }
+"Family_Planning_Methods" (formName, formFieldValues, patient) {
+    
+    if (patient.gender === "M") {
+        return {
+            show: ["Family_Planning_Contraceptive_Methods_PRES_Condom_button", "Family_Planning_Contraceptive_Methods_VAS_Vasectomy_button",
+                "Family_Planning_Contraceptive_Methods_OUT_Other_button"],
+            hide: ["Family_Planning_Contraceptive_Methods_INJ_Injection_button", "Family_Planning_Contraceptive_Methods_IMP_Implant_button",
+                "Family_Planning_Contraceptive_Methods_DIU_Intra_button", "Family_Planning_Contraceptive_Methods_Uterine_device_button",
+                "Family_Planning_Contraceptive_Methods_LT_Tubal_Ligation_button","Family_Planning_Contraceptive_Methods_PIL_Oral_Contraceptive_button", "Family_Planning_Contraceptive_Methods_MAL_Lactational_Amenorrhea_Method_button"]
         }
-     },
+    }
+    else {
+        return {
+            show: ["Family_Planning_Contraceptive_Methods_PIL_Oral_Contraceptive_button",
+                "Family_Planning_Contraceptive_Methods_INJ_Injection_button", "Family_Planning_Contraceptive_Methods_IMP_Implant_button",
+                "Family_Planning_Contraceptive_Methods_DIU_Intra_button", "Family_Planning_Contraceptive_Methods_Uterine_device_button",
+                "Family_Planning_Contraceptive_Methods_LT_Tubal_Ligation_button", "Family_Planning_Contraceptive_Methods_MAL_Lactational_Amenorrhea_Method_button"],
+            hide: ["Family_Planning_Contraceptive_Methods_VAS_Vasectomy_button"]
+        }
+    }
+},
+
     "PP_Key_population" (formName, formFieldValues) {
         var dia = formFieldValues["PP_Key_population"];
         if (dia === "PP_Key_population_Yes") {
@@ -175,6 +178,126 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
         } else {
             return {
                 hide: ["PP_IF_Vulnerable_Population_Yes"]
+            }
+        }
+    },
+     "Apss_Pre_TARV_counselling" (formName, formFieldValues) {
+        var yes = formFieldValues["Apss_Pre_TARV_counselling"];
+        if (yes === "Apss_Pre_TARV_counselling_Yes") {
+            return {
+                show: ["Apss_Pre_TARV_counselling_comments"]
+            }
+        } else {
+            return {
+                hide: ["Apss_Pre_TARV_counselling_comments"]
+            }
+        }
+    },
+    "Apss_Psychosocial_factors_affecting_adherence" (formName, formFieldValues) {
+        var yes = formFieldValues["Apss_Psychosocial_factors_affecting_adherence"];
+        if (yes === "Apss_Psychosocial_factors_affecting_adherence_Yes") {
+            return {
+                show: ["Apss_Psychosocial_factors_Reasons"]
+            }
+        } else {
+            return {
+                hide: ["Apss_Psychosocial_factors_Reasons"]
+            }
+        }
+    },
+    "Apss_Adherence_follow_up_Has_informed_someone" (formName, formFieldValues) {
+        var yes = formFieldValues["Apss_Adherence_follow_up_Has_informed_someone"];
+        if (yes === "Apss_Adherence_follow_up_Has_informed_someone_Yes") {
+            return {
+                show: ["Apss_Adherence_follow_up_Has_informed_Full_Name","Apss_Adherence_follow_up_Has_informed_Relationship"]
+            }
+        } else {
+            return {
+                hide: ["Apss_Adherence_follow_up_Has_informed_Full_Name","Apss_Adherence_follow_up_Has_informed_Relationship"]
+            }
+        }
+    },
+    "Apss_Adherence_follow_up_Who_administers_ARV" (formName, formFieldValues) {
+        var yes = formFieldValues["Apss_Adherence_follow_up_Who_administers_ARV"];
+        if (yes === "Apss_Adherence_follow_up_Who_administers_ARV_Yes") {
+            return {
+                show: ["Apss_Adherence_follow_up_Who_administers_Full_Name","Apss_Adherence_follow_up_Who_administers_Relationship"]
+            }
+        } else {
+            return {
+                hide: ["Apss_Adherence_follow_up_Who_administers_Full_Name","Apss_Adherence_follow_up_Who_administers_Relationship"]
+            }
+        }
+    },
+    "Apss_Support_Groups_Other" (formName, formFieldValues) {
+        var yes = formFieldValues["Apss_Support_Groups_Other"];
+        if (yes === "Apss_Support_Groups_Start")   {
+            return {
+                show: ["Apss_Support_Groups_Specify_group"]
+            }
+        }  else if (yes === "Apss_Support_Groups_In_Progress") {
+
+            return {
+                show: ["Apss_Support_Groups_Specify_group"]
+            }
+        } 
+         else if (yes === "Apss_Support_Groups_End") {
+
+            return {
+                show: ["Apss_Support_Groups_Specify_group"]
+            }
+        }
+         else {
+            return {
+                hide: ["Apss_Support_Groups_Specify_group"]
+            }
+        }
+    },
+    "Apss_Differentiated_Models_Other" (formName, formFieldValues) {
+        var yes = formFieldValues["Apss_Differentiated_Models_Other"];
+        if (yes === "Apss_Differentiated_Models_Start")   {
+            return {
+                show: ["Apss_Differentiated_Models_Specify Model"]
+            }
+        }  else if (yes === "Apss_Differentiated_Models_In_Progress") {
+
+            return {
+                show: ["Apss_Differentiated_Models_Specify Model"]
+            }
+        } 
+         else if (yes === "Apss_Differentiated_Models_End") {
+
+            return {
+                show: ["Apss_Differentiated_Models_Specify Model"]
+            }
+        }
+         else {
+            return {
+                hide: ["Apss_Differentiated_Models_Specify Model"]
+            }
+        }
+    },
+    "Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted" (formName, formFieldValues) {
+        var yes = formFieldValues["Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted"];
+        if (yes === "Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted_Yes")  {
+            return {
+                show: ["Apss_Agreement_Terms_Type_Contact"]
+            }
+        } else {
+            return {
+                hide: ["Apss_Agreement_Terms_Type_Contact"]
+            }
+        }
+    },
+    "Apss_Agreement_Terms_Confidant_agrees_contacted" (formName, formFieldValues) {
+        var yes = formFieldValues["Apss_Agreement_Terms_Confidant_agrees_contacted"];
+        if (yes === "Apss_Agreement_Terms_Confidant_agrees_contacted_Yes")  {
+            return {
+                show: ["Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact"]
+            }
+        } else {
+            return {
+                hide: ["Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact"]
             }
         }
     },
@@ -214,6 +337,92 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
         } else {
             return {
                 hide: ["Reference_GA","Reference_AF","Reference_CA","Reference_PU","Reference_FR","Reference_DT","Reference_DC","Reference_MDC_Other"]
+            }
+        }
+    },
+    "Pregnancy_Yes_No" (formName, formFieldValues) {
+        var pregValue = formFieldValues["Pregnancy_Yes_No"];
+
+        if (pregValue === "Pregnancy_Yes") {
+            return {
+                show: ["Probable delivery date"]
+            }
+        } else {
+            return {
+                hide: ["Probable delivery date"]
+
+            }
+        }
+    },
+    "Date of Delivery" (formName, formFieldValues) {
+        var delivValue = formFieldValues["Date of Delivery"];
+
+        if (delivValue) {
+            return {
+                show: ["Number of Alive Babies Born", "Number of Still Babies Born"]
+            }
+        } else {
+            return {
+                hide: ["Number of Alive Babies Born", "Number of Still Babies Born"]
+            }
+        }
+    },
+    "CONFIDENT_HIV_TEST" (formName, formFieldValues) {
+        var value = formFieldValues["CONFIDENT_HIV_TEST"];
+
+        if (value === "CONFIDENT_HIV_POSITIVE") {
+            return {
+                show: ["CONFIDENT_HIV_CARE"]
+            }
+        } else {
+            return {
+                hide: ["CONFIDENT_HIV_CARE"]
+            }
+        }
+    },
+    "Gynecology/Obstetrics" (formName, formFieldValues, patient) {
+        if (patient.gender === "F") {
+            return {
+                show: ["Gynecology/Obstetrics"],
+            }
+        } else {
+            return {
+                hide: ["Gynecology/Obstetrics"],
+            }
+        }
+    },
+    "CONFIDENT_AGE_TYPE" (formName, formFieldValues) {
+        var ageType = formFieldValues["CONFIDENT_AGE_TYPE"];
+        var ageVal = formFieldValues["CONFIDENT_AGE"];
+        
+        if ((ageType != "Anos") && (ageType != "Years") && (ageType != "Meses") && (ageType != "Months")) {
+            return {
+                hide: ["CONFIDENT_CCR"]
+            }
+        }
+
+        if ((ageType === "Anos") || (ageType === "Years")) {
+            if (ageVal < 5) {
+                return {
+                    show: ["CONFIDENT_CCR"]
+                }
+            } else {
+                return {
+                    hide: ["CONFIDENT_CCR"]
+                }
+            }
+
+        }
+
+        if ((ageType === "Meses") || (ageType === "Months")) {
+            if (ageVal < 60) {
+                return {
+                    show: ["CONFIDENT_CCR"]
+                }
+            } else {
+                return {
+                    hide: ["CONFIDENT_CCR"]
+                }
             }
         }
     }
