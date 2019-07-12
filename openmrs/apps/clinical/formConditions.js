@@ -414,22 +414,20 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             }
         }
         
-    }
-
-};
-    "CONFIDENT_HIV_TEST" (formName, formFieldValues) {
-        var value = formFieldValues["CONFIDENT_HIV_TEST"];
-
-        if (value === "CONFIDENT_HIV_POSITIVE") {
-            return {
-                show: ["CONFIDENT_HIV_CARE"]
-            }
-        } else {
-            return {
-                hide: ["CONFIDENT_HIV_CARE"]
-            }
-        }
     },
+    "CONFIDENT_HIV_TEST" (formName, formFieldValues) {
+            var value = formFieldValues["CONFIDENT_HIV_TEST"];
+
+            if (value === "CONFIDENT_HIV_POSITIVE") {
+                return {
+                    show: ["CONFIDENT_HIV_CARE"]
+                }
+            } else {
+                return {
+                    hide: ["CONFIDENT_HIV_CARE"]
+                }
+            }
+        },
     "CONFIDENT_FAMILY_SITUATION" (formName, formFieldValues, patient) {
         var value = patient.age;
 
@@ -453,5 +451,5 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
                 hide: ["Gynecology/Obstetrics"],
             }
         }
-    },
+    }
 };
