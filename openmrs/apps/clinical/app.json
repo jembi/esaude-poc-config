@@ -264,7 +264,7 @@
                 "disableAddNotes": true
             },
             "SP_Treatment End Date": {
-                "disableAddNotes": true
+                "disableAddNotes": false
             },
             "End Date": {
                 "disableAddNotes": true
