@@ -19,15 +19,14 @@ select distinct
    personAttributesonRegistration.value as "Contacto",
    paddress.state_province as "Província",
    paddress.city_village AS "Distrito",
-   paddress.address1 AS "Localidade/Bairro",
+   paddress.address1 AS "Localidade / Bairro",
    paddress.address3 AS "Quarteirão",
-   paddress.address4 AS "Avenida/Rua",
+   paddress.address4 AS "Avenida / Rua",
    paddress.address5 AS "Nº da Casa",
    paddress.postal_code AS "Perto De",
-   " " as "Treatment Line", 
+   " " as "Treatment Line",
    cast(o.value_numeric as char)as "Value of the last Result of Viral Load",
-   cast(o.date_created as date) as "Date of the last Result of Viral Load"
-   
+   cast(o.date_created as date) as "Date of the last Result of Viral Load" 
 from
    person p 
    inner join
@@ -59,16 +58,32 @@ from
       person_attribute_type pat 
       on pa.person_attribute_type_id = pat.person_attribute_type_id 
       and personAttributeTypeonRegistration.name = 'PRIMARY_CONTACT_NUMBER_1' 
-   Inner Join 
+   Inner Join
       obs o 
-      on o.person_id=p.person_id and o.voided=0
-       
-   Inner JOIN (select max(o.obs_id) as obs_id
-from person p Inner Join obs o on o.person_id=p.person_id and o.voided=0
-   Inner Join concept_view cv on o.concept_id=cv.concept_id and cv.retired=0 
-   and cv.concept_full_name = 'LO_ViralLoad' and o.value_numeric > 1000 
-   and cast(o.date_created as date) <= '#endDate#'
-   group by p.person_id) as Viralload on Viralload.obs_id=o.obs_id 
+      on o.person_id = p.person_id
+      and o.voided = 0
+   Inner JOIN
+      (
+         select
+            max(o.obs_id) as obs_id
+         from
+            person p
+            Inner Join
+               obs o
+               on o.person_id = p.person_id
+               and o.voided = 0
+            Inner Join
+               concept_view cv
+               on o.concept_id = cv.concept_id
+               and cv.retired = 0
+               and cv.concept_full_name = 'LO_ViralLoad'
+               and o.value_numeric > 1000
+               and cast(o.date_created as date) <= '#endDate#'
+         group by
+            p.person_id
+      )
+      as Viralload
+      on Viralload.obs_id = o.obs_id
    LEFT OUTER JOIN
       person_address paddress 
       ON p.person_id = paddress.person_id 
