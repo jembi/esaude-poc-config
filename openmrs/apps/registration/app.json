@@ -60,7 +60,8 @@
                     "class": "General",
                     "TEST_RESULT": "Positive",
                     "PATIENT_STATUS": "Pre TARV",
-                    "landHolding": 2
+                    "landHolding": 2,
+                    "PATIENT_ACTIVE_STATE": "ACTIVE"
                 }
             },
             "addressHierarchy": {
