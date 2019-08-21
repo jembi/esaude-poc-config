@@ -5,15 +5,15 @@ select distinct
       when
          p.gender = 'M' 
       then
-         'Male' 
+         'Masculino' 
       when
          p.gender = 'F' 
       then
-         'Female' 
+         'Feminino' 
       when
          p.gender = 'O' 
       then
-         'Other' 
+         'Outro' 
    end
    as "Sexo", TIMESTAMPDIFF( YEAR, p.birthdate, CURDATE() ) as "Idade",
    personAttributesonRegistration.value as "Contacto",
@@ -24,9 +24,9 @@ select distinct
    paddress.address4 AS "Avenida / Rua",
    paddress.address5 AS "Nº da Casa",
    paddress.postal_code AS "Perto De",
-   " " as "Treatment Line",
-   cast(o.value_numeric as char)as "Value of the last Result of Viral Load",
-   cast(o.date_created as date) as "Date of the last Result of Viral Load" 
+   treatment_line.concept_full_name as "Última Linha de Tratamento",
+   cast(o.value_numeric as char)as "Valor do Resultado da última Carga Viral",
+   cast(o.date_created as date) as "Data do Resultado da Carga Viral" 
 from
    person p 
    inner join
@@ -61,7 +61,7 @@ from
    Inner Join
       obs o 
       on o.person_id = p.person_id
-      and o.voided = 0
+      and o.voided = 0        
    Inner JOIN
       (
          select
@@ -84,6 +84,15 @@ from
       )
       as Viralload
       on Viralload.obs_id = o.obs_id
+   Inner join orders 
+      on orders.patient_id=p.person_id
+   Inner join drug_order
+      on drug_order.order_id=orders.order_id
+   Inner join drug_order_relationship dor
+      on drug_order.order_id=dor.drug_order_id
+      and cast(dor.date_created as date) <= '#endDate#'
+   Inner join concept_view  treatment_line
+      on treatment_line.concept_id = dor.treatment_line_id
    LEFT OUTER JOIN
       person_address paddress 
       ON p.person_id = paddress.person_id 
