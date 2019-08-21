@@ -1,52 +1,61 @@
 select
-   patient_identity.identity_data  as "NID",
-   CONCAT( person.first_name, ' ', COALESCE( person.middle_name, '' ), ' ', COALESCE( person.last_name, '' ) )as "Nome Completo ",
+   pi.identity_data  as "NID",
+   CONCAT( p.first_name, ' ', COALESCE( p.middle_name, '' ), ' ', COALESCE( p.last_name, '' ) )as "Nome Completo ",
    case
       when
-         patient.gender = 'M' 
+         pt.gender = 'M' 
       then
-         'Male' 
+         'Masculino' 
       when
-         patient.gender = 'F' 
+         pt.gender = 'F' 
       then
-         'Female' 
+         'Feminino' 
       when
-         patient.gender = 'O' 
+         pt.gender = 'O' 
       then
-         'Other' 
+         'Outro' 
    end
    as "Sexo",
-   date_part('year',AGE(patient.birth_date)) as "Idade",
-   person.Cell_phone AS "Contacto Principal",
-   concat(GetProvince(person.id),' ',COALESCE(GetDistrict(person.id))) as "Morada(Província,Distrito)"
- 
-from
-         person
+   date_part('year',AGE(pt.birth_date)) as "Idade",
+   p.Cell_phone AS "Contacto Principal",
+   string_agg(DISTINCT(case when ap.part_name = 'level6' then pa.value end), ' ') as "Província",
+   string_agg(DISTINCT(case when ap.part_name = 'level2' then pa.value end), ' ') as "Distrito"
+   -- string_agg(DISTINCT(case when ap.part_name = 'level3' then pa.value end), ' ') as "Administrativa",
+   -- string_agg(DISTINCT(case when ap.part_name = 'level1' then pa.value end), ' ') as "Localidade/Bairro",
+   -- string_agg(DISTINCT(case when ap.part_name = 'level4' then pa.value end), ' ') as "Quarteirão" 
+   from
+         person p
          inner join 
-         patient 
-            on person.id=patient.person_id
+         patient pt
+            on p.id=pt.person_id
          inner join
-            sample_human 
-            on patient.id = sample_human.patient_id 
+            sample_human sh
+            on pt.id = sh.patient_id 
          inner join
-            patient_identity 
-            on patient_identity.patient_id = patient.id
+            patient_identity pi
+            on pi.patient_id = pt.id
         inner join 
-            patient_identity_type 
-            on (patient_identity.identity_type_id = patient_identity_type.id 
-            and patient_identity_type.identity_type = 'ST')
+            patient_identity_type pit
+            on (pi.identity_type_id = pit.id 
+            and pit.identity_type = 'ST')
          inner join
-            sample 
-            on sample.id = sample_human.samp_id 
-            and sample.accession_number != '' 
-           
+            sample s
+            on s.id = sh.samp_id 
+            and s.accession_number is not null
+            and cast(s.entered_date as date) BETWEEN '#startDate#' and '#endDate#'
          inner join
-            sample_item 
-            on sample.id = sample_item.samp_id 
+            person_address pa
+            on p.id = pa.person_id
          inner join
-            analysis 
-            on analysis.sampitem_id = sample_item.id 
-           
+            address_part ap
+            on pa.address_part_id=ap.id
+         inner join
+            sample_item si
+            on s.id = si.samp_id 
+         inner join
+            analysis a
+            on a.sampitem_id = si.id 
+            
    left join
       (
          select
@@ -55,7 +64,8 @@ from
             result 
       )
       as result2 
-      on analysis.id = result2.rstID 
+      on a.id = result2.rstID 
 where
-   result2.rstId is null;
+   result2.rstId is null
    
+   group by pa.person_id,p.id,pi.id,pt.id,sh.patient_id,a.sampitem_id,si.id,s.id;
