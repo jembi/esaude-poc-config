@@ -87,10 +87,10 @@ from
          and orders.encounter_id=e.encounter_id and o.order_id=orders.order_id
    inner join order_type ot
          on ot.order_type_id=orders.order_type_id 
-   inner join drug_order do
-         on do.order_id=orders.order_id
+   inner join drug_order
+         on drug_order.order_id=orders.order_id
    inner join drug_order_relationship dor
-         on do.order_id=dor.drug_order_id
+         on drug_order.order_id=dor.drug_order_id
          and cast(dor.date_created as date) BETWEEN '#startDate#' and '#endDate#'  
    inner join concept_view  treatment_category
          on treatment_category.concept_id = dor.category_id
