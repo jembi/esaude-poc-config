@@ -219,4 +219,58 @@ angular.module('bahmni.common.displaycontrol.custom')
         },
         template: '<ng-include src="contentUrl"/>'
     };
-}]);
+}]).directive('positivePreventionDashboard', ['observationsService', 'appService', 'spinner', function (observationsService, appService, spinner) {
+    var link = function ($scope) {
+        var patientUuid = $scope.patient.uuid;
+        var conceptNames = $scope.section.conceptNames;
+        var scope = undefined;
+        var numberOfVisits = $scope.section.numberOfVisits;
+        var visitUuid = undefined;
+        var obsIgnoreList = undefined;
+        var filterObsWithOrders = undefined;
+        var patientProgramUuid = undefined;
+
+        $scope.contentUrl = appService.configBaseUrl() + "/customDisplayControl/views/positivePreventionDashboard.html";
+        spinner.forPromise(observationsService.fetch(patientUuid, conceptNames, scope, 0, visitUuid, obsIgnoreList, filterObsWithOrders, patientProgramUuid).then(function (response) {
+            var apiVisits = 0;
+            
+            $scope.observations = response.data;
+            if($scope.section.conceptsWithYes.length > 0){
+                $scope.section.visitDomId = [];
+                $scope.section.visitDateTime = [];
+                $scope.section.conceptsWithYes = [];
+            }
+            $scope.observations.forEach(observation => {
+                var groupMembersWithYes = [];
+
+                observation.groupMembers.forEach(member => {
+                    if(member.value.name.endsWith('_Yes')){
+                        groupMembersWithYes.push(member.conceptNameToDisplay);
+                    }
+                })
+                
+                if(groupMembersWithYes.length > 0){
+                    $scope.section.visitDomId.push(apiVisits);
+                    $scope.section.visitDateTime.push(observation.observationDateTime);
+                    $scope.section.conceptsWithYes.push(groupMembersWithYes);
+                    apiVisits += 1;
+                }
+            });
+        }));
+    };
+
+    return {
+        restrict: 'E',
+        link: link,
+        scope: {
+            patient: "=",
+            section: "="
+        },
+        template: '<ng-include src="contentUrl"/>'
+    }
+}]).controller('PositivePreventionDetailsController', ['$scope',function ($scope) {
+    //$scope.config = $scope.ngDialogData.section ? $scope.ngDialogData.section.expandedViewConfig : {};    
+    $scope.title = $scope.ngDialogData.title;
+    $scope.visitsList = $scope.ngDialogData.visitDateTime;
+    $scope.conceptsWithYes = $scope.ngDialogData.conceptsWithYes;
+}]);;
