@@ -25,11 +25,16 @@ select distinct
    paddress.address5 AS "Nº da Casa",
    paddress.postal_code AS "Perto De",
    " " as "Estado Paciente",
-   max(cast(o.date_created as date)) as "Data Último Levantamento",
-   max(cast(pappointment.start_date_time as date)) as "Data Último Levantamento Perdido"
-   
+    max(cast(pappointment.start_date_time as date)) as "Data Último Levantamento Perdido",
+    (select max(cast(obs.date_created as date)) from obs
+    inner join orders on orders.order_id=obs.order_id
+    inner join order_type on orders.order_type_id= order_type.order_type_id
+    and order_type.name = 'Drug Order'
+    where obs.person_id=p.person_id
+    group by person_id ) as "Data Último Levantamento"
+
 from
-   person p 
+   person p
    inner join
       person_name pn 
       on pn.person_id = p.person_id 
@@ -73,26 +78,25 @@ from
         on pappointment.patient_id=pt.patient_id
         and pappointment.voided = 0
         and cast(pappointment.start_date_time as date) BETWEEN '#startDate#' and '#endDate#'
-    left join
+    inner join
         appointment_service aservice
         on aservice.appointment_service_id = pappointment.appointment_service_id
         and aservice.name = 'Farmácia' 
         and pappointment.status <> 'CheckedIn'
         and pappointment.status <> 'Completed'
-        and pappointment.status <> 'Scheduled'
+        and ((pappointment.status = 'Scheduled' and cast(pappointment.start_date_time as date) < CURDATE()) or pappointment.status <> 'Scheduled' )
         and aservice.voided = 0
-        and aservice.appointment_service_id is null
-    INNER JOIN
-      obs o
-      on p.person_id=o.person_id 
-      and o.voided = 0
     inner join
-        concept con
-        on con.concept_id = o.concept_id
-        and con.retired=0
+        orders
+        on orders.patient_id=pt.patient_id
     inner join
-        concept_name conname
-        on con.concept_id=conname.concept_id
-        and conname.name = 'Dispensed'
-        and conname.voided = 0
-         group by o.person_id;
+        order_type
+        on orders.order_type_id= order_type.order_type_id
+        and order_type.name = 'Drug Order'
+    left JOIN
+        obs o
+        on orders.order_id=o.order_id
+        and o.voided = 0
+        where o.order_id is null
+        group by pappointment.patient_id
+        ;
