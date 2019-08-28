@@ -25,8 +25,8 @@ SELECT DISTINCT
   paddress.address5 AS "Nº da Casa",
   paddress.postal_code AS "Perto De",
   cn.name AS "Estado do Paciente",
-  CAST(pap.start_date_time AS DATE) AS "Data da Última Consulta",
-  CAST(papp.end_date_time AS DATE) AS "Data da Última Consulta Clínica Perdida"
+  papResult1.start_date_time AS "Data da Última Consulta",
+  papResult2.end_date_time AS "Data da Última Consulta Clínica Perdida"
 FROM
     person p
       INNER JOIN
@@ -57,12 +57,15 @@ FROM
       concept_name cn
       ON pa.value = cn.concept_id
         AND cn.concept_name_type = 'FULLY_SPECIFIED'
-      INNER JOIN (SELECT patient_appointment_id, appointment_service_id, patient_id, start_date_time FROM patient_appointment GROUP BY patient_id) pap
-      ON p.person_id = pap.patient_id
-      AND CAST(pap.start_date_time AS DATE) BETWEEN '#startDate#' AND '#endDate#'
-      LEFT JOIN
-      patient_appointment papp
-      ON papp.patient_appointment_id = pap.patient_appointment_id
-      AND papp.status = 'Missed'
-      AND CAST(papp.end_date_time AS DATE) BETWEEN '#startDate#' AND '#endDate#'
+      INNER JOIN (SELECT patient_id, appointment_service_id, start_date_time FROM patient_appointment pap1
+        WHERE start_date_time = (SELECT MAX(start_date_time) FROM patient_appointment pap2
+        WHERE appointment_service_id = 3 AND pap1.patient_id = pap2.patient_id)) papResult1
+        ON p.person_id = papResult1.patient_id
+        AND CAST(papResult1.start_date_time AS DATE) BETWEEN '#startDate#' AND '#endDate#'
+      INNER JOIN (SELECT patient_id, appointment_service_id, end_date_time FROM patient_appointment pap1
+        WHERE end_date_time = (SELECT MAX(end_date_time) FROM patient_appointment pap2
+        WHERE status = 'Missed'
+        AND pap1.patient_id = pap2.patient_id)) papResult2
+        ON p.person_id = papResult2.patient_id
+        AND CAST(papResult2.end_date_time AS DATE) BETWEEN '#startDate#' AND '#endDate#'
 ;
