@@ -9,7 +9,7 @@
     <div>
         <p class="placeholder-text" ng-if="!hasLabOrders()">{{ ::params.noLabOrdersMessage  | translate }}</p>
         <ul ng-if="hasLabOrders()">
-            <li ng-repeat="labOrderResults in section.accessions" bindonce="section.accessions">
+            <li ng-repeat="labOrderResults in section.accessions track by $index" bindonce="section.accessions">
                 <div class="laborder-sub-heading toggle-container" toggle="labOrderResults.isOpen">
                     <i class="fa fa-caret-right"></i>
                     <i class="fa fa-caret-down"></i>
