@@ -24,8 +24,18 @@ select distinct
    paddress.address4 AS "Avenida/Rua",
    paddress.address5 AS "Nº da Casa",
    paddress.postal_code AS "Perto De",
-   treatment_line.concept_full_name as "Última Linha de Tratamento",
-   cast(dor.date_created as date) as "Data de Mudança de Linha"
+   (select itreatment_line.concept_full_name as "Última Linha de Tratamento"
+    from patient ipt 
+    inner join orders io
+         on ipt.patient_id=io.patient_id
+    inner join drug_order_relationship idor
+         on idor.drug_order_id=io.order_id
+    inner join concept_view  itreatment_line
+         on itreatment_line.concept_id = idor.treatment_line_id
+    where ipt.patient_id = pt.patient_id
+    and (itreatment_line.concept_full_name ='3rd Line' or itreatment_line.concept_full_name ='2nd Line')
+    order by io.order_id desc limit 1) as "Última Linha de Tratamento",
+    cast(dor.date_created as date) as "Data de Mudança de Linha"
 from
    person p 
    inner join
@@ -57,11 +67,6 @@ from
       person_attribute_type pat 
       on pa.person_attribute_type_id = pat.person_attribute_type_id 
       and personAttributeTypeonRegistration.name = 'PRIMARY_CONTACT_NUMBER_1' 
-   inner JOIN
-      concept_view cv 
-      on pa.value = cv.concept_id 
-      AND cv.retired = 0 
-      and cv.concept_full_name = 'NEW_PATIENT'  
     LEFT OUTER JOIN
       person_address paddress 
       ON p.person_id = paddress.person_id 
@@ -81,21 +86,19 @@ from
         and conname.voided = 0
     inner join encounter e 
          on o.encounter_id=e.encounter_id
-    inner join 
-         orders
-         on orders.patient_id = pt.patient_id
-         and orders.encounter_id=e.encounter_id and o.order_id=orders.order_id
-   inner join order_type ot
-         on ot.order_type_id=orders.order_type_id 
+   inner join 
+         orders ord
+         on ord.patient_id = pt.patient_id
+         and o.order_id=ord.order_id
    inner join drug_order
-         on drug_order.order_id=orders.order_id
+         on drug_order.order_id=ord.order_id
    inner join drug_order_relationship dor
          on drug_order.order_id=dor.drug_order_id
          and cast(dor.date_created as date) BETWEEN '#startDate#' and '#endDate#'  
    inner join concept_view  treatment_category
          on treatment_category.concept_id = dor.category_id
-         and treatment_category.concept_full_name ='treatment_line_arv'
+         and treatment_category.concept_full_name ='ARV'
    inner join concept_view  treatment_line
          on treatment_line.concept_id = dor.treatment_line_id
-         and (treatment_line.concept_full_name ='2nd Line' or treatment_line.concept_full_name ='3rd Line')
-   order by dor.drug_order_relationship_id desc;
+         where  (treatment_line.concept_full_name ='3rd Line' or treatment_line.concept_full_name ='2nd Line')
+         group by pt.patient_id;
