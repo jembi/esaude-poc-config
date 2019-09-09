@@ -32,7 +32,6 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             
             returnHideValues.push("TB Type is Extrapulmonary");
             returnHideValues.push("TB Type is Extrapulmonary_Sensitive");
-
         }
     return {
 
@@ -74,36 +73,67 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
     if (dia === true) {
         return {
 
-            show: ["Received nutritional education"]
+            show: ["Received nutritional education", "Nutrition Supplement"]
         }
     } else {
         return {
-            hide: ["Received nutritional education"]
+            hide: ["Received nutritional education", "Nutrition Supplement"]
         }
     }
 },
-"STI Diagnosis_Prophylaxis" (formName, formFieldValues) {
-    var dia = formFieldValues["STI Diagnosis_Prophylaxis"];
+"Nutrition Supplement" (formName, formFieldValues) {
+    var dia = formFieldValues["Nutrition Supplement"];
 
-    if (dia === "Syndromic Approach") {
+    if (dia) {
         return {
 
-            show: ["Syndromic Approach_STI"]
+            show: ["Quantity of Nutritional Supplement", "SP_Measurement_Unit"]
         }
     } else {
         return {
-            hide: ["Syndromic Approach_STI"]
+            hide: ["Quantity of Nutritional Supplement", "SP_Measurement_Unit"]
         }
     }
+},
+"STI Diagnosis_Prophylaxis" (formName, formFieldValues, patient) {
+    var dia = formFieldValues["STI Diagnosis_Prophylaxis"];
+
+    if (dia === "Syndromic Approach") {
+        if (patient.gender === "M") {
+            return {
+                show: ["Syndromic Approach_STI_M"]
+            }
+    } else {
+            return {
+                show: ["Syndromic Approach_STI_F"]
+            }
+        }
+    } else {
+        return {
+            hide:["Syndromic Approach_STI_M", "Syndromic Approach_STI_F"]
+        }
+    }
+},
+"Nutrition_Prophylaxis" (formName, formFieldValues, patient) {
+    if (patient.age < 5) {
+        return {
+            show: ["Infants Odema_Prophylaxis"]
+        }
+    } else {
+        return {
+            hide: ["Infants Odema_Prophylaxis"]
+        }
+    }
+
 },
 "Type_Prophylaxis" (formName, formFieldValues) {
     var dia = formFieldValues["Type_Prophylaxis"];
     var returnShowValue = [];
     var returnHideValue = [];
-    
     if (dia === "INH") {
 
             returnShowValue.push("INH_Details");
+            returnHideValue.push("Secondary effects_INH");
 
         } else {
             returnHideValue.push("INH_Details");
@@ -112,6 +142,7 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
         if (dia === "CTZ") {
 
             returnShowValue.push("CTZ_Details");
+            returnHideValue.push("Secondary effects_CTZ");
 
         } else {
             returnHideValue.push("CTZ_Details");
@@ -120,6 +151,7 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
         if (dia ==="Fluconazol") {
 
             returnShowValue.push("Fluconazol_Details");
+            returnHideValue.push("Secondary effects_Fluconazol");
 
         } else {
             returnHideValue.push("Fluconazol_Details");
@@ -135,6 +167,42 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
     
     
 },
+"SP_Side_Effects_INH" (formName, formFieldValues, patient) {
+    var answer = formFieldValues["SP_Side_Effects_INH"];
+    if (answer) {
+        return {
+            show: ["Secondary effects_INH"]    
+        }
+    } else {
+        return {
+            hide: ["Secondary effects_INH"]
+        }
+    }
+},
+"SP_Side_Effects_CTZ" (formName, formFieldValues, patient) {
+    var answer = formFieldValues["SP_Side_Effects_CTZ"];
+    if (answer) {
+        return {
+            show: ["Secondary effects_CTZ"]    
+        }
+    } else {
+        return {
+            hide: ["Secondary effects_CTZ"]
+        }
+    }
+},
+"SP_Side_Effects_Fluconazol" (formName, formFieldValues, patient) {
+    var answer = formFieldValues["SP_Side_Effects_Fluconazol"];
+    if (answer) {
+        return {
+            show: ["Secondary effects_Fluconazol"]    
+        }
+    } else {
+        return {
+            hide: ["Secondary effects_Fluconazol"]
+        }
+    }
+},
 "Family_Planning_Methods" (formName, formFieldValues, patient) {
     
     if (patient.gender === "M") {
@@ -142,7 +210,7 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             show: ["Family_Planning_Contraceptive_Methods_PRES_Condom_button", "Family_Planning_Contraceptive_Methods_VAS_Vasectomy_button",
                 "Family_Planning_Contraceptive_Methods_OUT_Other_button"],
             hide: ["Family_Planning_Contraceptive_Methods_INJ_Injection_button", "Family_Planning_Contraceptive_Methods_IMP_Implant_button",
-                "Family_Planning_Contraceptive_Methods_DIU_Intra_button", "Family_Planning_Contraceptive_Methods_Uterine_device_button",
+                "Family_Planning_Contraceptive_Methods_DIU_Intra_button",
                 "Family_Planning_Contraceptive_Methods_LT_Tubal_Ligation_button","Family_Planning_Contraceptive_Methods_PIL_Oral_Contraceptive_button", "Family_Planning_Contraceptive_Methods_MAL_Lactational_Amenorrhea_Method_button"]
         }
     }
@@ -150,12 +218,24 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
         return {
             show: ["Family_Planning_Contraceptive_Methods_PIL_Oral_Contraceptive_button",
                 "Family_Planning_Contraceptive_Methods_INJ_Injection_button", "Family_Planning_Contraceptive_Methods_IMP_Implant_button",
-                "Family_Planning_Contraceptive_Methods_DIU_Intra_button", "Family_Planning_Contraceptive_Methods_Uterine_device_button",
+                "Family_Planning_Contraceptive_Methods_DIU_Intra_button",
                 "Family_Planning_Contraceptive_Methods_LT_Tubal_Ligation_button", "Family_Planning_Contraceptive_Methods_MAL_Lactational_Amenorrhea_Method_button"],
             hide: ["Family_Planning_Contraceptive_Methods_VAS_Vasectomy_button"]
         }
     }
 },
+
+    "Anthropometric" (formName, formFieldValues, patient) {
+        if ((patient.gender === "M") && (patient.age > 5)) {
+           return {
+               hide: ["Brachial_perimeter_new"]
+           }
+        } else {
+            return {
+                show: ["Brachial_perimeter_new"]
+            }
+        }
+    },
 
     "PP_Key_population" (formName, formFieldValues) {
         var dia = formFieldValues["PP_Key_population"];
@@ -209,23 +289,35 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
         var yes = formFieldValues["Apss_Adherence_follow_up_Has_informed_someone"];
         if (yes === "Apss_Adherence_follow_up_Has_informed_someone_Yes") {
             return {
-                show: ["Apss_Adherence_follow_up_Has_informed_Full_Name","Apss_Adherence_follow_up_Has_informed_Relationship"]
+                show: ["Apss_Adherence_follow_up_Has_informed_someone_RELATIONSHIP"]
             }
         } else {
             return {
-                hide: ["Apss_Adherence_follow_up_Has_informed_Full_Name","Apss_Adherence_follow_up_Has_informed_Relationship"]
+                hide: ["Apss_Adherence_follow_up_Has_informed_someone_RELATIONSHIP"]
             }
         }
     },
-    "Apss_Adherence_follow_up_Who_administers_ARV" (formName, formFieldValues) {
-        var yes = formFieldValues["Apss_Adherence_follow_up_Who_administers_ARV"];
-        if (yes === "Apss_Adherence_follow_up_Who_administers_ARV_Yes") {
+    "Apss_Adherence_follow_up_If_Child_Adolescent_Elderly_Disabled" (formName, formFieldValues) {
+        var yes = formFieldValues["Apss_Adherence_follow_up_If_Child_Adolescent_Elderly_Disabled"];
+        if (yes === "Apss_Adherence_follow_up_If_Child_Adolescent_Elderly_Disabled_Yes") {
             return {
-                show: ["Apss_Adherence_follow_up_Who_administers_Full_Name","Apss_Adherence_follow_up_Who_administers_Relationship"]
+                show: ["Apss_Adherence_follow_up_Administers_ARV_Alone"]
             }
         } else {
             return {
-                hide: ["Apss_Adherence_follow_up_Who_administers_Full_Name","Apss_Adherence_follow_up_Who_administers_Relationship"]
+                hide: ["Apss_Adherence_follow_up_Administers_ARV_Alone", "Apss_Adherence_follow_up_Who_administers_Full_Name", "CONFIDENT_RELATIONSHIP"]
+            }
+        }
+    },
+    "Apss_Adherence_follow_up_Administers_ARV_Alone" (formName, formFieldValues) {
+        var answer = formFieldValues["Apss_Adherence_follow_up_Administers_ARV_Alone"];
+        if (answer === "Apss_Adherence_follow_up_Administers_ARV_Alone_No") {
+            return {
+                show: ["Apss_Adherence_follow_up_Who_administers_Full_Name", "CONFIDENT_RELATIONSHIP"]
+            }
+        } else {
+            return {
+                hide: ["Apss_Adherence_follow_up_Who_administers_Full_Name", "CONFIDENT_RELATIONSHIP"]
             }
         }
     },
@@ -314,16 +406,16 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             };
         }
     },
-    "Reference_Other_Services" (formName, formFieldValues) {
-        var value = formFieldValues["Reference_Other_Services"];
+    "Reference_Other_Specify_Group" (formName, formFieldValues) {
+        var value = formFieldValues["Reference_Other_Specify_Group"];
         
-        if (value === "Reference_Other") {
+        if (value) {
             return {
-                show: ["Reference_Other_Text"]
+                show: ["Reference_Other_Specify_Group_Other"]
             }
         } else {
             return {
-                hide: ["Reference_Other_Text"]
+                hide: ["Reference_Other_Specify_Group_Other"]
             }
         }
     },
@@ -336,10 +428,22 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             }
         } else {
             return {
-                hide: ["Reference_GA","Reference_AF","Reference_CA","Reference_PU","Reference_FR","Reference_DT","Reference_DC","Reference_MDC_Other"]
+                hide: ["Reference_GA","Reference_AF","Reference_CA","Reference_PU","Reference_FR","Reference_DT","Reference_DC","Reference_MDC_Other","Reference_MDC_Other_comments"]
             }
         }
     },
+    "Reference_MDC_Other" (formName, formFieldValues) {
+        var pregValue = formFieldValues["Reference_MDC_Other"];
+        if (pregValue) {
+             return {
+                show: ["Reference_MDC_Other_comments"]
+             }
+         } else {
+             return {
+                hide: ["Reference_MDC_Other_comments"]
+             }
+         }
+     },
     "Pregnancy_Yes_No" (formName, formFieldValues) {
         var pregValue = formFieldValues["Pregnancy_Yes_No"];
 
@@ -380,6 +484,21 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             }
         }
     },
+
+    "CONFIDENT_HIV_CARE" (formName,formFieldValues) {
+        var value = formFieldValues["CONFIDENT_HIV_CARE"];
+
+        if (value == true){
+            return {
+                show: ["CONFIDENT_NID"]
+        }
+        } else {
+            return {
+                hide: ["CONFIDENT_NID"]
+                }
+            }
+    },
+
     "Gynecology/Obstetrics" (formName, formFieldValues, patient) {
         if (patient.gender === "F") {
             return {
@@ -394,36 +513,58 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
     "CONFIDENT_AGE_TYPE" (formName, formFieldValues) {
         var ageType = formFieldValues["CONFIDENT_AGE_TYPE"];
         var ageVal = formFieldValues["CONFIDENT_AGE"];
-        
-        if ((ageType != "Anos") && (ageType != "Years") && (ageType != "Meses") && (ageType != "Months")) {
+
+        if(ageVal > 0){
+            if(ageVal < 5 && (ageType === "Years" || ageType === "Anos" || ageType === "CONFIDENT_AGE_TYPE_YEARS")){
+                return {
+                    show: ["CONFIDENT_CCR"]
+                }
+            } else if (ageVal < 60 && (ageType === "Months" || ageType === "Meses" || ageType === "CONFIDENT_AGE_TYPE_MONTHS")){
+                return {
+                    show: ["CONFIDENT_CCR"]
+                }
+            }else {
+                return {
+                    hide: ["CONFIDENT_CCR"]
+                }
+            }
+        } else {
             return {
                 hide: ["CONFIDENT_CCR"]
             }
         }
+    },
+    "CONFIDENT_AGE" (formName, formFieldValues) {
+        var ageType = formFieldValues["CONFIDENT_AGE_TYPE"];
+        var ageVal = formFieldValues["CONFIDENT_AGE"];
 
-        if ((ageType === "Anos") || (ageType === "Years")) {
-            if (ageVal < 5) {
+        if(ageVal > 0){
+            if(ageVal < 5 && (ageType === "Years" || ageType === "Anos" || ageType === "CONFIDENT_AGE_TYPE_YEARS")){
                 return {
                     show: ["CONFIDENT_CCR"]
                 }
-            } else {
+            } else if (ageVal < 60 && (ageType === "Months" || ageType === "Meses" || ageType === "CONFIDENT_AGE_TYPE_MONTHS")){
                 return {
-                    hide: ["CONFIDENT_CCR"]
+                    show: ["CONFIDENT_CCR"]
+                }
+            }else {
+                return {
+                    hide: ["CONFIDENT_CCR"],
+                    show: ["CONFIDENT_AGE_TYPE"]
                 }
             }
-
-        }
-
-        if ((ageType === "Meses") || (ageType === "Months")) {
-            if (ageVal < 60) {
-                return {
-                    show: ["CONFIDENT_CCR"]
-                }
-            } else {
-                return {
-                    hide: ["CONFIDENT_CCR"]
-                }
+        } else if( ageVal === 0) {
+            return {
+                hide: ["CONFIDENT_CCR"],
+                disable: ["CONFIDENT_AGE_TYPE"],
+                error: "Introduza Idade maior que zero"
+            }
+        } else {
+            return {
+                hide: ["CONFIDENT_CCR"],
+                disable: ["CONFIDENT_AGE_TYPE"]
             }
         }
     }
+
 };

@@ -25,17 +25,22 @@
                 "showCertainty":true,
                 "showOrder":true,
                 "showDetailsButton":true,
-                "displayOrder":3
+                "displayOrder":4
             },
             "allergies": {
                 "translationKey":"ALLERGIES_LIST_DISPLAY_CONTROL_TITLE",
                 "type": "allergiesList",
-                "displayOrder":4
+                "displayOrder":6
+            },
+            "treatmentDate": {
+                "translationKey":"TREATMENT_START_DATE_LIST_DISPLAY_CONTROL_TITLE",
+                "type": "treatmentDate",
+                "displayOrder":2
             },
             "navigationLinksControl":{
                 "translationKey":"DASHBOARD_TITLE_NAVIGATION_LINKS_CONTROL_KEY",
                 "type":"navigationLinksControl",
-                "displayOrder":2,
+                "displayOrder":3,
                 "showLinks":[
                     "home",
                     "visit",
@@ -46,13 +51,13 @@
             "treatments":{
                 "translationKey":"DASHBOARD_TITLE_TREATMENTS_KEY",
                 "type":"treatment",
-                "displayOrder":7,
+                "displayOrder":9,
                 "dashboardConfig":{
                     "showFlowSheet":true,
                     "showListView":true,
                     "showRoute":true,
                     "showDrugForm":true,
-                    "numberOfVisits":5,
+                    "numberOfVisits":3,
                     "showOtherActive":true,
                     "showDetailsButton":true
                 },
@@ -67,14 +72,13 @@
                     "showDetailsButton":true
                 }
             },
-
             "labResults":{
                 "translationKey":"DASHBOARD_TITLE_LAB_RESULTS_KEY",
                 "type":"labOrders",
-                "displayOrder":1,
+                "displayOrder":2,
                 "dashboardConfig":{
                     "title":null,
-                    "numberOfVisits":6,
+                    "numberOfVisits":3,
                     "showChart":false,
                     "showTable":true,
                     "showNormalLabResults": true,
@@ -90,7 +94,7 @@
                 "translationKey":"DASHBOARD_TITLE_NUTRITIONAL_VALUES_KEY",
                 "type":"vitals",
                 "isObservation":true,
-                "displayOrder":6,
+                "displayOrder":8,
                 "dashboardConfig":{
                     "conceptNames":[
                         "HEIGHT",
@@ -121,7 +125,7 @@
                 "translationKey":"DASHBOARD_TITLE_VITALS_KEY",
                 "type":"vitals",
                 "isObservation":true,
-                "displayOrder":8,
+                "displayOrder":10,
                 "dashboardConfig":{
                     "showDetailsButton":true,
                     "conceptNames":[
@@ -164,20 +168,18 @@
                 "translationKey": "DASHBOARD_TITLE_WHO_STAGE",
                 "type": "vitals",
                 "isObservation": true,
-                "displayOrder": 10,
+                "displayOrder": 12,
                 "dashboardConfig": {
                     "conceptNames": [
                     "HTC, WHO Staging"
                     ],
                     "showDetailsButton": true,
-                    "numberOfVisits": 1,
                     "scope": "latest"
                 },
                 "expandedViewConfig": {
                     "conceptNames": [
                         "HTC, WHO Staging"
                     ],
-                    "numberOfVisits": 1,
                     "scope": "latest",
                     "showDetailsButton": true,
                     "pivotTable": {
@@ -187,12 +189,12 @@
             "conditions": {
                 "translationKey": "CONDITION_LIST_DISPLAY_CONTROL_TITLE",
                 "type": "conditionsList",
-                "displayOrder": 5
+                "displayOrder": 6
             },
             "visits":{
                 "translationKey":"DASHBOARD_TITLE_VISITS_KEY",
                 "type":"visits",
-                "displayOrder":9,
+                "displayOrder":12,
                 "dashboardConfig":{
                     "title":null,
                     "maximumNoOfVisits":8,
@@ -241,7 +243,7 @@
 
             "formsDisplay": {
                 "type": "forms",
-                "displayOrder": 12,
+                "displayOrder": 14,
                 "dashboardConfig": {
                     "title": null,
                     "maximumNoOfVisits": 10
@@ -251,10 +253,37 @@
             },
             "patientAppointments": {
                 "type": "custom",
-                "displayOrder": 11,
+                "displayOrder": 14,
                 "config": {
                     "title": "DASHBOARD_TITLE_APPOINTMENTS_KEY",
                     "template": "<patient-appointments-dashboard section='config' patient='patient'></patient-appointments-dashboard>"
+                }
+            },  
+            "positivePrevention": {
+                "type": "custom",
+                "displayOrder": 10,
+                "config": {
+                    "title": "DASHBOARD_POSITIVE_PREVENTION_KEY",
+                    "label": "DASHBOARD_POSITIVE_PREVENTION_KEY_TOTAL_YES",
+                    "conceptNames": ["Apss_Positive_prevention"],
+                    "template": "<positive-prevention-dashboard section='config' patient='patient'></positive-prevention-dashboard>",
+                    "numberOfVisits": 3,
+                    "visitDateTime": [],
+                    "isOpen": [],
+                    "conceptsWithYes": []
+                }
+            },
+            "confidentDetails": {
+                "type": "custom",
+                "displayOrder": 1,
+                "config": {
+                    "title": "DASHBOARD_CONFIDENT_DETAILS_KEY",
+                    "conceptNames": ["CONFIDENT_DETAILS"],
+                    "template": "<confident-details section='config' patient='patient'></confident-details>",
+                    "numberOfVisits": 3,
+                    "visitDateTime": [],
+                    "isOpen": [],
+                    "confidentDetailsData": []
                 }
             }
         }

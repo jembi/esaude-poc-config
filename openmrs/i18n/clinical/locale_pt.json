@@ -43,12 +43,14 @@
   "DASHBOARD_TITLE_RADIOLOGY_ORDERS_KEY": "Requisições de radiologia",
   "DASHBOARD_TITLE_SECOND_VITALS_KEY": "Segundos Vitais",
   "DASHBOARD_TITLE_TREATMENTS_KEY": "Tratamentos",
-  "DASHBOARD_TITLE_VISITS_KEY": "Consultas clínicas",
+  "DASHBOARD_TITLE_VISITS_KEY": "Consultas",
   "DASHBOARD_TITLE_VITALS_KEY": "Sinais vitais",
   "DASHBOARD_TITLE_WEIGHT_BMI": "Peso/IMC",
   "DASHBOARD_TITLE_WHO_STAGE":"Estadio OMS",
   "DASHBOARD_UPCOMING_APPOINTMENTS_KEY_LINK": "Visualização em lista",
   "DASHBOARD_UPCOMING_APPOINTMENTS_KEY": "Próximas Marcações",
+  "DASHBOARD_POSITIVE_PREVENTION_KEY": "Prevenção positiva",
+  "DASHBOARD_POSITIVE_PREVENTION_KEY_TOTAL_YES": "Total de PP",
   "DIAGNOSIS_BOARD_LABEL_KEY": "Diagnóstico",
   "DISCHARGE_SUMMARY_ADMISSION_DETAILS_KEY": "Detalhes de admissão",
   "DISCHARGE_SUMMARY_ADVICE_ON_DISCHARGE_KEY": "Conselhos de alta",
@@ -93,5 +95,7 @@
   "Scheduled":"Agendada",
   "Cancelled":"Cancelar",
   "CheckedIn":"Introduza um horário de entrada válido.",
-  "Group_VIII_Family_Planning_obs_form": "Planeamento Familiar"
+  "Group_VIII_Family_Planning_obs_form": "Planeamento Familiar",
+  "DASHBOARD_CONFIDENT_DETAILS_KEY": "Detalhes do confidente",
+  "NO_CONFIDENT_DETAILS": "Detalhes do confidente não disponiveis"
 }

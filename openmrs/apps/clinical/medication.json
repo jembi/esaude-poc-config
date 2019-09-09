@@ -9,7 +9,11 @@
       "inputOptionsConfig": {
         "defaultDurationUnit": "Day(s)",
         "hideOrderSet" : false,
-        "defaultInstructions": "As directed",
+        "allowOnlyCodedDrugs" : true,
+        "hiddenFields" : [
+          "sos",
+          "additionalInstructions"
+        ],
         "frequencyDefaultDurationUnitsMap": [
           {
             "minFrequency": "1/7",
@@ -26,6 +30,10 @@
             "maxFrequency": "1/30",
             "defaultDurationUnit": "Month(s)"
           }
+        ],
+        "durationUnits" : [
+          "Day(s)",
+          "Dia (s)"
         ],
         "drugFormDefaults": {
           "Ayurvedic": {

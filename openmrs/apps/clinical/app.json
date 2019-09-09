@@ -35,7 +35,7 @@
                 { "locale" : "pt", "css": "offline-language-portuguese-brazil"}
             ]
         },
-        "diagnosisStatus": "Inactive",
+        "diagnosisStatus": "Inactivo",
             "program": {
                 "patientInformation": {
                     "ageLimit": 100
@@ -81,8 +81,8 @@
         "visitTypeForRetrospectiveEntries": "Special OPD",
         "maxConceptSetLevels": 3,
         "allowOnlyCodedDiagnosis": false,
-        "clinicalProviderForms": ["Clinical_Observation_form", "Group V-Screening / Prophylaxis", "Group_Priority_Population_obs_form", "Group IV-Anamneses", "Group_VIII_Family_Planning_obs_form", "Reference_Form","CONFIDENT_FORM","DI_Death Information Form", "Apss_obs_form" ],
-        "APSSProviderForms": ["Group_Priority_Population_obs_form", "Reference_Form", "Apss_obs_form"],
+        "clinicalProviderForms": ["Clinical_Observation_form", "Group V-Screening / Prophylaxis", "Group_Priority_Population_obs_form", "Group IV-Anamneses", "Group_VIII_Family_Planning_obs_form", "Reference_Form","CONFIDENT_FORM","DI_Death Information Form", "Apss_Section_I_form", "Apss_Section_II_form", "Apss_Section_III_form", "Apss_Section_IV_form" ],
+        "APSSProviderForms": ["CONFIDENT_FORM","Group_Priority_Population_obs_form", "Reference_Form", "Apss_Section_I_form", "Apss_Section_II_form", "Apss_Section_III_form", "Apss_Section_IV_form"],
         "conceptSetUI": {
             "Chief Complaint Data": {
                 "autocomplete":true,
@@ -257,6 +257,10 @@
             "TB_Type": {
                 "disableAddNotes": true
             },
+            "TB Treatment": {
+              "disableAddNotes": true,
+              "dropdown": true
+            },
             "SP_Treatment Start Date": {
                 "disableAddNotes": true
             },
@@ -264,16 +268,20 @@
                 "disableAddNotes": true
             },
             "SP_Treatment End Date": {
-                "disableAddNotes": true
+              "allowFutureDates":true,
+              "disableAddNotes": true
             },
             "End Date": {
-                "disableAddNotes": true
+              "allowFutureDates":true,
+              "disableAddNotes": true
             },
             "End Date_CTZ": {
-                "disableAddNotes": true
+              "allowFutureDates":true,
+              "disableAddNotes": true
             },
             "End Date_Fluconazol": {
-                "disableAddNotes": true
+              "allowFutureDates":true,
+              "disableAddNotes": true
             },
             "Infants Odema_Prophylaxis": {
                 "disableAddNotes": true
@@ -373,6 +381,9 @@
             "Reference_Other_Specify_Group": {
                 "disableAddNotes": true
             },
+            "Reference_Other_Specify_Group_Other": {
+                "disableAddNotes": true
+            },
             "Reference_GA": {
                 "disableAddNotes": true
             },
@@ -398,7 +409,6 @@
                 "disableAddNotes": true
             },
             "Reference_Other_Services": {
-                "disableAddNotes": true,
                 "multiSelect" : true
             },
             "Reference_Eligible": {
@@ -417,9 +427,6 @@
                 "disableAddNotes": true
             },
             "Family_Planning_Contraceptive_Methods_DIU_Intra_button": {
-                "disableAddNotes": true
-            },
-            "Family_Planning_Contraceptive_Methods_Uterine_device_button": {
                 "disableAddNotes": true
             },
             "Family_Planning_Contraceptive_Methods_LT_Tubal_Ligation_button": {
@@ -449,6 +456,10 @@
                 "required": true
              },
              "CONFIDENT_RELATIONSHIP": {
+                "disableAddNotes": true,
+                "dropdown": true
+             },
+             "Apss_Adherence_follow_up_Has_informed_someone_RELATIONSHIP": {
                 "disableAddNotes": true,
                 "dropdown": true
              },
@@ -540,19 +551,16 @@
             "Apss_Adherence_follow_up_Has_informed_someone": {
                   "disableAddNotes": true
             },
-            "Apss_Adherence_follow_up_Has_informed_Full_Name": {
-                  "disableAddNotes": true
-            },
             "Apss_Adherence_follow_up_Has_informed_Relationship": {
                   "disableAddNotes": true
             },
-            "Apss_Adherence_follow_up_Who_administers_ARV": {
+            "Apss_Adherence_follow_up_If_Child_Adolescent_Elderly_Disabled": {
                   "disableAddNotes": true
             },
             "Apss_Adherence_follow_up_Who_administers_Full_Name": {
                   "disableAddNotes": true
             },
-            "Apss_Adherence_follow_up_Who_administers_Relationship": {
+            "Apss_Adherence_follow_up_Administers_ARV_Alone": {
                   "disableAddNotes": true
             },
             "Apss_Adherence_follow_up_Adherence_Plan": {
@@ -631,6 +639,30 @@
             "Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact": {
                   "disableAddNotes": true,
                   "multiSelect" : true
+            },
+            "Prophylaxis_Nutritional_Status": {
+                  "disableAddNotes": true
+            },
+            "Syndromic Approach_STI_M": {
+                  "disableAddNotes": true
+            },
+            "Syndromic Approach_STI_F": {
+                  "disableAddNotes": true
+            },
+            "SP_Side_Effects_INH": {
+                  "disableAddNotes": true
+            },
+            "SP_Side_Effects_CTZ": {
+                  "disableAddNotes": true
+            },
+            "SP_Side_Effects_Fluconazol": {
+                  "disableAddNotes": true
+            },
+            "SP_Measurement_Unit": {
+                  "disableAddNotes": true
+            },
+            "Apss_Reason_For_The_Visit": {
+                "disableAddNotes": true
             },
             "defaults": {
                 "Number of living children": 1,
