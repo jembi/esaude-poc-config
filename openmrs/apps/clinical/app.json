@@ -661,6 +661,46 @@
             "Apss_Reason_For_The_Visit": {
                 "disableAddNotes": true
             },
+            "HTC, WHO Staging": {
+                "disableAddNotes": true
+            },
+            "HOF_CLINICAL_SITUATION_STAGING_I_CONDITION": {
+                "disableAddNotes": true,
+                "dropdown": true
+            },
+            "HOF_CLINICAL_SITUATION_STAGING_II_CONDITION": {
+                "disableAddNotes": true,
+                "dropdown": true
+            },
+            "HOF_CLINICAL_SITUATION_STAGING_III_CONDITION": {
+                "disableAddNotes": true,
+                "dropdown": true
+            },
+            "HOF_CLINICAL_SITUATION_STAGING_IV_CONDITION": {
+                "disableAddNotes": true,
+                "dropdown": true
+            },
+            "HOF_CLINICAL_SITUATION_TB_Antecedent": {
+                "disableAddNotes": true
+            },
+            "HOF_CLINICAL_SITUATION_TB_Treatment_Start_Date": {
+                "disableAddNotes": true
+            },
+            "HOF_CLINICAL_SITUATION_TB_Treatment_End_Date": {
+                "disableAddNotes": true
+            },
+            "HOF_CLINICAL_SITUATION_Breastfeeding": {
+                "disableAddNotes": true
+            },
+            "HOF_CLINICAL_SITUATION_Registered_to_Some_MDS": {
+                "disableAddNotes": true
+            },
+            "HOF_CLINICAL_SITUATION_Registered_Date": {
+                "disableAddNotes": true
+            },
+            "HOF_CLINICAL_SITUATION_Model_Type": {
+                "disableAddNotes": true
+            },
             "defaults": {
                 "Number of living children": 1,
                 "Accepted Family Planning methods": [
