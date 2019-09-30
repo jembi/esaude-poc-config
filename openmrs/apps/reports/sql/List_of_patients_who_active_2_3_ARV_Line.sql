@@ -101,7 +101,7 @@ from
          and cast(dor.date_created as date) BETWEEN '#startDate#' and '#endDate#'  
    inner join concept_view  treatment_category
          on treatment_category.concept_id = dor.category_id
-         and treatment_category.concept_full_name ='ARV' or treatment_category.concept_full_name ='Antirretrovirals' or 	treatment_category.concept_full_name ='Antirretrovirais' 
+         and treatment_category.concept_full_name ='ARV' or treatment_category.concept_full_name ='Antirretrovirals' or treatment_category.concept_full_name ='Antirretrovirais' 
    inner join concept_view  treatment_line
          on treatment_line.concept_id = dor.treatment_line_id
          where  (treatment_line.concept_full_name ='3rd Line' or treatment_line.concept_full_name ='2nd Line')
