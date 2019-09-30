@@ -34,25 +34,25 @@ case
       when
          pss.patient_state = 'ACTIVE'
       then
-         'Activo'
+         'Activo em'
       when
          pss.patient_state = 'INACTIVE_DEATH'
       then
-         'Inactive Óbito'
+         'Inactive - Óbito'
       when
          pss.patient_state = 'INACTIVE_TRANSFERRED_OUT'
       then
-         'Inactivo Transferir para'
+         'Inactivo - Transferido Para'
       when
          pss.patient_state = 'INACTIVE_SUSPENDED'
       then
-         'Inactivo Paciente Suspensão'
-   end,' - ',
+         'Inactivo - Suspenso'
+   end,' ',
    case
       when
          pss.patient_status = 'Pre TARV'
       then
-         'Pre TARV'
+         'Pre-TARV'
       when
          pss.patient_status = 'TARV'
       then
