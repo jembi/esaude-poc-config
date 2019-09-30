@@ -903,6 +903,24 @@
       "HOF_Other_Info_Contact": {
         "disableAddNotes": true
       },
+      "HOF_TARV_PROPHILAXIS_Start_Date_INH": {
+        "disableAddNotes": true
+      },
+      "HOF_TARV_PROPHILAXIS_End_Date_INH": {
+        "disableAddNotes": true
+      },
+      "HOF_TARV_PROPHILAXIS_Start_Date_CTZ": {
+        "disableAddNotes": true
+      },
+      "HOF_TARV_PROPHILAXIS_End_Date_CTZ": {
+        "disableAddNotes": true
+      },
+      "HOF_TARV_PROPHILAXIS_Start_Date_Fluconazol": {
+        "disableAddNotes": true
+      },
+      "HOF_TARV_PROPHILAXIS_End_Date_Fluconazol": {
+        "disableAddNotes": true
+      },
       "defaults": {
         "Number of living children": 1,
         "Accepted Family Planning methods": [
