@@ -796,10 +796,12 @@
         "disableAddNotes": true
       },
       "HOF_CLINICAL_SITUATION_Next_Clinical_Visit_Date": {
-        "disableAddNotes": true
+        "disableAddNotes": true,
+        "allowFutureDates": true
       },
       "HOF_CLINICAL_SITUATION_Next_Drug_Pickup_Date": {
-        "disableAddNotes": true
+        "disableAddNotes": true,
+        "allowFutureDates": true
       },
       "HOF_LAB_SITUATION_Glicemia_Date": {
         "disableAddNotes": true
