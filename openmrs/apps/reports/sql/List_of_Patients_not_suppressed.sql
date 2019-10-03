@@ -37,7 +37,7 @@ select distinct
     where ipt.patient_id = pt.patient_id
     order by io.order_id desc limit 1) as "Última Linha de Tratamento",
    cast(o.value_numeric as char)as "Valor do Resultado da última Carga Viral",
-   cast(o.date_created as date) as "Data do Resultado da Carga Viral"
+   DATE_FORMAT(o.date_created,'%d-%m-%Y') AS "Data do Resultado da Carga Viral"
 from
    person p 
    inner join
