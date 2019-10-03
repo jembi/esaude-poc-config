@@ -25,7 +25,7 @@ case
    paddress.address4 AS "Avenida/Rua",
    paddress.address5 AS "Nº da Casa",
    paddress.postal_code AS "Perto De",
-   cast(pt.date_created as date) AS "Data de Registo na US",
+   DATE_FORMAT(pt.date_created,'%d-%m-%Y') AS "Data de Registo na US",
    concat(case
       when
          pss.patient_state = 'ABANDONED'
@@ -70,7 +70,7 @@ case
       then
          'TARV-Reinício'
    end ) AS "Estado de Permanência",
-   cast(erpdrug_order.dispensed_date as date) AS "Data de Inicio TARV"
+   DATE_FORMAT(erpdrug_order.dispensed_date,'%d-%m-%Y') AS "Data de Inicio TARV"
 from
    person p 
    INNER JOIN
