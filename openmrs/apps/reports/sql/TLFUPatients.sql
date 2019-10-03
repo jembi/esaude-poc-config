@@ -54,8 +54,8 @@ SELECT DISTINCT
        from patient_status_state pss inner join obs 
        on obs.person_id = pss.patient_id where patient_id=p.person_id and pss.patient_status='TARV_ABANDONED' limit 1
       ) AS 'Estado do Paciente',
-       max(DATE(eod.dispensed_date)) AS 'Último Levantamento',
-       max(DATE(missed_pickup.date_created)) AS 'Último Levantamento Perdido'
+       DATE_FORMAT(max(eod.dispensed_date),'%d-%m-%Y') AS 'Último Levantamento',
+       DATE_FORMAT(max(missed_pickup.date_created),'%d-%m-%Y') AS 'Último Levantamento Perdido'
 FROM orders o
 JOIN order_type ot ON o.order_type_id = ot.order_type_id AND ot.uuid='131168f4-15f5-102d-96e4-000c29c2a5d7'
 JOIN person p ON o.patient_id = person_id
