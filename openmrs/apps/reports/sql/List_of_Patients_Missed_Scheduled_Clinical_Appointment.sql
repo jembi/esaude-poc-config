@@ -25,8 +25,8 @@ SELECT DISTINCT
   paddress.address5 AS "Nº da Casa",
   paddress.postal_code AS "Perto De",
   cn.name AS "Estado do Paciente",
-  papResult1.start_date_time AS "Data da Última Consulta",
-  papResult2.end_date_time AS "Data da Última Consulta Clínica Perdida"
+  DATE_FORMAT(papResult1.start_date_time,'%d-%m-%Y') AS "Data da Última Consulta",
+  DATE_FORMAT(papResult2.end_date_time,'%d-%m-%Y') AS "Data da Última Consulta Clínica Perdida"
 FROM
     person p
       INNER JOIN
