@@ -678,4 +678,10 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             }
         }
     },
+
+    "HOF_TARV_PROPHILAXIS_Patient_Type" () {
+        return {
+            hide:["HOF_TARV_PROPHILAXIS_Patient_Type"]
+        }
+    }
 };
