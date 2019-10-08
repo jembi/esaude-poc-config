@@ -25,8 +25,8 @@ SELECT DISTINCT
   paddress.address5 AS "Nº da Casa",
   paddress.postal_code AS "Perto De",
   cn.name AS "Estado do Paciente",
-  CAST(papResult1.start_date_time AS DATE) AS "Data da Última Consulta",
-  CAST(papResult2.end_date_time AS DATE) AS "Data da Última Consulta Clínica Perdida"
+  DATE_FORMAT(papResult1.start_date_time, '%d-%m-%Y') AS "Data da Última Consulta",
+  DATE_FORMAT(papResult2.end_date_time, '%d-%m-%Y') AS "Data da Última Consulta Clínica Perdida"
 FROM
   person p
     INNER JOIN
@@ -98,8 +98,8 @@ SELECT DISTINCT
   paddress.address5 AS "Nº da Casa",
   paddress.postal_code AS "Perto De",
   cn.name AS "Estado do Paciente",
-  CAST(v.date_started AS DATE) AS "Data da Última Consulta",
-  CAST(v.date_stopped AS DATE) AS "Data da Última Consulta Clínica Perdida"
+  DATE_FORMAT(v.date_started, '%d-%m-%Y') AS "Data da Última Consulta",
+  DATE_FORMAT(v.date_stopped, '%d-%m-%Y') AS "Data da Última Consulta Clínica Perdida"
 FROM
   person p
     INNER JOIN
