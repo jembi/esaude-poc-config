@@ -5,9 +5,57 @@ SELECT DISTINCT
        floor(datediff(now(), p.birthdate)/365) AS Idade,
        contact.contact AS 'Contacto Principal',
        concat (pa.state_province, ',', pa.city_village) AS Endereço,
-       Concat(IFNULL(patient_state.patient_status, ''),' - ', IFNULL(patient_state.patient_state,'')) AS 'Estado do Paciente',
-       DATE(eod.dispensed_date) AS 'Último Levantamento',
-       DATE(missed_pickup.date_created) AS 'Último Levantamento Perdido'
+       (
+        select 
+        concat(case
+      when
+         pss.patient_state = 'ABANDONED'
+      then
+         'Abandono'
+      when
+         pss.patient_state = 'ACTIVE'
+      then
+         'Activo em'
+      when
+         pss.patient_state = 'INACTIVE_DEATH'
+      then
+         'Inactive - Óbito'
+      when
+         pss.patient_state = 'INACTIVE_TRANSFERRED_OUT'
+      then
+         'Inactivo - Transferido Para'
+      when
+         pss.patient_state = 'INACTIVE_SUSPENDED'
+      then
+         'Inactivo - Suspenso'
+   end,' ',
+   case
+      when
+         pss.patient_status = 'Pre TARV'
+      then
+         'Pre-TARV'
+      when
+         pss.patient_status = 'TARV'
+      then
+         'TARV'
+      when
+         pss.patient_status = 'TARV_ABANDONED'
+      then
+         'TARV-Abandono'
+      when
+         pss.patient_status = 'TARV_TREATMENT_SUSPENDED'
+      then
+         'TARV-Tratamento Suspenso'
+      when
+         pss.patient_status = 'TARV_RESTART'
+      then
+         'TARV-Reinício'
+   end )
+       from patient_status_state pss inner join obs 
+       on obs.person_id = pss.patient_id where patient_id=p.person_id and pss.patient_status='TARV_ABANDONED' limit 1
+      ) AS 'Estado do Paciente',
+       DATE_FORMAT(max(eod.dispensed_date),'%d-%m-%Y') AS 'Último Levantamento',
+       DATE_FORMAT(max(missed_pickup.date_created),'%d-%m-%Y') AS 'Último Levantamento Perdido'
 FROM orders o
 JOIN order_type ot ON o.order_type_id = ot.order_type_id AND ot.uuid='131168f4-15f5-102d-96e4-000c29c2a5d7'
 JOIN person p ON o.patient_id = person_id
@@ -26,12 +74,12 @@ JOIN
           pss.patient_status,
           pss.date_created
       FROM patient_status_state pss
-      WHERE pss.patient_state='ABANDONED' ORDER BY pss.date_created DESC LIMIT 1) patient_state ON patient_state.patient_id = p.person_id
+      WHERE pss.patient_status='TARV_ABANDONED' and pss.id=(select max(id) from patient_status_state where patient_id=pss.patient_id)) patient_state ON patient_state.patient_id = p.person_id
 LEFT JOIN
   (SELECT eo.patient_id,
           eo.dispensed,
           eo.dispensed_date
-  FROM erpdrug_order eo ) eod ON eod.patient_id = p.person_id
+  FROM erpdrug_order eo WHERE arv_dispensed = true) eod ON eod.patient_id = p.person_id
 LEFT JOIN
   (SELECT o.order_id,
           o.date_created,
@@ -39,6 +87,8 @@ LEFT JOIN
       FROM orders o
       WHERE o.order_id NOT  IN
                         (SELECT order_id
-                          FROM erpdrug_order WHERE erpdrug_order.patient_id = o.patient_id)) missed_pickup
-                          ON missed_pickup.patient_id = p.person_id AND missed_pickup.date_created < patient_state.date_created
-WHERE cast(patient_state.date_created AS date) BETWEEN '#startDate#' AND '#endDate#';
+                          FROM erpdrug_order WHERE erpdrug_order.patient_id = o.patient_id and arv_dispensed = true)) missed_pickup
+                          ON missed_pickup.patient_id = p.person_id AND missed_pickup.date_created > patient_state.date_created
+      
+      WHERE cast(patient_state.date_created AS date) BETWEEN '#startDate#' AND '#endDate#'
+      group by missed_pickup.patient_id,eod.patient_id;
