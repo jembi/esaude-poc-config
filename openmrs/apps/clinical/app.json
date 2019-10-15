@@ -796,10 +796,12 @@
         "disableAddNotes": true
       },
       "HOF_CLINICAL_SITUATION_Next_Clinical_Visit_Date": {
-        "disableAddNotes": true
+        "disableAddNotes": true,
+        "allowFutureDates": true
       },
       "HOF_CLINICAL_SITUATION_Next_Drug_Pickup_Date": {
-        "disableAddNotes": true
+        "disableAddNotes": true,
+        "allowFutureDates": true
       },
       "HOF_LAB_SITUATION_Glicemia_Date": {
         "disableAddNotes": true
@@ -919,6 +921,21 @@
         "disableAddNotes": true
       },
       "HOF_TARV_PROPHILAXIS_End_Date_Fluconazol": {
+        "disableAddNotes": true
+      },
+      "HOF_TARV_PROPHILAXIS_Patient_Type": {
+        "disableAddNotes": true
+      },
+      "HOF_LAB_SITUATION_Percentual_CD4_Date": {
+        "disableAddNotes": true
+      },
+      "HOF_LAB_SITUATION_Percentual_CD4_Date2": {
+        "disableAddNotes": true
+      },
+      "HOF_LAB_SITUATION_Carga_Viral_Absolute_Retrospective2": {
+        "disableAddNotes": true
+      },
+      "HOF_LAB_SITUATION_Carga_Viral_Absolute_Retrospective": {
         "disableAddNotes": true
       },
       "defaults": {
