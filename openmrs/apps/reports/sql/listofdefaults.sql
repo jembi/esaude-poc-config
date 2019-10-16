@@ -25,8 +25,8 @@ select distinct
    paddress.address5 AS "Nº da Casa",
    paddress.postal_code AS "Perto De",
    " " as "Estado Paciente",
-    max(DATE_FORMAT(pappointment.start_date_time, '%d-%m-%Y')) as "Data Último Levantamento Perdido",
-    (select max(DATE_FORMAT(obs.date_created, '%d-%m-%Y')) from obs
+    DATE_FORMAT(max(pappointment.start_date_time),'%d-%m-%Y') AS "Data Último Levantamento Perdido",
+    (select DATE_FORMAT(max(obs.date_created),'%d-%m-%Y')  from obs
     inner join orders on orders.order_id=obs.order_id
     inner join order_type on orders.order_type_id= order_type.order_type_id
     and order_type.name = 'Drug Order'

@@ -39,7 +39,7 @@ select distinct
          and (itreatment_line.name ='Terceira Linha' or itreatment_line.name ='Segunda Linha')
     where ipt.patient_id = pt.patient_id
     order by io.order_id desc limit 1) as "Última Linha de Tratamento",
-    DATE_FORMAT(dor.date_created, '%d-%m-%Y') as "Data de Mudança de Linha"
+    DATE_FORMAT(dor.date_created,'%d-%m-%Y') AS "Data de Mudança de Linha"
 from
    person p 
    inner join

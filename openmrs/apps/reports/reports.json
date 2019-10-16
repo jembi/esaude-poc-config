@@ -30,7 +30,7 @@
         }
     },
     "Listpatientswhoactivein23ARVLine": {
-        "name": "List of patients who are active in 2 and 3 ARV Line",
+        "name": " Lista de Pacientes em 2 e 3 linha de TARV",
         "titleKey" : "LIST_PATIENTS_ACTIVE_IN_2_3_ARV",
         "type": "MRSGeneric",
         "config": {
