@@ -494,7 +494,7 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
     "HOF_CLINICAL_SITUATION_Registered_to_Some_MDS" (formName, formFieldValues) {
         var value = formFieldValues["HOF_CLINICAL_SITUATION_Registered_to_Some_MDS"];
         
-        if (value === "HOF_CLINICAL_SITUATION_Registered_to_Some_MDS_Yes") {
+        if (value === "Tue") {
             return {
                 show: ["Reference_GA","Reference_AF","Reference_CA","Reference_PU","Reference_FR","Reference_DT","Reference_DC","Reference_MDC_Other"]
             }
@@ -678,4 +678,10 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             }
         }
     },
+
+    "HOF_TARV_PROPHILAXIS_Patient_Type" () {
+        return {
+            hide:["HOF_TARV_PROPHILAXIS_Patient_Type"]
+        }
+    }
 };
