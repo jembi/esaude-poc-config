@@ -200,8 +200,6 @@ FROM
     concept_name cn
     ON pa.value = cn.concept_id
       AND cn.concept_name_type = 'FULLY_SPECIFIED'
-    INNER JOIN encounter en
-    ON en.patient_id = p.person_id
     INNER JOIN (SELECT visit_id, patient_id, date_started, date_stopped FROM visit v1
             WHERE date_started = (SELECT MAX(date_started) FROM visit v2
             WHERE date_stopped IS NOT NULL AND v1.patient_id = v2.patient_id)
