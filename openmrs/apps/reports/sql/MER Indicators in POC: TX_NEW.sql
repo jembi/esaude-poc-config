@@ -7,9 +7,9 @@ FROM   global_property
 WHERE  property = "healthfacility.info"
 )
 as "Health Facility",
-count(*) As "Total",
+count(distinct p.person_id ) As "Total",
    (
-      select count(*) from obs o 
+      select count(distinct o.person_id ) from obs o 
        inner join
       erpdrug_order erp1
       on erp1.patient_id=o.person_id
