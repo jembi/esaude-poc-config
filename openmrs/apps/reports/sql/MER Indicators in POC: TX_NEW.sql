@@ -20,7 +20,8 @@ count(*) As "Total",
                             and erpdrug_order.arv_dispensed=1
                             and erpdrug_order.first_arv_dispensed=1 and erpdrug_order.patient_id=erp1.patient_id)                            
                             and (
-                                  ((o.value_datetime >= DATE_SUB('#endDate#', INTERVAL 18 MONTH)) 
+                                  (
+                                  cast(o.value_datetime as date) BETWEEN '#startDate#' and '#endDate#' 
                                   and (o.obs_id = (select max(obs_id) from obs 
                                                       inner join
                                                       concept_name conname
@@ -29,7 +30,7 @@ count(*) As "Total",
                                                       and conname.voided = 0  
                                                       and obs.person_id=o.person_id)))
                                   OR
-                                  ((o.date_created >= DATE_SUB('#endDate#', INTERVAL 18 MONTH)) 
+                                  (cast(o.date_created as date) BETWEEN '#startDate#' and '#endDate#'
                                   and (o.obs_id = (select max(obs_id) from obs 
                                                       inner join
                                                       concept_name conname
