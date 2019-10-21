@@ -71,7 +71,7 @@ count(distinct p.person_id ) As "Total",
    count(case when  (p.gender = 'F' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') >= 50 ) then 1 else NULL END) as "F >=50" ,
    count(case when  (p.gender = 'F' and (p.birthdate is NULL)) then 1 else NULL END) as "F Unknown age",
    count(case when  (p.gender = 'F') then 1 else NULL END) as "Female Subtotal",
-   "" as "Data Check"
+   " " as "Data Check"
 from
    person p 
    inner join
