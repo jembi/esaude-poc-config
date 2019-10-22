@@ -37,6 +37,7 @@ count(distinct p.person_id ) As "Total",
                                                       on obs.concept_id=conname.concept_id
                                                       where conname.name = 'Breastfeeding_ANA' and concept_name_type ='FULLY_SPECIFIED' and conname.locale ='en'
                                                       and conname.voided = 0
+                                                      and obs.value_coded = 1
                                                       and obs.person_id=o.person_id)))
                                  )
    ) as "Breastfeeding",
