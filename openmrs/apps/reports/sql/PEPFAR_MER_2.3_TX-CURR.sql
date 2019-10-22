@@ -59,12 +59,12 @@ from
       on ddate.person_id=p.person_id
       and ddate.person_attribute_type_id = (
       select person_attribute_type_id from person_attribute_type patype where patype.name='DATE_OF_DEATH')
-    inner join
+  inner join
       erpdrug_order erp
       on erp.patient_id=pt.patient_id
       and cast(erp.dispensed_date as date) BETWEEN '#startDate#' and '#endDate#'
 	inner join
-	  drug_order do
+	    drug_order do
       on do.order_id=erp.order_id
       where erp.id = (select max(id) from erpdrug_order
                       where erpdrug_order.dispensed=1
