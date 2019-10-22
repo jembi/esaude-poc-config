@@ -59,18 +59,24 @@ from
       on ddate.person_id=p.person_id
       and ddate.person_attribute_type_id = (
       select person_attribute_type_id from person_attribute_type patype where patype.name='DATE_OF_DEATH')
-  inner join
-      erpdrug_order erp
-      on erp.patient_id=pt.patient_id
-      and cast(erp.dispensed_date as date) BETWEEN '#startDate#' and '#endDate#'
 	inner join
+	    erpdrug_order erp
+	    on erp.patient_id=pt.patient_id
+	    and cast(erp.dispensed_date as date) BETWEEN '#startDate#' and '#endDate#'
+	    and erp.id = (select max(id) from erpdrug_order
+                    where erpdrug_order.dispensed=1
+                    and erpdrug_order.arv_dispensed=1
+                    and erpdrug_order.patient_id=erp.patient_id)
+  inner join
 	    drug_order do
       on do.order_id=erp.order_id
-      where erp.id = (select max(id) from erpdrug_order
-                      where erpdrug_order.dispensed=1
-                            and erpdrug_order.arv_dispensed=1
-                            and erpdrug_order.patient_id=erp.patient_id)
-	and (tdate.value is null or DATE(tdate.value) > DATE('#endDate#'))
-    and (sdate.value is null or DATE(sdate.value) > DATE('#endDate#'))
-    and (ddate.value is null or DATE(ddate.value) > DATE('#endDate#'))
-    and ((date_add(date_add(erp.dispensed_date, interval do.quantity DAY ), interval 31 DAY)) > DATE('#endDate#'));
+  left join patient_status_state pss
+      on pss.patient_id=pt.patient_id
+	    and DATE(pss.date_created) <= DATE('#endDate#')
+      and pss.id= (select  max(id) from patient_status_state
+                  where patient_status_state.patient_id=pss.patient_id)
+  where (tdate.value is null or DATE(tdate.value) > DATE('#endDate#'))
+  and (sdate.value is null or DATE(sdate.value) > DATE('#endDate#'))
+  and (ddate.value is null or DATE(ddate.value) > DATE('#endDate#'))
+  and ((date_add(date_add(erp.dispensed_date, interval do.quantity DAY ), interval 31 DAY)) > DATE('#endDate#'))
+  and pss.patient_status is null or pss.patient_status<>'TARV_TREATMENT_SUSPENDED';
