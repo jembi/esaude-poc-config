@@ -27,7 +27,8 @@ count(distinct p.person_id ) As "Total",
                                                       concept_name conname
                                                       on obs.concept_id=conname.concept_id
                                                       where conname.name = 'Date of Delivery' and concept_name_type ='FULLY_SPECIFIED' and conname.locale ='en'
-                                                      and conname.voided = 0  
+                                                      and conname.voided = 0
+                                                      and obs.voided = 0  
                                                       and obs.person_id=o.person_id)))
                                   OR
                                   (cast(o.date_created as date) BETWEEN '#startDate#' and '#endDate#'
@@ -37,6 +38,7 @@ count(distinct p.person_id ) As "Total",
                                                       on obs.concept_id=conname.concept_id
                                                       where conname.name = 'Breastfeeding_ANA' and concept_name_type ='FULLY_SPECIFIED' and conname.locale ='en'
                                                       and conname.voided = 0
+                                                      and obs.voided = 0
                                                       and obs.person_id=o.person_id)))
                                  )
    ) as "Breastfeeding",
