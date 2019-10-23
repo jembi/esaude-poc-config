@@ -23,7 +23,7 @@ select
                         on cv.concept_id = inob.concept_id
                         where (cv.concept_full_name = 'CARGA VIRAL (Absoluto-Rotina)' or cv.concept_full_name = 'CARGA VIRAL (Absoluto-Suspeita)' )
                         and inob.value_numeric < 1000 
-                        and (o.date_created >= DATE_SUB('#endDate#', INTERVAL 12 MONTH))
+                        and (o.date_created >= DATE_SUB('#endDate#', INTERVAL 1 YEAR))
                         and inob.person_id=p.person_id)
     
     inner join
@@ -96,7 +96,7 @@ from
                         on cv.concept_id = inob.concept_id
                         where (cv.concept_full_name = 'CARGA VIRAL (Absoluto-Rotina)' or cv.concept_full_name = 'CARGA VIRAL (Absoluto-Suspeita)' )
                         and inob.value_numeric < 1000 
-                        and (o.date_created >= DATE_SUB('#endDate#', INTERVAL 12 MONTH))
+                        and (o.date_created >= DATE_SUB('#endDate#', INTERVAL 1 YEAR))
                         and inob.person_id=p.person_id)
     
     inner join
@@ -168,7 +168,7 @@ from
                         on cv.concept_id = inob.concept_id
                         where (cv.concept_full_name = 'CARGA VIRAL (Absoluto-Rotina)' or cv.concept_full_name = 'CARGA VIRAL (Absoluto-Suspeita)' )
                         and inob.value_numeric < 1000 
-                        and (o.date_created >= DATE_SUB('#endDate#', INTERVAL 12 MONTH))
+                        and (o.date_created >= DATE_SUB('#endDate#', INTERVAL 1 YEAR))
                         and inob.person_id=p.person_id)
     
     inner join
@@ -242,7 +242,7 @@ from
                         on cv.concept_id = inob.concept_id
                         where (cv.concept_full_name = 'CARGA VIRAL (Absoluto-Rotina)' or cv.concept_full_name = 'CARGA VIRAL (Absoluto-Suspeita)' )
                         and inob.value_numeric < 1000 
-                        and (o.date_created >= DATE_SUB('#endDate#', INTERVAL 12 MONTH))
+                        and (o.date_created >= DATE_SUB('#endDate#', INTERVAL 1 YEAR))
                         and inob.person_id=p.person_id)
     
     inner join
