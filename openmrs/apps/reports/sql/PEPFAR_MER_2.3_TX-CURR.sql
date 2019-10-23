@@ -68,8 +68,8 @@ from
                     and erpdrug_order.arv_dispensed=1
                     and erpdrug_order.patient_id=erp.patient_id)
   inner join
-	    drug_order do
-      on do.order_id=erp.order_id
+	drug_order dor
+      on dor.order_id=erp.order_id
   left join patient_status_state pss
       on pss.patient_id=pt.patient_id
 	    and DATE(pss.date_created) <= DATE('#endDate#')
@@ -78,5 +78,5 @@ from
   where (tdate.value is null or DATE(tdate.value) > DATE('#endDate#'))
   and (sdate.value is null or DATE(sdate.value) > DATE('#endDate#'))
   and (ddate.value is null or DATE(ddate.value) > DATE('#endDate#'))
-  and ((date_add(date_add(erp.dispensed_date, interval do.quantity DAY ), interval 31 DAY)) > DATE('#endDate#'))
+  and ((date_add(date_add(erp.dispensed_date, interval dor.quantity DAY ), interval 31 DAY)) > DATE('#endDate#'))
   and pss.patient_status is null or pss.patient_status<>'TARV_TREATMENT_SUSPENDED';
