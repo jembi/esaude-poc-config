@@ -1,7 +1,7 @@
 
 select 
     count(*) As "Total",
-   
+   -- -- "Routine Breastfeeding"
     (
     select count(distinct p.person_id)
     from 
@@ -73,8 +73,8 @@ select
                     )
         )
     )
-    ) as "Routina Breastfeeding",
-
+    ) as "Routine Breastfeeding",
+    -- -- "Targeted Breastfeeding"
     (
     select count(distinct p.person_id)
 from 
@@ -146,7 +146,7 @@ from
         )
     )
     ) as "Targeted Breastfeeding",
-
+    -- -- "Routine Pregnant"
     (
         select count(distinct p.person_id)
     from 
@@ -219,8 +219,8 @@ from
                     )
         )
     )
-    ) "Rutina Pregnant",
-
+    ) "Routine Pregnant",
+ -- -- "Targeted Pregnant"
     (
         select count(distinct p.person_id)
     from 
@@ -327,7 +327,7 @@ from
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Rotina)' and p.gender = 'F') then 1 else NULL END) as "Routine Female Subtotal",
 
 --  'CARGA VIRAL (Absoluto-Suspeita)'
-   "" As "Sepearator",
+
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'M' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') < 1 ) then 1 else NULL END) as "Targeted M <1",
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'M' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') BETWEEN 1 and 4 ) then 1 else NULL END) as "Targeted M 1-4",
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'M' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') BETWEEN 5 and 9 ) then 1 else NULL END) as "Targeted M 5-9",
