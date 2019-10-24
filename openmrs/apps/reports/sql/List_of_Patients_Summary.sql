@@ -1,125 +1,69 @@
-select distinct
-(pi.identifier) as "NID",
-CONCAT( pn.given_name, " ", COALESCE( pn.middle_name, '' ), " ", COALESCE( pn.family_name, '' ) )as "Nome Completo ",
+select  distinct enc.identifier as NID, enc.full_name as Nome, enc.date_created as "Consulta Actual",appointment.next_consultation as "Próxima consulta", enc.age as "Idade",diastolic.value_numeric as "Tensão Arterial", pregnant as "Gravidez",breast_feeding_value as "Lactante",condom_value, weight.value_numeric as "Peso", bmi.value_numeric as "IMC", enc.encounter_id  from (select identifier,person.person_id,full_name,date_created,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
+inner join
+(select identifier,concat(pn.given_name," ", COALESCE(pn.middle_name,'')," ", COALESCE(pn.family_name,'')) as full_name, pn.person_id, p.birthdate from person_name pn join patient_identifier pi on pn.person_id = pi.patient_id join person p on p.person_id = pn.person_id) person
+on person_id=patient_id) enc
+inner join obs on obs.encounter_id = enc.encounter_id
+Left join
+ (select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "BP_Diastolic_VSNormal") as diastolic on diastolic.encounter_id = obs.encounter_id
+Left join
+(SELECT
+  DATE_FORMAT(start_date_time, "%d/%m/%Y") as next_consultation,
+  p.person_id,
+  pa.status
+FROM
+  patient_appointment pa
+  JOIN person p ON p.person_id = pa.patient_id AND pa.voided IS FALSE
+  JOIN appointment_service app_service
+    ON app_service.appointment_service_id = pa.appointment_service_id AND app_service.voided IS FALSE
+  LEFT JOIN provider prov ON prov.provider_id = pa.provider_id AND prov.retired IS FALSE
+  LEFT JOIN person_name pn ON pn.person_id = prov.person_id AND pn.voided IS FALSE
+  LEFT JOIN appointment_service_type app_service_type
+    ON app_service_type.appointment_service_type_id = pa.appointment_service_type_id
+WHERE start_date_time >= CURDATE() AND
+      (app_service_type.voided IS FALSE OR app_service_type.voided IS NULL)
+ORDER BY start_date_time desc limit 1) as appointment on appointment.person_id = enc.person_id
+Left join
+(select preg.obs_id,preg.encounter_id,
 case
-      when
-         p.gender = 'M' 
-      then
-         'Masculino' 
-      when
-         p.gender = 'F' 
-      then
-         'Feminino' 
-      when
-         p.gender = 'O' 
-      then
-         'Outro' 
-   end
-   as "Sexo",
-   TIMESTAMPDIFF( YEAR, p.birthdate, CURDATE() ) as "Idade",
-   personAttributesonRegistration.value as "Contacto",
-   paddress.state_province as "Província",
-   paddress.city_village AS "Distrito",
-   paddress.address1 AS "Localidade/Bairro",
-   paddress.address3 AS "Quarteirão",
-   paddress.address4 AS "Avenida/Rua",
-   paddress.address5 AS "Nº da Casa",
-   paddress.postal_code AS "Perto De",
-   DATE_FORMAT(pt.date_created,'%d-%m-%Y') AS "Data de Registo na US",
-   concat(case
-      when
-         pss.patient_state = 'ABANDONED'
-      then
-         'Abandono'
-      when
-         pss.patient_state = 'ACTIVE'
-      then
-         'Activo em'
-      when
-         pss.patient_state = 'INACTIVE_DEATH'
-      then
-         'Inactive - Óbito'
-      when
-         pss.patient_state = 'INACTIVE_TRANSFERRED_OUT'
-      then
-         'Inactivo - Transferido Para'
-      when
-         pss.patient_state = 'INACTIVE_SUSPENDED'
-      then
-         'Inactivo - Suspenso'
-   end,' ',
-   case
-      when
-         pss.patient_status = 'Pre TARV'
-      then
-         'Pre-TARV'
-      when
-         pss.patient_status = 'TARV'
-      then
-         'TARV'
-      when
-         pss.patient_status = 'TARV_ABANDONED'
-      then
-         'TARV-Abandono'
-      when
-         pss.patient_status = 'TARV_TREATMENT_SUSPENDED'
-      then
-         'TARV-Tratamento Suspenso'
-      when
-         pss.patient_status = 'TARV_RESTART'
-      then
-         'TARV-Reinício'
-   end ) AS "Estado de Permanência",
-   DATE_FORMAT(erpdrug_order.dispensed_date,'%d-%m-%Y') AS "Data de Inicio TARV"
-from
-   person p 
-   INNER JOIN
-      person_name pn 
-      on pn.person_id = p.person_id 
-      and p.voided = 0 
-      and pn.voided = 0 
-   INNER JOIN
-      patient_identifier pi 
-      on pi.patient_id = p.person_id 
-      and pi.voided = 0
-   INNER JOIN
-      patient pt 
-      on pt.patient_id = p.person_id
-      and pi.voided = 0
-      and cast(pt.date_created as date) BETWEEN '#startDate#' and '#endDate#'
-   LEFT JOIN
-      person_attribute personAttributesonRegistration 
-      on personAttributesonRegistration.person_id = p.person_id 
-      and personAttributesonRegistration.voided = 0 
-   INNER JOIN
-      person_attribute_type personAttributeTypeonRegistration 
-      on personAttributesonRegistration.person_attribute_type_id = personAttributeTypeonRegistration.person_attribute_type_id 
-      and personAttributeTypeonRegistration.name = 'PRIMARY_CONTACT_NUMBER_1' 
-   LEFT JOIN
-      person_attribute pa 
-      on pa.person_id = p.person_id 
-      and pa.voided = 0 
-   INNER JOIN
-      person_attribute_type pat 
-      on pa.person_attribute_type_id = pat.person_attribute_type_id 
-      and personAttributeTypeonRegistration.name = 'PRIMARY_CONTACT_NUMBER_1' 
-   JOIN
-      concept_view cv 
-      on pa.value = cv.concept_id 
-      AND cv.retired = 0 
-      and cv.concept_full_name = 'NEW_PATIENT' 
-   INNER JOIN
-      patient_status_state pss
-      on pss.patient_id=pt.patient_id
-   LEFT JOIN
-      patient_status_state pss2
-      on pss.patient_id=pss2.patient_id and pss.id < pss2.id
-   LEFT JOIN
-      erpdrug_order
-      on erpdrug_order.patient_id=pss.patient_id
-      and first_arv_dispensed = 1 and arv_dispensed = 1
-   LEFT OUTER JOIN
-      person_address paddress 
-      ON p.person_id = paddress.person_id 
-      AND paddress.voided is false
-      where pss2.id IS NULL;
+when
+cn_pregnancy.name = "Pregnancy_Yes"
+then 'SIM'
+when
+cn_pregnancy.name = "Pregnancy_No"
+then 'NÃO'
+end
+as pregnant
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Pregnancy_Yes_No") preg
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_pregnancy on cn_pregnancy.concept_id = preg.value_coded) pregnancy_state on pregnancy_state.encounter_id = obs.encounter_id
+
+Left join
+(select breast_feeding.obs_id,breast_feeding.encounter_id,
+case
+when
+cn_breast_feeding.name = "True"
+then 'SIM'
+when
+cn_breast_feeding.name = "False"
+then 'NÃO'
+end
+as breast_feeding_value
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Breastfeeding_ANA") breast_feeding
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_breast_feeding on cn_breast_feeding.concept_id = breast_feeding.value_coded) brestfeeding_state on brestfeeding_state.encounter_id = obs.encounter_id
+
+Left Join
+(select condom.obs_id,condom.encounter_id,
+case
+when
+cn_condom.name = "Family_Planning_Contraceptive_Methods_PRES_Condom_button_Yes"
+then 'SIM'
+when
+cn_condom.name = "Family_Planning_Contraceptive_Methods_PRES_Condom_button_No"
+then 'NÃO'
+end
+as condom_value
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Family_Planning_Contraceptive_Methods_PRES_Condom_button") condom
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_condom on cn_condom.concept_id = condom.value_coded) condom_usage on condom_usage.encounter_id = obs.encounter_id
+Left join
+(select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "WEIGHT") weight on weight.encounter_id = obs.encounter_id
+Left join
+(select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "BMI") bmi on bmi.encounter_id = obs.encounter_id;
