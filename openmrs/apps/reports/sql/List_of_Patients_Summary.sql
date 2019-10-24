@@ -1,4 +1,4 @@
-select  distinct enc.identifier as NID, enc.full_name as Nome, enc.date_created as "Consulta Actual",appointment.next_consultation as "Próxima consulta", enc.age as "Idade",diastolic.value_numeric as "Tensão Arterial", pregnant as "Gravidez",breast_feeding_value as "Lactante",condom_value, weight.value_numeric as "Peso", bmi.value_numeric as "IMC", enc.encounter_id  from (select identifier,person.person_id,full_name,date_created,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
+select  distinct enc.identifier as NID, enc.full_name as Nome, enc.date_created as "Consulta Actual",appointment.next_consultation as "Próxima consulta", enc.age as "Idade",diastolic.value_numeric as "Tensão Arterial", pregnant as "Gravidez",breast_feeding_value as "Lactante",condom_value, weight.value_numeric as "Peso", height.value_numeric as "Altura",bmi.value_numeric as "IMC", nutritional_eval as "Aval. Nutricional",odema.odemas_value as "Edema", enc.encounter_id  from (select identifier,person.person_id,full_name,date_created,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
 inner join
 (select identifier,concat(pn.given_name," ", COALESCE(pn.middle_name,'')," ", COALESCE(pn.family_name,'')) as full_name, pn.person_id, p.birthdate from person_name pn join patient_identifier pi on pn.person_id = pi.patient_id join person p on p.person_id = pn.person_id) person
 on person_id=patient_id) enc
@@ -66,4 +66,59 @@ join (select name, concept_id from concept_name where concept_name_type = "FULLY
 Left join
 (select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "WEIGHT") weight on weight.encounter_id = obs.encounter_id
 Left join
-(select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "BMI") bmi on bmi.encounter_id = obs.encounter_id;
+(select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "HEIGHT") height on height.encounter_id = obs.encounter_id
+Left join
+(select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "BMI") bmi on bmi.encounter_id = obs.encounter_id
+LEFT JOIN
+(select nutritional_eval.obs_id,nutritional_eval.encounter_id,
+case
+when
+cn_nutritional_eval.name = "CO_SAM"
+then 'Desnutrição aguda grave'
+when
+cn_nutritional_eval.name = "CO_Normal"
+then 'Normal'
+when
+cn_nutritional_eval.name = "CO_MAM"
+then 'Desnutrição aguda moderada'
+when
+cn_nutritional_eval.name = "CO_LAM"
+then 'Desnutrição aguda ligeira'
+when
+cn_nutritional_eval.name = "CO_Overweight"
+then 'Sobrepeso'
+when
+cn_nutritional_eval.name = "CO_OneDO"
+then 'Obesidade grau 1'
+when
+cn_nutritional_eval.name = "CO_TwoDO"
+then 'Obesidade grau 2'
+when
+cn_nutritional_eval.name = "CO_ThreeDO"
+then 'Obesidade grau 3'
+when
+cn_nutritional_eval.name = "CO_Obese"
+then 'Obesidade'
+end
+as nutritional_eval
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Nutritional_States_new") nutritional_eval
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_nutritional_eval on cn_nutritional_eval.concept_id = nutritional_eval.value_coded) imc_eval on imc_eval.encounter_id = obs.encounter_id
+Left Join
+(select odemas.obs_id,odemas.encounter_id,
+case
+when
+cn_odemas.name = "Infants Odema_O"
+then 'O'
+when
+cn_odemas.name = "Infants Odema_+"
+then '+'
+when
+cn_odemas.name = "Infants Odema_++"
+then '++'
+when
+cn_odemas.name = "Infants Odema_+++"
+then '+++'
+end
+as odemas_value
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Infants Odema_Prophylaxis") odemas
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_odemas on cn_odemas.concept_id = odemas.value_coded) odema on odema.encounter_id = obs.encounter_id;
