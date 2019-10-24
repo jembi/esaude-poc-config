@@ -328,7 +328,7 @@ from
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'M' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') BETWEEN 45 and 49 ) then 1 else NULL END) as "Targeted M 45-49",
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'M' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') >= 50 ) then 1 else NULL END) as "Targeted M >=50",
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'M' and p.birthdate is NULL) then 1 else NULL END) as "Targeted M Unknown age",
-   count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'M') then 1 else NULL END) as "Male Subtotal",
+   count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'M') then 1 else NULL END) as "Targeted Male Subtotal",
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'F' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') < 1 ) then 1 else NULL END) as "Targeted F <1",
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'F' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') BETWEEN 1 and 4 ) then 1 else NULL END) as "Targeted F 1-4",
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'F' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') BETWEEN 5 and 9 ) then 1 else NULL END) as "Targeted F 5-9",
@@ -342,7 +342,7 @@ from
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'F' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') BETWEEN 45 and 49 ) then 1 else NULL END) as "Targeted F 45-49",
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'F' and TIMESTAMPDIFF( YEAR, p.birthdate, '#endDate#') >= 50 ) then 1 else NULL END) as "Targeted F >=50" ,
    count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'F' and (p.birthdate is NULL)) then 1 else NULL END) as "Targeted F Unknown age",
-   count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'F') then 1 else NULL END) as "Female Subtotal",
+   count(case when  ( Viralload.test_name = 'CARGA VIRAL (Absoluto-Suspeita)' and p.gender = 'F') then 1 else NULL END) as "Targeted Female Subtotal",
    "" as "Data Check"
 from
    person p 
@@ -390,11 +390,6 @@ from
       person_attribute pa 
       on pa.person_id = p.person_id 
       and pa.voided = 0 
-   JOIN
-      concept_view cv 
-      on pa.value = cv.concept_id 
-      AND cv.retired = 0 
-      and cv.concept_full_name = 'NEW_PATIENT'
       inner join
       erpdrug_order erp
       on erp.patient_id=pt.patient_id
