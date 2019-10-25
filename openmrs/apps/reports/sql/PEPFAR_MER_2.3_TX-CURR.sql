@@ -46,7 +46,7 @@ from
       and
       p.person_id not in (
          select
-			pa.person_id as 'mypid' from person_attribute pa
+			pa.person_id from person_attribute pa
 		 where
 			pa.person_attribute_type_id
 		 in (
