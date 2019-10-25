@@ -1,4 +1,6 @@
-select  distinct enc.identifier as NID, enc.full_name as Nome, enc.date_created as "Consulta Actual",appointment.next_consultation as "Próxima consulta", enc.age as "Idade",diastolic.value_numeric as "Tensão Arterial", pregnant as "Gravidez",breast_feeding_value as "Lactante",condom_value, weight.value_numeric as "Peso", height.value_numeric as "Altura",bmi.value_numeric as "IMC", nutritional_eval as "Aval. Nutricional",odema.odemas_value as "Edema", enc.encounter_id  from (select identifier,person.person_id,full_name,date_created,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
+select  distinct enc.identifier as NID, enc.full_name as Nome, enc.date_created as "Consulta Actual",appointment.next_consultation as "Próxima consulta", enc.age as "Idade",diastolic.value_numeric as "Tensão Arterial", pregnant as "Gravidez",breast_feeding_value as "Lactante",condom_value, weight.value_numeric as "Peso",
+height.value_numeric as "Altura",bperimeter.value_numeric as "PB",bmi.value_numeric as "IMC", nutritional_eval as "Aval. Nutricional",odema.odemas_value as "Edema",nutritional_education.received as "Educ. Nutric.", nutritional_supplement.supplement as "Supl", suppl_quant.value_numeric as "Supl. Quant",has_symptoms.symptoms_value as "Tem Sintomas",symptoms_list.symptoms as "Sintomas", enc.encounter_id
+from (select identifier,person.person_id,full_name,date_created,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
 inner join
 (select identifier,concat(pn.given_name," ", COALESCE(pn.middle_name,'')," ", COALESCE(pn.family_name,'')) as full_name, pn.person_id, p.birthdate from person_name pn join patient_identifier pi on pn.person_id = pi.patient_id join person p on p.person_id = pn.person_id) person
 on person_id=patient_id) enc
@@ -63,12 +65,14 @@ end
 as condom_value
  from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Family_Planning_Contraceptive_Methods_PRES_Condom_button") condom
 join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_condom on cn_condom.concept_id = condom.value_coded) condom_usage on condom_usage.encounter_id = obs.encounter_id
-Left join
+LEFT JOIN
 (select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "WEIGHT") weight on weight.encounter_id = obs.encounter_id
-Left join
+LEFT JOIN
 (select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "HEIGHT") height on height.encounter_id = obs.encounter_id
-Left join
+LEFT JOIN
 (select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "BMI") bmi on bmi.encounter_id = obs.encounter_id
+LEFT JOIN
+(select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Brachial_perimeter_new") bperimeter on bperimeter.encounter_id = obs.encounter_id
 LEFT JOIN
 (select nutritional_eval.obs_id,nutritional_eval.encounter_id,
 case
@@ -121,4 +125,73 @@ then '+++'
 end
 as odemas_value
  from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Infants Odema_Prophylaxis") odemas
-join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_odemas on cn_odemas.concept_id = odemas.value_coded) odema on odema.encounter_id = obs.encounter_id;
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_odemas on cn_odemas.concept_id = odemas.value_coded) odema on odema.encounter_id = obs.encounter_id
+LEFT JOIN
+(select nutritional_education.obs_id,nutritional_education.encounter_id,
+case
+when
+cn_nutritional_education.name = "True"
+then 'SIM'
+when
+cn_nutritional_education.name = "False"
+then 'NÃO'
+end
+as received
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Received nutritional education") nutritional_education
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_nutritional_education on cn_nutritional_education.concept_id = nutritional_education.value_coded) nutritional_education on nutritional_education.encounter_id = obs.encounter_id
+LEFT JOIN
+(select nutrition_supplement.obs_id,nutrition_supplement.encounter_id,
+case
+when
+cn_nutrition_supplement.name = "Soya__Prophylaxis"
+then 'Soja'
+when
+cn_nutrition_supplement.name = "ATPUS__Prophylaxis"
+then 'ATPUS'
+when
+cn_nutrition_supplement.name = "Other__Prophylaxis"
+then 'Outro'
+end
+as supplement
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Nutrition Supplement") nutrition_supplement
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_nutrition_supplement on cn_nutrition_supplement.concept_id = nutrition_supplement.value_coded) nutritional_supplement on nutritional_supplement.encounter_id = obs.encounter_id
+LEFT JOIN
+ (select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "BP_Diastolic_VSNormal") as suppl_quant on suppl_quant.encounter_id = obs.encounter_id
+ Left join
+(select symptoms.obs_id,symptoms.encounter_id,
+case
+when
+cn_symptoms.name = "True"
+then 'SIM'
+when
+cn_symptoms.name = "False"
+then 'NÃO'
+end
+as symptoms_value
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Breastfeeding_ANA") symptoms
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_symptoms on cn_symptoms.concept_id = symptoms.value_coded) has_symptoms on has_symptoms.encounter_id = obs.encounter_id
+LEFT JOIN
+(select encounter_id, GROUP_CONCAT(supplement) as symptoms from (select symptomslist.obs_id,symptomslist.encounter_id,
+case
+when
+cn_symptomslist.name = "Fever_PL"
+then 'Febre'
+when
+cn_symptomslist.name = "Recent weight loss"
+then 'Emagrecimento Recente'
+when
+cn_symptomslist.name = "Cough with blood_Prophylaxis"
+then 'Tosse com Sangue'
+when
+cn_symptomslist.name = "Cough without blood_Prophylaxis"
+then 'Tosse sem Sangue'
+when
+cn_symptomslist.name = "Asthenia"
+then 'Astenia'
+when
+cn_symptomslist.name = "Recent contact with Tuberculosis"
+then 'Contacto Recente com TB'
+end
+as supplement
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Symptoms Prophylaxis_New") symptomslist
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_symptomslist on cn_symptomslist.concept_id = symptomslist.value_coded) list_of_symptoms group by encounter_id) symptoms_list on symptoms_list.encounter_id = obs.encounter_id; 
