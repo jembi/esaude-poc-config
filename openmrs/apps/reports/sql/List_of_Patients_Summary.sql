@@ -1,5 +1,6 @@
-select  distinct enc.identifier as NID, enc.full_name as Nome, enc.date_created as "Consulta Actual",appointment.next_consultation as "Próxima consulta", enc.age as "Idade",diastolic.value_numeric as "Tensão Arterial", pregnant as "Gravidez",breast_feeding_value as "Lactante",condom_value, weight.value_numeric as "Peso",
-height.value_numeric as "Altura",bperimeter.value_numeric as "PB",bmi.value_numeric as "IMC", nutritional_eval as "Aval. Nutricional",odema.odemas_value as "Edema",nutritional_education.received as "Educ. Nutric.", nutritional_supplement.supplement as "Supl", suppl_quant.value_numeric as "Supl. Quant",has_symptoms.symptoms_value as "Tem Sintomas",symptoms_list.symptoms as "Sintomas", enc.encounter_id
+select  distinct enc.identifier as NID, enc.full_name as Nome, enc.date_created as "Cons. Actual",appointment.next_consultation as "Próx. Cons", enc.age as "Idade",diastolic.value_numeric as "T. Art", pregnant as "Gravidez",breast_feeding_value as "Lact",condom_value, weight.value_numeric as "Peso",
+height.value_numeric as "Alt",bperimeter.value_numeric as "PB",bmi.value_numeric as "IMC", nutritional_eval as "Aval. Nut",odema.odemas_value as "Edema",nutritional_education.received as "Ed. Nut", nutritional_supplement.supplement as "Supl", suppl_quant.value_numeric as "Supl. Quant",has_symptoms.symptoms_value as "Tem Sintomas",
+symptoms_list.symptoms as "Sintomas",date_of_diagnosis.value_datetime as "Data Diag. TB",date_of_TB_start.value_datetime,date_of_TB_start.value_datetime,state_of_TB.state,type_of_prophilaxis.type_of_pfx,state_of_prophylaxis.state,sec_efects.has_sec_efects as SEF_INH,sec_efects_ctz.has_sec_efects_ctz as SEF_CTZ, enc.encounter_id
 from (select identifier,person.person_id,full_name,date_created,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
 inner join
 (select identifier,concat(pn.given_name," ", COALESCE(pn.middle_name,'')," ", COALESCE(pn.family_name,'')) as full_name, pn.person_id, p.birthdate from person_name pn join patient_identifier pi on pn.person_id = pi.patient_id join person p on p.person_id = pn.person_id) person
@@ -24,7 +25,7 @@ FROM
 WHERE start_date_time >= CURDATE() AND
       (app_service_type.voided IS FALSE OR app_service_type.voided IS NULL)
 ORDER BY start_date_time desc limit 1) as appointment on appointment.person_id = enc.person_id
-Left join
+LEFT JOIN
 (select preg.obs_id,preg.encounter_id,
 case
 when
@@ -37,7 +38,6 @@ end
 as pregnant
  from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Pregnancy_Yes_No") preg
 join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_pregnancy on cn_pregnancy.concept_id = preg.value_coded) pregnancy_state on pregnancy_state.encounter_id = obs.encounter_id
-
 Left join
 (select breast_feeding.obs_id,breast_feeding.encounter_id,
 case
@@ -194,4 +194,74 @@ then 'Contacto Recente com TB'
 end
 as supplement
  from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Symptoms Prophylaxis_New") symptomslist
-join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_symptomslist on cn_symptomslist.concept_id = symptomslist.value_coded) list_of_symptoms group by encounter_id) symptoms_list on symptoms_list.encounter_id = obs.encounter_id; 
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_symptomslist on cn_symptomslist.concept_id = symptomslist.value_coded) list_of_symptoms group by encounter_id) symptoms_list on symptoms_list.encounter_id = obs.encounter_id
+LEFT JOIN
+ (select value_datetime,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Date of Diagnosis") as date_of_diagnosis on date_of_diagnosis.encounter_id = obs.encounter_id
+ LEFT JOIN
+ (select value_datetime,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "SP_Treatment Start Date") as date_of_TB_start on date_of_TB_start.encounter_id = obs.encounter_id
+  LEFT JOIN
+ (select value_datetime,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "SP_Treatment End Date") as date_of_TB_end on date_of_TB_end.encounter_id = obs.encounter_id
+LEFT JOIN
+ (select TB_state.obs_id,TB_state.encounter_id,
+case
+when
+cn_TB_state.name = "Start_SP"
+then 'Início'
+when
+cn_TB_state.name = "Em Curso"
+then 'Em curso'
+when
+cn_TB_state.name = "End"
+then 'Fim'
+end
+as state
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "SP_Treatment State") TB_state
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_TB_state on cn_TB_state.concept_id = TB_state.value_coded) state_of_TB on state_of_TB.encounter_id = obs.encounter_id
+
+LEFT JOIN
+ (select prophilaxis_type.obs_id,prophilaxis_type.encounter_id,cn_prophilaxis_type.name as type_of_pfx
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Type_Prophylaxis") prophilaxis_type
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_prophilaxis_type on cn_prophilaxis_type.concept_id = prophilaxis_type.value_coded) type_of_prophilaxis on type_of_prophilaxis.encounter_id = obs.encounter_id
+
+LEFT JOIN
+ (select prophylaxis_state.obs_id,prophylaxis_state.encounter_id,
+case
+when
+cn_prophylaxis_state.name = "Inicio_Prophylaxis"
+then 'Início'
+when
+cn_prophylaxis_state.name = "Em Curso_Prophylaxis"
+then 'Em curso'
+when
+cn_prophylaxis_state.name = "Fim_Prophylaxis"
+then 'Fim'
+end
+as state
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "SP_Side_Effects_INH") prophylaxis_state
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_prophylaxis_state on cn_prophylaxis_state.concept_id = prophylaxis_state.value_coded) state_of_prophylaxis on state_of_prophylaxis.encounter_id = obs.encounter_id
+LEFT JOIN
+(select secondary_efects.obs_id,secondary_efects.encounter_id,
+case
+when
+cn_secondary_efects.name = "True"
+then 'SIM'
+when
+cn_secondary_efects.name = "False"
+then 'NÃO'
+end
+as has_sec_efects
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "SP_Side_Effects_INH") secondary_efects
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_secondary_efects on cn_secondary_efects.concept_id = secondary_efects.value_coded) sec_efects on sec_efects.encounter_id = obs.encounter_id
+LEFT JOIN
+(select secondary_efects_ctz.obs_id,secondary_efects_ctz.encounter_id,
+case
+when
+cn_secondary_efects_ctz.name = "True"
+then 'SIM'
+when
+cn_secondary_efects_ctz.name = "False"
+then 'NÃO'
+end
+as has_sec_efects_ctz
+ from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "SP_Side_Effects_CTZ") secondary_efects_ctz
+join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_secondary_efects_ctz on cn_secondary_efects_ctz.concept_id = secondary_efects_ctz.value_coded) sec_efects_ctz on sec_efects_ctz.encounter_id = obs.encounter_id
