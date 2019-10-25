@@ -352,43 +352,22 @@ from
    inner join
       patient pt 
       on pt.patient_id = p.person_id 
+      and 
+      p.person_id not in (
+         select pa.person_id as 'mypid' from person_attribute pa
+          where pa.person_attribute_type_id 
+		in (
+		   select
+            person_attribute_type_id 
+         from
+            person_attribute_type patype 
+         where
+            patype.name in ( 'Transfer_Date','DATE_OF_SUSPENSION','DATE_OF_DEATH')
+		  )
+            and DATE(pa.value) <= DATE('#endDate#')
+            )
       and pi.voided = 0 
-   left JOIN
-      person_attribute tdate 
-      on tdate.person_id = p.person_id 
-      and tdate.person_attribute_type_id = 
-      (
-         select
-            person_attribute_type_id 
-         from
-            person_attribute_type patype 
-         where
-            patype.name = 'Transfer_Date'
-      )
-   left JOIN
-      person_attribute sdate 
-      on sdate.person_id = p.person_id 
-      and sdate.person_attribute_type_id = 
-      (
-         select
-            person_attribute_type_id 
-         from
-            person_attribute_type patype 
-         where
-            patype.name = 'DATE_OF_SUSPENSION'
-      )
-   left JOIN
-      person_attribute ddate 
-      on ddate.person_id = p.person_id 
-      and ddate.person_attribute_type_id = 
-      (
-         select
-            person_attribute_type_id 
-         from
-            person_attribute_type patype 
-         where
-            patype.name = 'DATE_OF_DEATH'
-      )
+
    inner join
       erpdrug_order erp 
       on erp.patient_id = pt.patient_id 
@@ -404,7 +383,7 @@ from
             and erpdrug_order.arv_dispensed = 1 
             and erpdrug_order.patient_id = erp.patient_id
       )
-   inner join
+    inner join
       drug_order dor 
       on dor.order_id = erp.order_id 
    left join
@@ -420,22 +399,7 @@ from
          where
             patient_status_state.patient_id = pss.patient_id
       )
-where
-   (
-      tdate.value is null 
-      or DATE(tdate.value) > DATE('#endDate#')
-   )
-   and 
-   (
-      sdate.value is null 
-      or DATE(sdate.value) > DATE('#endDate#')
-   )
-   and 
-   (
-      ddate.value is null 
-      or DATE(ddate.value) > DATE('#endDate#')
-   )
-   and 
+where 
    (
 (date_add(date_add(erp.dispensed_date, interval dor.quantity DAY ), interval 31 DAY)) > DATE('#endDate#')
    )
