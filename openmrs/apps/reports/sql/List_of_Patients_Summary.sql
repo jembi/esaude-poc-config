@@ -130,7 +130,7 @@ FROM
 		  
 		(SELECT obs_mdc.obs_id, obs_mdc.concept_id, obs_mdc.person_id, obs_mdc.value_coded
 			FROM obs as obs_mdc
-			WHERE obs_mdc.person_id = 32942
+			WHERE obs_mdc.encounter_id = obs.encounter_id
 		) mdc_obs
 					
 		JOIN
