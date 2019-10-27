@@ -1,4 +1,4 @@
-select  distinct enc.identifier as NID, enc.full_name as Nome, enc.date_created as "Consulta Actual",appointment.next_consultation as "Próxima consulta", enc.age as "Idade",diastolic.value_numeric as "Tensão Arterial", pregnant as "Gravidez",breast_feeding_value as "Lactante",condom_value, weight.value_numeric as "Peso", bmi.value_numeric as "IMC", enc.encounter_id, modelos_diferenciados.modelos_diferenciados_list, mdc_elegibility.mdc_yes_no, modelos_diferenciados_estado.mdc_list_status
+select  distinct enc.identifier as NID, enc.full_name as Nome, enc.date_created as "Consulta Actual",appointment.next_consultation as "Próxima consulta", enc.age as "Idade",diastolic.value_numeric as "Tensão Arterial", pregnant as "Gravidez",breast_feeding_value as "Lactante",condom_value, weight.value_numeric as "Peso", bmi.value_numeric as "IMC", enc.encounter_id, modelos_diferenciados.modelos_diferenciados_list, mdc_elegibility.mdc_yes_no, modelos_diferenciados_estado.mdc_list_status, grupos_apoio_lista.suport_groups_list_coded, grupos_apoio_estado.sg_list_status
 from (select identifier,person.person_id,full_name,date_created,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
 inner join
 (select identifier,concat(pn.given_name," ", COALESCE(pn.middle_name,'')," ", COALESCE(pn.family_name,'')) as full_name, pn.person_id, p.birthdate from person_name pn join patient_identifier pi on pn.person_id = pi.patient_id join person p on p.person_id = pn.person_id) person
@@ -164,8 +164,72 @@ FROM
 	) AS mdc_result_status
 ) modelos_diferenciados_estado
 
-                        
-select * from concept_name where concept_id = 8147;
+-- Lista de Grupos de Apoio
+LEFT JOIN                   
+(SELECT GROUP_CONCAT(name SEPARATOR ", ") AS suport_groups_list_coded
+	FROM
 
+		(SELECT sg_obs.obs_id, sg_obs.concept_id, sg_obs.person_id, sg_obs.value_coded
+		FROM obs AS sg_obs
+		WHERE sg_obs.encounter_id = enc.encounter_id
+    ) as sg_obs
+		
+		JOIN
+			(SELECT c_name_pt.concept_id, c_name_pt.name
+				FROM concept_name AS c_name_pt
+				WHERE c_name_pt.concept_id IN 
+					(SELECT concept_id
+						FROM concept_name
+						WHERE name IN ("Reference_CR", "Reference_PC", "Reference_AR", "Reference_MPS") -- , "Reference_Other_Specify_Group_Other")
+							AND concept_name_type = "FULLY_SPECIFIED"
+							AND locale = "en"
+							ORDER BY concept_id ASC)
+					AND c_name_pt.concept_name_type = "SHORT"
+					AND c_name_pt.locale = "pt"
+			) sg_shortname
+			ON sg_obs.concept_id = sg_shortname.concept_id
+) grupos_apoio_lista
+
+-- Lista de Grupos de Apoio com estado de progresso
+LEFT JOIN
+(SELECT GROUP_CONCAT(sg_result_status.sg_list_with_states SEPARATOR ", ") AS sg_list_status
+FROM
+(SELECT CONCAT_WS(" - ", sg_shortname.name, sg_status.name) AS sg_list_with_states
+	FROM
+		(SELECT sg_obs.obs_id, sg_obs.concept_id, sg_obs.person_id, sg_obs.value_coded
+		FROM obs AS sg_obs
+		WHERE sg_obs.person_id = 32942) as sg_obs
+		
+		JOIN
+			(SELECT c_name_pt.concept_id, c_name_pt.name
+				FROM concept_name AS c_name_pt
+				WHERE c_name_pt.concept_id IN 
+					(SELECT concept_id
+						FROM concept_name
+						WHERE name IN ("Reference_CR", "Reference_PC", "Reference_AR", "Reference_MPS") -- , "Reference_Other_Specify_Group_Other")
+							AND concept_name_type = "FULLY_SPECIFIED"
+							AND locale = "en"
+							ORDER BY concept_id ASC)
+					AND c_name_pt.concept_name_type = "SHORT"
+					AND c_name_pt.locale = "pt"
+			) sg_shortname
+			ON sg_obs.concept_id = sg_shortname.concept_id
+		
+        JOIN
+			(SELECT c_name_status.concept_id, c_name_status.name
+				FROM concept_name AS c_name_status
+				WHERE c_name_status.concept_id IN
+					(SELECT concept_id
+						FROM concept_name
+						WHERE name IN ("Reference_Start", "Reference_In_Progress", "Reference_End")
+							AND concept_name_type = "FULLY_SPECIFIED"
+							AND locale = "en")
+					AND c_name_status.concept_name_type = "SHORT"
+					AND c_name_status.locale = "pt"
+				) sg_status
+				ON sg_status.concept_id = sg_obs.value_coded
+) AS sg_result_status
+
+) grupos_apoio_estado
 
 order by enc.date_created desc;
