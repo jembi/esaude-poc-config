@@ -1,7 +1,7 @@
 select distinct pi.identifier as NID
 ,concat(pn.given_name,' ',pn.family_name) as Nome
-,prt.date_app as 'Consulta Atual'
-,date(prx.next_app) as 'Consulta Proxima'
+,date_format(date(prt.date_app),'%d-%m-%Y')  as 'Consulta Atual'
+,date_format(date(prx.next_app),'%d-%m-%Y')  as 'Consulta Proxima'
 ,timestampdiff(YEAR, date(pr.birthdate), date(now())) as idade
 ,ch.pop_chave as 'População Chave'
 ,cv.pop_vul as 'População Vulnerável (Especifique)'
@@ -30,14 +30,14 @@ select distinct pi.identifier as NID
 ,mdc.grupos as 'Modelos Diferenciados de Cuidados (MDC)'
 ,mdc_o.other as 'MDC - OUTRO'
 ,prp.prep as 'Está preparado para iniciar o TARV'
-,model.dia as 'DATA'
+,date_format(date(model.dia),'%d-%m-%Y') as 'DATA'
 ,prov.provider as 'Provedor'
 ,conf.contact as ' O paciente/ cuidador concorda em ser contactado, se necessário? '
 ,ctype.contact as 'Contacto'
-,conf.last as 'Data'
+,date_format(date(conf.last),'%d-%m-%Y') as 'Data'
 ,care.contact as ' O confidente concorda em ser contactado, se necessário?'
 ,cntype.contact as 'Contacto'
-,care.last as 'Data'
+,date_format(date(care.last),'%d-%m-%Y') as 'Data'
 
 from  
 person pr
