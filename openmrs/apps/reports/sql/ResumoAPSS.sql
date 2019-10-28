@@ -1,4 +1,4 @@
-select pi.identifier as NID
+select distinct pi.identifier as NID
 ,concat(pn.given_name,' ',pn.family_name) as nome
 ,curdate() as consulta_atual
 ,date(prx.next_app) as proxima_consulta
@@ -41,11 +41,8 @@ select pi.identifier as NID
 from  
 person pr
 
-inner join (select o.person_id,e.encounter_id from obs o, concept_name cn, encounter e
-where o.concept_id = cn.concept_id 
-and o.encounter_id = e.encounter_id and o.person_id = e.patient_id
-and cn.name in ('Reference_Form','Apss_Section_II_form','Apss_Section_I_form','Apss_Section_III_form','Group_Priority_Population_obs_form')
-and e.encounter_datetime BETWEEN '2019-10-27 00:00:00' and '2019-10-28 00:00:00' group by o.person_id) as me on me.person_id = pr.person_id
+inner join (select e.patient_id,max(e.encounter_id) as encounter_id from encounter e
+where e.encounter_datetime BETWEEN '#startDate' and '#endDate#' group by e.patient_id) as me on me.patient_id = pr.person_id
 
 left join (select distinct patient_id from patient where voided = 0) as p on p.patient_id = pr.person_id
 left join (select distinct patient_id,identifier,identifier_type from patient_identifier where voided = 0) as pi on pi.patient_id = p.patient_id
@@ -61,12 +58,10 @@ left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pop_chave
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'PP_Key_population'
-group by ob.person_id) as ch on ch.person_id = p.patient_id and ch.encounter_id = me.encounter_id
+and cn.name = 'PP_Key_population') as ch on ch.person_id = p.patient_id and ch.encounter_id = me.encounter_id
 
  left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
   when name='PP_Vulnerable_Population_Yes_Female_youths' then 'Rapariga entre 10-14 anos' 
@@ -80,47 +75,35 @@ when name='PP_Vulnerable_Population_Yes_Truck_driver' then 'Camionista'
  end as name 
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pop_vul
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'PP_IF_Vulnerable_Population_Yes'
-/*and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'PP_IF_Vulnerable_Population_Yes' group by o.person_id)*/
-group by ob.person_id) as cv on cv.person_id = p.patient_id and cv.encounter_id = me.encounter_id
+and cn.name = 'PP_IF_Vulnerable_Population_Yes') as cv on cv.person_id = p.patient_id and cv.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Disclosure_Diagnosis_results_child_adolescent_No' then 'Não'
  when name='Apss_Disclosure_Diagnosis_results_child_adolescent_Partial' then 'Parcial'
  when name='Apss_Disclosure_Diagnosis_results_child_adolescent_Total' then 'Total'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as estado
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Disclosure_Diagnosis_results_child_adolescent'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Disclosure_Diagnosis_results_child_adolescent' group by o.person_id)
-group by ob.person_id) as rev on rev.person_id = p.patient_id
+and cn.name = 'Apss_Disclosure_Diagnosis_results_child_adolescent') as rev on rev.person_id = p.patient_id and rev.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id, ob.person_id,ob.value_coded,(select case
  when name='Apss_Pre_TARV_counselling_Yes' then 'Sim'
  when name='Apss_Pre_TARV_counselling_NO' then 'Não'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as tarv_cons
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Pre_TARV_counselling'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Pre_TARV_counselling' group by o.person_id)
-group by ob.person_id) as cons on cons.person_id = p.patient_id
+and cn.name = 'Apss_Pre_TARV_counselling') as cons on cons.person_id = p.patient_id and cons.encounter_id = me.encounter_id
 
-left join (select ob.person_id,group_concat((select case
+left join (select e.encounter_id, ob.person_id,group_concat((select case
  when name='Apss_Psychosocial_factors_Alcohol_Drug_Abuse' then 'Q'
  when name='Apss_Psychosocial_factors_Cultural_Religious_Traditional_Aspects' then 'P'
  when name='Apss_Psychosocial_factors_Denial_of_positive_result' then 'A'
@@ -141,7 +124,6 @@ left join (select ob.person_id,group_concat((select case
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED')) as reason
-,max(e.encounter_datetime)
 from obs ob
 , encounter e
 , concept_name cn
@@ -151,147 +133,103 @@ and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' 
 and cn.locale = 'en'
 and cn.name = 'Apss_Psychosocial_factors_Reasons'
-and ob.encounter_id in (select max(e.encounter_id) from encounter e,obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and e.patient_id = o.person_id and e.encounter_id = o.encounter_id
- and cn.name = 'Apss_Psychosocial_factors_Reasons' group by e.patient_id)
-group by ob.person_id) as rs on rs.person_id = p.patient_id
+) as rs on rs.person_id = p.patient_id and rs.encounter_id = me.encounter_id and rs.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Positive_prevention_Sexual_behavior_Yes' then 'Sim'
  when name='Apss_Positive_prevention_Sexual_behavior_No' then 'Não'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp1
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Positive_prevention_Sexual_behavior'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Positive_prevention_Sexual_behavior' group by o.person_id)
-group by ob.person_id) as psb on psb.person_id = p.patient_id
+and cn.name = 'Apss_Positive_prevention_Sexual_behavior') as psb on psb.person_id = p.patient_id and psb.encounter_id = me.encounter_id 
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Positive_prevention_Disclosure_HIV_status_partner_encouragement_test_Yes' then 'Sim'
  when name='Apss_Positive_prevention_Disclosure_HIV_status_partner_encouragement_test_No' then 'Não'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp2
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Positive_prevention_Disclosure_HIV_status_partner_encouragement_test'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Positive_prevention_Disclosure_HIV_status_partner_encouragement_test' group by o.person_id)
-group by ob.person_id) as psb2 on psb2.person_id = p.patient_id
+) as psb2 on psb2.person_id = p.patient_id and psb2.encounter_id = me.encounter_id 
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Positive_prevention_importance_adherence_Yes' then 'Sim'
  when name='Apss_Positive_prevention_importance_adherence_No' then 'Não'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp3
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Positive_prevention_importance_adherence'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Positive_prevention_importance_adherence' group by o.person_id)
-group by ob.person_id) as psb3 on psb3.person_id = p.patient_id
+) as psb3 on psb3.person_id = p.patient_id and psb3.encounter_id = me.encounter_id 
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Positive_prevention_Sexually_Transmitted_Infections_Yes' then 'Sim'
  when name='Apss_Positive_prevention_Sexually_Transmitted_Infections_No' then 'Não'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp4
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Positive_prevention_Sexually_Transmitted_Infections'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Positive_prevention_Sexually_Transmitted_Infections' group by o.person_id)
-group by ob.person_id) as psb4 on psb4.person_id = p.patient_id
+) as psb4 on psb4.person_id = p.patient_id and psb4.encounter_id = me.encounter_id 
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Positive_prevention_Family_Planning_Yes' then 'Sim'
  when name='Apss_Positive_prevention_Family_Planning_No' then 'Não'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp5
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Positive_prevention_Family_Planning'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Positive_prevention_Family_Planning' group by o.person_id)
-group by ob.person_id) as psb5 on psb5.person_id = p.patient_id
+) as psb5 on psb5.person_id = p.patient_id and psb5.encounter_id = me.encounter_id 
 
-left join (select ob.person_id,ob.value_coded,(select case
- when name='Apss_Positive_prevention_Alcohol_other_Drugs_consumption_Yes' then 'Sim'
- when name='Apss_Positive_prevention_Alcohol_other_Drugs_consumption_No' then 'Não'
- end as name
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp6
-,max(e.encounter_datetime) as last 
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as pp6
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Positive_prevention_Alcohol_other_Drugs_consumption'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Positive_prevention_Alcohol_other_Drugs_consumption' group by o.person_id)
-group by ob.person_id) as psb6 on psb6.person_id = p.patient_id
+and cn.name = 'Apss_Positive_prevention_Alcohol_other_Drugs_consumption') as psb6 on psb6.person_id = p.patient_id and psb6.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
- when name='Apss_Positive_prevention_Need_community_support_Yes' then 'Sim'
- when name='Apss_Positive_prevention_Need_community_support_No' then 'Não'
- end as name
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp7
-,max(e.encounter_datetime) as last 
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as pp7
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Positive_prevention_Need_community_support'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Positive_prevention_Need_community_support' group by o.person_id)
-group by ob.person_id) as psb7 on psb7.person_id = p.patient_id
+) as psb7 on psb7.person_id = p.patient_id and psb7.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
- when name='Apss_Positive_prevention_Key_Population_Yes' then 'Sim'
- when name='Apss_Positive_prevention_Key_Population_No' then 'Não'
- end as name
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as lub
-,max(e.encounter_datetime) as last 
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as lub
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Positive_prevention_Key_Population'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Positive_prevention_Key_Population' group by o.person_id)
-group by ob.person_id) as ppl on ppl.person_id = p.patient_id
+) as ppl on ppl.person_id = p.patient_id and ppl.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
- when name='Apss_Adherence_follow_up_Has_informed_someone_Yes' then 'Sim'
- when name='Apss_Adherence_follow_up_Has_informed_someone_No' then 'Não'
- end as name
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as inf
-,max(e.encounter_datetime) as last 
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as inf
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Adherence_follow_up_Has_informed_someone'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Adherence_follow_up_Has_informed_someone' group by o.person_id)
-group by ob.person_id) as ppi on ppi.person_id = p.patient_id
+) as ppi on ppi.person_id = p.patient_id and ppi.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='REL_DAD' then 'Pai'
  when name='REL_MOM' then 'Mãe'
   when name='REL_STEPDAD' then 'Padrasto'
@@ -319,41 +257,32 @@ left join (select ob.person_id,ob.value_coded,(select case
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as rel
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Adherence_follow_up_Has_informed_someone_RELATIONSHIP'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Adherence_follow_up_Has_informed_someone_RELATIONSHIP' group by o.person_id)
-group by ob.person_id) as ppr on ppr.person_id = p.patient_id
+) as ppr on ppr.person_id = p.patient_id and ppr.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Adherence_follow_up_If_Child_Adolescent_Elderly_Disabled_Yes' then 'Sim'
  when name='Apss_Adherence_follow_up_If_Child_Adolescent_Elderly_Disabled_No' then 'Não'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pptype
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Adherence_follow_up_If_Child_Adolescent_Elderly_Disabled'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Adherence_follow_up_If_Child_Adolescent_Elderly_Disabled' group by o.person_id)
-group by ob.person_id) as ppad on ppad.person_id = p.patient_id
+) as ppad on ppad.person_id = p.patient_id and ppad.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_text as name
-,max(e.encounter_datetime) as last 
+left join (select e.encounter_id,ob.person_id,ob.value_text as name
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Adherence_follow_up_Who_administers_Full_Name'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Adherence_follow_up_Who_administers_Full_Name' group by o.person_id)
-group by ob.person_id) as ppname on ppname.person_id = p.patient_id
+) as ppname on ppname.person_id = p.patient_id and ppname.encounter_id = me.encounter_id
 
-left join (select ob.person_id,(select case
+left join (select e.encounter_id,ob.person_id,(select case
 when name='REL_DAD' then 'Pai'
  when name='REL_MOM' then 'Mãe'
   when name='REL_STEPDAD' then 'Padrasto'
@@ -380,8 +309,7 @@ when name='REL_DAD' then 'Pai'
              when name='REL_FRIEND' then 'Amigo(a)'
  end as name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp_par,
-max(e.encounter_datetime) as last
+where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp_par
 from obs ob, concept_name cn, encounter e
 where 
  ob.concept_id = cn.concept_id
@@ -389,209 +317,157 @@ and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'CONFIDENT_RELATIONSHIP'
 and ob.encounter_id = e.encounter_id
 and ob.person_id = e.patient_id
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'CONFIDENT_RELATIONSHIP' group by o.person_id)
-group by ob.person_id) as ppp  on ppp.person_id = p.patient_id 
+) as ppp  on ppp.person_id = p.patient_id and ppp.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Adherence_follow_up_Adherence_Plan_Yes' then 'Sim'
  when name='Apss_Adherence_follow_up_Adherence_Plan_No' then 'Não'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp_plan
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Adherence_follow_up_Adherence_Plan'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Adherence_follow_up_Adherence_Plan' group by o.person_id)
-group by ob.person_id) as pad on pad.person_id = p.patient_id 
+and cn.name = 'Apss_Adherence_follow_up_Adherence_Plan') as pad on pad.person_id = p.patient_id and pad.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Adherence_follow_up_Side_Effects_Yes' then 'Sim'
  when name='Apss_Adherence_follow_up_Side_Effects_No' then 'Não'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp_se
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Adherence_follow_up_Side_Effects'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Adherence_follow_up_Side_Effects' group by o.person_id)
-group by ob.person_id) as se on se.person_id = p.patient_id 
+and cn.name = 'Apss_Adherence_follow_up_Side_Effects') as se on se.person_id = p.patient_id and se.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Adherence_follow_up_Adherence_TARV_Good' then 'Boa'
  when name='Apss_Adherence_follow_up_Adherence_TARV_Risky' then 'Risco'
   when name='Apss_Adherence_follow_up_Adherence_TARV_Bad' then 'Má'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as tarv_ad
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Adherence_follow_up_Adherence_TARV'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Adherence_follow_up_Adherence_TARV' group by o.person_id)
-group by ob.person_id) as ptar on ptar.person_id = p.patient_id 
+and cn.name = 'Apss_Adherence_follow_up_Adherence_TARV') as ptar on ptar.person_id = p.patient_id and ptar.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id, ob.person_id,ob.value_coded,(select case
  when name='Apss_Reason_For_The_Visit_Normal' then 'Normal'
  when name='Apss_Reason_For_The_Visit_Faulty' then 'Faltoso'
   when name='Apss_Reason_For_The_Visit_Leave' then 'Abandono'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as pp_visit
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Reason_For_The_Visit'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Reason_For_The_Visit' group by o.person_id)
-group by ob.person_id) as ppv on ppv.person_id = p.patient_id 
+and cn.name = 'Apss_Reason_For_The_Visit') as ppv on ppv.person_id = p.patient_id and ppv.encounter_id = me.encounter_id
 
-left join (select ob.person_id,group_concat(concat((select substr(name,1,2)
- from concept_name where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT'),'-',(select case
- when name='Reference_Start' then 'Início'
- when name='Reference_In_Progress' then 'Em curso'
-  when name='Reference_End' then 'Fim'
- end as name
+left join (select e.encounter_id,ob.person_id,group_concat(concat((select substr(name,1,2)
+ from concept_name where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT'),'-',(select name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED'))) as grupos
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT'))) as grupos
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name in ('Reference_Other_Specify_Group','Reference_MPS','Reference_PR','Reference_CR','Reference_CA','Reference_AR')
 and ob.encounter_id in (select max(e.encounter_id) from encounter e,obs o, concept_name 
 where o.concept_id = cn.concept_id and o.person_id = ob.person_id and e.patient_id = o.person_id and e.encounter_id = o.encounter_id
- and cn.name in ('Reference_Other_Specify_Group','Reference_MPS','Reference_PR','Reference_CR','Reference_CA','Reference_AR') group by e.patient_id)) as refall on refall.person_id = p.patient_id 
+ and cn.name in ('Reference_Other_Specify_Group','Reference_MPS','Reference_PR','Reference_CR','Reference_CA','Reference_AR') group by e.patient_id)) 
+ as refall on refall.person_id = p.patient_id and refall.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_text as grupo
-,max(e.encounter_datetime) as last 
+left join (select e.encounter_id,ob.person_id,ob.value_text as grupo
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Reference_Other_Specify_Group_Other'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Reference_Other_Specify_Group_Other' group by o.person_id)
-group by ob.person_id) as refother on refother.person_id = p.patient_id 
+) as refother on refother.person_id = p.patient_id and refother.encounter_id = me.encounter_id
 
-left join (select ob.person_id,group_concat(concat(
+left join (select e.encounter_id,ob.person_id,group_concat(concat(
 (select substr(name,1,2)
  from concept_name 
-where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT'),'-',(select case
- when name='Reference_Start' then 'Início'
- when name='Reference_In_Progress' then 'Em curso'
-  when name='Reference_End' then 'Fim'
- end as name
+where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT'),'-',(select name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED'))) as grupos
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name in ('Reference_MDC_Other','Reference_DC','Reference_PU','Reference_CA','Reference_AF','Reference_GA')
-and ob.encounter_id in (select max(e.encounter_id) from encounter e,obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and e.patient_id = o.person_id and e.encounter_id = o.encounter_id
- and cn.name in ('Reference_MDC_Other','Reference_DC','Reference_PU','Reference_CA','Reference_AF','Reference_GA') group by e.patient_id)
-) as mdc on mdc.person_id = p.patient_id 
+) as mdc on mdc.person_id = p.patient_id and mdc.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_text as other
-,max(e.encounter_datetime) as last 
+left join (select e.encounter_id,ob.person_id,ob.value_text as other
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Reference_MDC_Other_comments'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Reference_MDC_Other_comments' group by o.person_id)
-group by ob.person_id) as mdc_o on mdc_o.person_id = p.patient_id 
+) as mdc_o on mdc_o.person_id = p.patient_id and mdc_o.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_datetime as dia
-,max(e.encounter_datetime) as last 
+left join (select e.encounter_id,ob.person_id,ob.value_datetime as dia
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Differentiated_Models_Date'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Differentiated_Models_Date' group by o.person_id)
-group by ob.person_id) as model on model.person_id = p.patient_id 
+and cn.name = 'Apss_Differentiated_Models_Date') as model on model.person_id = p.patient_id and model.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.creator,(select concat(given_name,family_name)
+left join (select e.encounter_id,ob.person_id,ob.creator,(select concat(given_name,family_name)
  from person_name 
 where person_id = ob.creator) as provider
- ,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name in ('Reference_Form','Apss_Section_II_form','Apss_Section_I_form','Apss_Section_III_form','Group_Priority_Population_obs_form')
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name cn
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name in ('Reference_Form','Apss_Section_II_form','Apss_Section_I_form','Apss_Section_III_form','Group_Priority_Population_obs_form') group by o.person_id)
-group by ob.person_id) as prov on prov.person_id = p.patient_id 
+) as prov on prov.person_id = p.patient_id and prov.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id, ob.person_id,ob.value_coded,(select case
  when name='Apss_Agreement_Terms_Confidant_agrees_contacted_Yes' then 'Sim'
  when name='Apss_Agreement_Terms_Confidant_agrees_contacted_No' then 'Não'
  end as name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as contact
-,max(e.encounter_datetime) as last 
+where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as contact,
+e.encounter_datetime as last
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted' group by o.person_id)
-group by ob.person_id) as conf on conf.person_id = p.patient_id 
+) as conf on conf.person_id = p.patient_id and conf.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Agreement_Terms_Type_Contact_Phone_call' then 'Chamada Telefônica'
  when name='Apss_Agreement_Terms_Type_Contact_SMS' then 'SMS'
   when name='Apss_Agreement_Terms_Type_Contact_House_Visits' then 'Visita Domiciliária'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as contact
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Agreement_Terms_Type_Contact'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Agreement_Terms_Type_Contact' group by o.person_id)
-group by ob.person_id) as ctype on ctype.person_id = p.patient_id 
+and cn.name = 'Apss_Agreement_Terms_Type_Contact') as ctype on ctype.person_id = p.patient_id  and ctype.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted_Yes' then 'Sim'
  when name='Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted_No' then 'Não'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as contact
-,max(e.encounter_datetime) as last 
+,e.encounter_datetime as last
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted' group by o.person_id)
-group by ob.person_id) as care on care.person_id = p.patient_id 
+) as care on care.person_id = p.patient_id  and care.encounter_id = me.encounter_id
 
-left join (select ob.person_id,ob.value_coded,(select case
+
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select case
  when name='Apss_Agreement_Terms_Confidant_agrees_contacted_TC_Phone_call' then 'Chamada Telefônica'
  when name='Apss_Agreement_Terms_Confidant_agrees_contacted_TC_SMS' then 'SMS'
   when name='Apss_Agreement_Terms_Confidant_agrees_contacted_TC_Visits' then 'Visita Domiciliária'
  end as name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED') as contact
-,max(e.encounter_datetime) as last 
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact'
-and ob.obs_id in (select max(o.obs_id) from obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact' group by o.person_id)
-group by ob.person_id) as cntype on cntype.person_id = p.patient_id 
+and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact') as cntype on cntype.person_id = p.patient_id  and cntype.encounter_id = me.encounter_id
 
 where pi.identifier_type = 3;
