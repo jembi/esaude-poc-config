@@ -1,6 +1,6 @@
 select distinct pi.identifier as NID
 ,concat(pn.given_name,' ',pn.family_name) as Nome
-,curdate() as 'Consulta Atual'
+,prt.date_app as 'Consulta Atual'
 ,date(prx.next_app) as 'Consulta Proxima'
 ,timestampdiff(YEAR, date(pr.birthdate), date(now())) as idade
 ,ch.pop_chave as 'População Chave'
@@ -42,13 +42,15 @@ select distinct pi.identifier as NID
 from  
 person pr
 
-inner join (select e.patient_id,max(e.encounter_id) as encounter_id from encounter e
-where date(e.encounter_datetime) BETWEEN '#startDate#' and '#endDate#' group by e.patient_id) as me on me.patient_id = pr.person_id
+inner join (select e.patient_id,e.encounter_id as encounter_id from encounter e
+where date(e.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') as me on me.patient_id = pr.person_id
 
 left join (select distinct patient_id from patient where voided = 0) as p on p.patient_id = pr.person_id
 left join (select distinct patient_id,identifier,identifier_type from patient_identifier where voided = 0) as pi on pi.patient_id = p.patient_id
 left join (select distinct person_id,given_name,family_name from person_name where voided = 0) as pn on pn.person_id = p.patient_id
 
+left join (select encounter_id,patient_id,(encounter_datetime) as  date_app
+from encounter) as prt on prt.patient_id = pr.person_id and prt.encounter_id = me.encounter_id
 
 left join (select patient_id,max(start_date_time) as  next_app
 from patient_appointment group by patient_id) as prx on prx.patient_id = pr.person_id
@@ -349,4 +351,5 @@ where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.co
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact') as cntype on cntype.person_id = p.patient_id  and cntype.encounter_id = me.encounter_id
 
-where pi.identifier_type = 3;
+where pi.identifier_type = 3
+order by prt.date_app desc;
