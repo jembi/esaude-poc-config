@@ -1,6 +1,6 @@
 {
     "ListPatientsAPSS": {
-        "name": " Lista de Paciente com consulta APSS",
+        "name": " Lista de Pacientes com consulta APSS",
         "type": "MRSGeneric",
         "config": {
             "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/ResumoAPSS.sql"
