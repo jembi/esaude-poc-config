@@ -1,13 +1,13 @@
 select distinct pi.identifier as NID
-,concat(pn.given_name,' ',pn.family_name) as nome
-,curdate() as consulta_atual
-,date(prx.next_app) as proxima_consulta
+,concat(pn.given_name,' ',pn.family_name) as Nome
+,curdate() as 'Consulta Atual'
+,date(prx.next_app) as 'Consulta Proxima'
 ,timestampdiff(YEAR, date(pr.birthdate), date(now())) as idade
-,ch.pop_chave as populacao_chave
-,cv.pop_vul as populacao_vulneravel
-,rev.estado as estado_revelacao
-,cons.tarv_cons as estado_aconselhamento
-,rs.reason as fatores
+,ch.pop_chave as 'População Chave'
+,cv.pop_vul as 'População Vulnerável (Especifique)'
+,rev.estado as 'ESTADO DA REVELAÇÃO DO DIAGNÓSTICO à Criança/Adolescente?'
+,cons.tarv_cons as 'ACONSELHAMENTO PRÉ-TARV'
+,rs.reason as 'FACTORES PSICO-SOCIAIS que afectam a adesão'
 ,psb.pp1 as pp1
 ,psb2.pp2 as pp2
 ,psb3.pp3 as pp3
@@ -15,28 +15,29 @@ select distinct pi.identifier as NID
 ,psb5.pp5 as pp5
 ,psb6.pp6 as pp6
 ,psb7.pp7 as pp7
-,ppl.lub as pop_chave_lub
-,ppi.inf as informou_alguem
-,ppr.rel as relacao
-,ppad.pptype as outrem_administra
-,ppname.name as nome
-,ppp.pp_par as admin_relacao
-,pad.pp_plan as plano_aderencia
-,se.pp_se as efeitos_secundarios
-,ptar.tarv_ad as aderencia_tarv
-,ppv.pp_visit as motivo_visita
-,refall.grupos as grupo_apoio
-,refother.grupo as o_outro_grupo
-,mdc.grupos as grupo_mdc
-,mdc_o.other as outro_grupo_mdc
-,model.dia as dia_cuidados_diferenciados
-,prov.provider as provider
-,conf.contact as confidente_concorda_c_contacto
-,ctype.contact as tipo_de_contacto
-,conf.last as dia_confidente
-,care.contact as cuidador_concorda_c_contacto
-,care.last as dia_cuidador
-,cntype.contact as tipo_de_contacto_cuidador
+,ppl.lub as 'POPULAÇÕES CHAVE - Oferta de lubrificantes (S/N)'
+,ppi.inf as 'Informou alguém sobre o seu seroestado?'
+,ppr.rel as '(Parentesco)'
+,ppad.pptype as 'Se criança, adolescente, idoso, se tem deficiência física ou mental - Quem administra os ARVS?'
+,ppname.name as '(Nome/ Próprio)'
+,ppp.pp_par as '(Parentesco)'
+,pad.pp_plan as 'PLANO DE ADESÃO - Horário; Dose; Esquecimento da dose; Viagem - (S/N)'
+,se.pp_se as 'EFEITOS SECUNDÁRIOS - O que pode ocorrer; Como manejar efeitos secundários -  (S/N)'
+,ptar.tarv_ad as 'ADESÃO ao TARV - Boa; Risco; Má;'
+,ppv.pp_visit as 'MOTIVO da consulta'
+,refall.grupos as 'GRUPOS DE APOIO'
+,refother.grupo as 'GRUPO DE APOIO - OUTRO'
+,mdc.grupos as 'Modelos Diferenciados de Cuidados (MDC)'
+,mdc_o.other as 'MDC - OUTRO'
+,prp.prep as 'Está preparado para iniciar o TARV'
+,model.dia as 'DATA'
+,prov.provider as 'Provedor'
+,conf.contact as ' O paciente/ cuidador concorda em ser contactado, se necessário? '
+,ctype.contact as 'Contacto'
+,conf.last as 'Data'
+,care.contact as ' O confidente concorda em ser contactado, se necessário?'
+,cntype.contact as 'Contacto'
+,care.last as 'Data'
 
 from  
 person pr
@@ -68,13 +69,15 @@ where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.co
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'PP_IF_Vulnerable_Population_Yes') as cv on cv.person_id = p.patient_id and cv.encounter_id = me.encounter_id
 
-left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
+left join (select e.encounter_id,ob.person_id,(select name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as estado
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Disclosure_Diagnosis_results_child_adolescent') as rev on rev.person_id = p.patient_id and rev.encounter_id = me.encounter_id
+and cn.name = 'Apss_Disclosure_Diagnosis_results_child_adolescent' 
+group by ob.person_id,e.encounter_id) as rev 
+on rev.person_id = p.patient_id and rev.encounter_id = me.encounter_id
 
 left join (select e.encounter_id, ob.person_id,ob.value_coded,(select name
  from concept_name 
@@ -96,7 +99,7 @@ and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' 
 and cn.locale = 'en'
 and cn.name = 'Apss_Psychosocial_factors_Reasons'
-) as rs on rs.person_id = p.patient_id and rs.encounter_id = me.encounter_id and rs.encounter_id = me.encounter_id
+group by ob.person_id,e.encounter_id) as rs on rs.person_id = p.patient_id and rs.encounter_id = me.encounter_id
 
 left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
  from concept_name 
@@ -271,12 +274,12 @@ left join (select e.encounter_id,ob.person_id,group_concat(concat(
  from concept_name 
 where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT'),'-',(select name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED'))) as grupos
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT'))) as grupos
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name in ('Reference_MDC_Other','Reference_DC','Reference_PU','Reference_CA','Reference_AF','Reference_GA')
-) as mdc on mdc.person_id = p.patient_id and mdc.encounter_id = me.encounter_id
+group by ob.person_id,e.encounter_id) as mdc on mdc.person_id = p.patient_id and mdc.encounter_id = me.encounter_id
 
 left join (select e.encounter_id,ob.person_id,ob.value_text as other
 from obs ob, encounter e, concept_name cn
@@ -284,6 +287,15 @@ where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.co
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Reference_MDC_Other_comments'
 ) as mdc_o on mdc_o.person_id = p.patient_id and mdc_o.encounter_id = me.encounter_id
+
+left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name 
+ from concept_name 
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as prep
+from obs ob, encounter e, concept_name cn
+where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
+and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
+and cn.name = 'Apss_Prepared_start_ARV_treatment') as prp on prp.person_id = p.patient_id and prp.encounter_id = me.encounter_id
+
 
 left join (select e.encounter_id,ob.person_id,ob.value_datetime as dia
 from obs ob, encounter e, concept_name cn
