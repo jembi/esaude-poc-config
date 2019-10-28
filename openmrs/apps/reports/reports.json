@@ -1,5 +1,13 @@
 {
-     "PEPFAR_ MER_TX-NEW": {
+    "ListPatientsAPSS": {
+        "name": " Lista de Paciente com consulta APSS",
+        "type": "MRSGeneric",
+        "config": {
+            "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/ResumoAPSS.sql"
+        }
+    }, 
+    
+    "PEPFAR_ MER_TX-NEW": {
         "name": "TX_NEW: Number of adults and children newly enrolled on antiretroviral therapy (ART)",
         "type": "MRSGeneric",
         "config": {
