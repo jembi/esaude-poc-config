@@ -43,7 +43,7 @@ from
 person pr
 
 inner join (select e.patient_id,max(e.encounter_id) as encounter_id from encounter e
-where e.encounter_datetime BETWEEN '#startDate#' and '#endDate#' group by e.patient_id) as me on me.patient_id = pr.person_id
+where date(e.encounter_datetime) BETWEEN '#startDate#' and '#endDate#' group by e.patient_id) as me on me.patient_id = pr.person_id
 
 left join (select distinct patient_id from patient where voided = 0) as p on p.patient_id = pr.person_id
 left join (select distinct patient_id,identifier,identifier_type from patient_identifier where voided = 0) as pi on pi.patient_id = p.patient_id
