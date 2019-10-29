@@ -1,50 +1,59 @@
 SELECT global_table.NID,
 Nome,
-DATE_FORMAT(encounter_datetime, "%d/%m/%Y") AS "Cons. Actual",
-next_cons AS "Prox. Cons",
-age AS "Idade",
-CONCAT (COALESCE(diastolic,'-'),'/',COALESCE(sistolic,'-'))AS "T. Arterial",
-CONCAT(COALESCE(pregnancy_status,'-'),'/',COALESCE(menstruation_date,'-'),'/',COALESCE(bfeeding,'-')) AS "Grav/Data Ult. Menst/ Lactante",
-WHO AS Estadio,
-edemas AS "Edemas",
+DATE_FORMAT(encounter_datetime, "%d/%m/%Y") AS "Consulta Atual / Outros (d/m/a)",
+next_cons AS "Próxima Consulta (d/m/a)",
+age AS "Idade (Se > 5 anos-em anos; Se ≤ 5 anos - em meses)",
+CONCAT (COALESCE(diastolic,'-'),'/',COALESCE(sistolic,'-'))AS "Tensão Arterial",
+CONCAT(COALESCE(pregnancy_status,'-'),'/',COALESCE(menstruation_date,'-'),'/',COALESCE(bfeeding,'-')) AS "Gravidez/ Data Última Menstruaç/Lactante (G -Data DUM/ L)",
+fam_planning AS "Plan. Familiar (Não/ Método)",
+WHO AS "Estadio OMS (I,II,III,IV)",
+edemas AS "Criança - Edemas (0/ + a +++)",
 weight AS "Peso (kg)",
 altura as "Comprimento/ Altura (Se > 5 anos - em metros; Se ≤ 5 anos - em cm)",
-PB AS "Per. Braquial)",
+PB AS "PB (Grávida; 6 meses do Pós- Parto; Criança6-59 meses)",
 IMC AS "IMC (Kg/m2)",
+''  AS "Avaliação Nutricional -Indicador(IMC; PB; IMC/Idade; P/E)",
 nut_eval AS "Avaliação Nutricional - Grau (Normal/ Ligeira/ DAM/ DAG)",
 CONCAT(COALESCE(nut_ed_received,'-'),'/',COALESCE(nutritional_supplements,'-')) AS "Recebeu apoio/ educação nutricional (Não/Tipo)",
 quantidade AS "Quantidade",
 got_symptoms AS "Tem sintomas? (S/N)",
-synd_appr_female as "ITS DiagnósticoITS (Código)",
 list_of_symptoms AS "Quais sintomas? (FESTAC; adenopatias)",
 TB_diagosis_date AS "Diagnóstico TB activa (S/ N)",
-CONCAT(COALESCE(TB_start,'-'),'/',COALESCE(TB_state,'-'),'/',COALESCE(TB_end,'-')) AS "ratamento TB (Cartão TB -Data de Inicio e Fim) (Início/ Continua/ Fim) (d/m/a- I/C/F)",
+CONCAT(COALESCE(TB_start,'-'),'/',COALESCE(TB_state,'-'),'/',COALESCE(TB_end,'-')) AS "Tratamento TB (Cartão TB -Data de Inicio e Fim) (Início/ Continua/ Fim) (d/m/a- I/C/F)",
 prophilaxis_type as "Tipo de Profilaxia",
 CONCAT(COALESCE(prophylaxis_start,'-'),'/',COALESCE(prophilaxis_state,'-'),'/',COALESCE(prophylaxis_end,'-')) AS "Profilaxia Data de Inicio/(Início/ Continua/Fim -I/ C/ F)/Data de Fim",
 SEF_INH AS "INH Ef. Secundários  (S/ N)",
 SEF_CTZ AS "CTZ Ef. Secundarios (S/N)",
-its_symptoms "ITS Tem sintomas",
+its_symptoms "ITS Tem sintomas? (S/N)",
+synd_appr_female as "ITS Diagnóstico ITS (Código)",
+infects as "Infeções oportunistas, incluindo Sarcoma Kaposi, Outras doenças (Não/ Diagnóstico)",
 cv AS "Carga viral (Pedido/Cópias/ ml)",
 cd4 AS "CD4 (Pedido/Se < 5A - CD4%)",
-CONCAT(COALESCE(hb,'-'),'/',COALESCE(ast,'-'),'/',COALESCE(alt,'-'),'/',COALESCE(glicemia,'-'),'/',COALESCE(creatinina,'-'),'/', COALESCE(amilase,'-'))AS "Hemoglobina (Hg)/ Transaminases (AST/ALT)/ Glicemia(GL)/ Creatinina(CR)/ Amilase (AM)/Outros (O)",
+CONCAT(COALESCE(hb,'-'),'/',COALESCE(ast,'-'),'/',COALESCE(alt,'-'),'/',COALESCE(glicemia,'-'),'/',COALESCE(creatinina,'-'),'/', COALESCE(amilase,'-'),'/',COALESCE(outro_test,'-'))AS "Hemoglobina (Hg)/ Transaminases (AST/ALT)/ Glicemia(GL)/ Creatinina(CR)/ Amilase (AM)/Outros (O)",
 line_dispense as "Linha - Dispensa mensal/ trimestral (1.ª/ 2.ª/ 3.ª Linha - DM/ DT/DS)",
 drugs_regime as "Regime (siglas)",
 regime_frequency as "Para cada ARV Posologia de cada dose e N.º de doses/dia",
-p_state as "Mudança Estado Permanência TARV ( R S A O T)",
-c_services as "TB/ PTV/PF/APSS e PP/Revelação diagnóstica/Internamento/Outro",
-grupo_apoio_list as "Grupo Apoio (Código)",
-grupo_apoio as "Grupo Apoio Início/ Continua/ Fim (I/ C/ F)",
-mdc_code as "Modelo Diferenciado Cuidados (MDC)(Código)",
-eligibility_mdc as "Modelo Diferenciado Cuidados (MDC) Elegível(S/ N)",
+'' AS "Alternativa ou Mudança linha? (Não/A - M)",
+'' AS "Motivo (Código)",
+'' AS "Efeitos Secundários (Não/Código - Grau)",
+'' AS "Adesão (Boa/ Risco/ Má -B/ R/ M)",
+p_state AS "Mudança Estado Permanência TARV ( R S A O T)",
+'' AS "Outras prescrições (Excluir TPI, TPC eARVs)",
+c_services AS "TB/ PTV/PF/APSS e PP/Revelação diagnóstica/Internamento/Outro",
+grupo_apoio_list AS "Grupo Apoio (Código)",
+'' AS "Grupo Apoio Elegível(S/ N)",
+grupo_apoio AS "Grupo Apoio Início/ Continua/ Fim (I/ C/ F)",
+mdc_code AS "Modelo Diferenciado Cuidados (MDC)(Código)",
+eligibility_mdc AS "Modelo Diferenciado Cuidados (MDC) Elegível(S/ N)",
 mdc_states as "Modelo Diferenciado Cuidados (MDC) Início/ Continua/ Fim (I/ C/ F)"
-FROM (SELECT  DISTINCT enc.identifier as NID, enc.full_name as Nome,encounter_datetime,appointment.next_consultation as next_cons, enc.age,diastolic.value_numeric as diastolic,sistolic.value_numeric as sistolic, pregnant as pregnancy_status,breast_feeding_value as bfeeding,DATE_FORMAT(date_of_menstruation.value_datetime, "%d/%m/%Y") as menstruation_date, table_WHO_staging.name as WHO, condom_value, weight.value_numeric as weight,
-height.value_numeric as altura,bperimeter.value_numeric as PB,bmi.value_numeric as IMC, nutritional_eval as nut_eval,odema.odemas_value as edemas,nutritional_education.received as nut_ed_received, nutritional_supplement.supplement as nutritional_supplements, suppl_quant.value_numeric as quantidade,has_symptoms.symptoms_value as got_symptoms,
-symptoms_list.symptoms as list_of_symptoms,date_of_diagnosis.value_datetime as TB_diagosis_date, DATE_FORMAT(date_of_TB_start.value_datetime, "%d/%m/%Y") as TB_start,DATE_FORMAT(date_of_TB_end.value_datetime, "%d/%m/%Y") as TB_end,state_of_TB.state as TB_state,type_of_prophilaxis.type_of_pfx as prophilaxis_type,state_of_prophylaxis.state as prophilaxis_state,
-DATE_FORMAT(date_of_prophylaxis_start.value_datetime, "%d/%m/%Y") as prophylaxis_start,DATE_FORMAT(date_of_prophylaxis_end.value_datetime, "%d/%m/%Y") as prophylaxis_end,
-sec_efects.has_sec_efects as SEF_INH,sec_efects_ctz.has_sec_efects_ctz as SEF_CTZ,symptoms_of_its.has_its_symptoms as its_symptoms,
-male_syndromic_appr.approach as synd_appr_male,female_syndromic_appr.approach as synd_appr_female,op_infections.infections as infects,viral_load.value_numeric as cv,cd4.value_numeric as cd4,hb.value_numeric as hb, ast.value_numeric as ast,alt.value_numeric as alt,glicemia.value_numeric as glicemia, amilase.value_numeric as amilase,creatinina.value_numeric as creatinina,
-lab_test_other.value_numeric as outro_test, line_dispense.LD as line_dispense,drugs_regime.drugs as drugs_regime,frqncy.freq as regime_frequency, Concat('Activo em ',patient_state.patient_status) as p_state, services_list.services as c_services, gr_apoio.g_apoio_list as grupo_apoio, table_mdc.states as mdc_states,
-sg_list.list_sg as grupo_apoio_list,mdc_eligibility.mdc_yes_no as eligibility_mdc,mdc_table1.modelos_diferenciados as mdc_code, enc.encounter_id
+FROM (SELECT  DISTINCT enc.identifier AS NID, enc.full_name AS Nome,encounter_datetime,appointment.next_consultation AS next_cons, enc.age,diastolic.value_numeric as diastolic,sistolic.value_numeric as sistolic, pregnant as pregnancy_status,breast_feeding_value as bfeeding,DATE_FORMAT(date_of_menstruation.value_datetime, "%d/%m/%Y") as menstruation_date, table_WHO_staging.name as WHO, condom_value, weight.value_numeric as weight,
+height.value_numeric AS altura,bperimeter.value_numeric AS PB,bmi.value_numeric AS IMC, nutritional_eval AS nut_eval,odema.odemas_value as edemas,nutritional_education.received as nut_ed_received, nutritional_supplement.supplement as nutritional_supplements, suppl_quant.value_numeric as quantidade,has_symptoms.symptoms_value as got_symptoms,
+symptoms_list.symptoms AS list_of_symptoms,date_of_diagnosis.value_datetime as TB_diagosis_date, DATE_FORMAT(date_of_TB_start.value_datetime, "%d/%m/%Y") as TB_start,DATE_FORMAT(date_of_TB_end.value_datetime, "%d/%m/%Y") as TB_end,state_of_TB.state as TB_state,type_of_prophilaxis.type_of_pfx as prophilaxis_type,state_of_prophylaxis.state as prophilaxis_state,
+DATE_FORMAT(date_of_prophylaxis_start.value_datetime, "%d/%m/%Y") AS prophylaxis_start,DATE_FORMAT(date_of_prophylaxis_end.value_datetime, "%d/%m/%Y") as prophylaxis_end,
+sec_efects.has_sec_efects AS SEF_INH,sec_efects_ctz.has_sec_efects_ctz as SEF_CTZ,symptoms_of_its.has_its_symptoms as its_symptoms,
+male_syndromic_appr.approach AS synd_appr_male,female_syndromic_appr.approach as synd_appr_female,op_infections.infections as infects,viral_load.value_numeric as cv,cd4.value_numeric as cd4,CONCAT('Hg-',hb.value_numeric) as hb, CONCAT('AST-',ast.value_numeric) as ast,CONCAT('ALT-',alt.value_numeric) as alt, CONCAT('GL-',glicemia.value_numeric) as glicemia, CONCAT('AM-',amilase.value_numeric) as amilase,CONCAT('CR-',creatinina.value_numeric) as creatinina,
+CONCAT('O-',lab_test_other.value_numeric) as outro_test, line_dispense.LD as line_dispense,drugs_regime.drugs as drugs_regime,frqncy.freq as regime_frequency, Concat('Activo em ',patient_state.patient_status) as p_state, services_list.services as c_services, gr_apoio.g_apoio_list as grupo_apoio, table_mdc.states as mdc_states,
+sg_list.list_sg as grupo_apoio_list,mdc_eligibility.mdc_yes_no as eligibility_mdc,mdc_table1.modelos_diferenciados as mdc_code,fplanning.family_planning as fam_planning, enc.encounter_id
 from (select identifier,person.person_id,full_name,date_created,encounter_datetime,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
 inner join
 (select identifier,concat(pn.given_name," ", COALESCE(pn.middle_name,'')," ", COALESCE(pn.family_name,'')) as full_name, pn.person_id, p.birthdate from person_name pn join patient_identifier pi on pn.person_id = pi.patient_id join person p on p.person_id = pn.person_id) person
@@ -572,4 +581,31 @@ FROM
 				AND c_name_pt.concept_name_type = "SHORT"
                 AND c_name_pt.locale = "pt"
 		) mdc_shortname
-		ON mdc_obs.concept_id = mdc_shortname.concept_id) group by encounter_id) mdc_table1 on mdc_table1.encounter_id = obs.encounter_id) global_table
+		ON mdc_obs.concept_id = mdc_shortname.concept_id) group by encounter_id) mdc_table1 on mdc_table1.encounter_id = obs.encounter_id
+
+		LEFT JOIN
+(SELECT GROUP_CONCAT(name) as family_planning, encounter_id
+FROM (SELECT sg_obs.obs_id,sg_shortname.name,sg_obs.encounter_id, sg_obs.concept_id, sg_obs.person_id, sg_obs.value_coded
+		FROM obs AS sg_obs
+		JOIN
+			(SELECT c_name_pt.concept_id, c_name_pt.name
+				FROM concept_name AS c_name_pt
+				WHERE c_name_pt.concept_id IN
+					(SELECT concept_id
+						FROM concept_name
+						WHERE name IN ("Family_Planning_Contraceptive_Methods_PRES_Condom_button",
+                        "Family_Planning_Contraceptive_Methods_PIL_Oral_Contraceptive_button",
+                        "Family_Planning_Contraceptive_Methods_INJ_Injection_button",
+                        "Family_Planning_Contraceptive_Methods_IMP_Implant_button",
+                        "Family_Planning_Contraceptive_Methods_DIU_Intra_button",
+                        "Family_Planning_Contraceptive_Methods_LT_Tubal_Ligation_button",
+                        "Family_Planning_Contraceptive_Methods_MAL_Lactational_Amenorrhea_Method_button",
+                        "Family_Planning_Contraceptive_Methods_OUT_Other_button")
+							AND concept_name_type = "FULLY_SPECIFIED"
+							AND locale = "en"
+							ORDER BY concept_id ASC)
+					AND c_name_pt.concept_name_type = "SHORT"
+					AND c_name_pt.locale = "pt"
+			) sg_shortname
+			ON sg_obs.concept_id = sg_shortname.concept_id) f_planning GROUP BY encounter_id) fplanning on fplanning.encounter_id = obs.obs_id
+		) global_table
