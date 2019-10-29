@@ -1,4 +1,12 @@
 {
+     "PEPFAR_ MER_TX-NEW": {
+        "name": "TX_NEW: Number of adults and children newly enrolled on antiretroviral therapy (ART)",
+        "type": "MRSGeneric",
+        "config": {
+            "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/MER Indicators in POC: TX_NEW.sql",
+             "macroTemplatePath": "/var/www/bahmni_config/openmrs/apps/reports/template/template-TX_NEW.xls"
+        }
+    },
   "ListPatientsnotsuppressed": {
         "name": " Lista de Paciente Nao Suprimidos (Carga Viral)",
         "type": "MRSGeneric",
@@ -30,7 +38,7 @@
         }
     },
     "Listpatientswhoactivein23ARVLine": {
-        "name": "List of patients who are active in 2 and 3 ARV Line",
+        "name": " Lista de Pacientes em 2 e 3 linha de TARV",
         "titleKey" : "LIST_PATIENTS_ACTIVE_IN_2_3_ARV",
         "type": "MRSGeneric",
         "config": {
