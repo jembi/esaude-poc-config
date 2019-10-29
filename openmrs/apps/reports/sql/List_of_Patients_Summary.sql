@@ -32,7 +32,10 @@ drugs_regime as "Regime (siglas)",
 regime_frequency as "Para cada ARV Posologia de cada dose e N.º de doses/dia",
 p_state as "Mudança Estado Permanência TARV ( R S A O T)",
 c_services as "TB/ PTV/PF/APSS e PP/Revelação diagnóstica/Internamento/Outro",
-grupo_apoio as "Grupo de Apoio",
+grupo_apoio_list as "Grupo Apoio (Código)",
+grupo_apoio as "Grupo Apoio Início/ Continua/ Fim (I/ C/ F)",
+mdc_code as "Modelo Diferenciado Cuidados (MDC)(Código)",
+eligibility_mdc as "Modelo Diferenciado Cuidados (MDC) Elegível(S/ N)",
 mdc_states as "Modelo Diferenciado Cuidados (MDC) Início/ Continua/ Fim (I/ C/ F)"
 FROM (SELECT  DISTINCT enc.identifier as NID, enc.full_name as Nome,encounter_datetime,appointment.next_consultation as next_cons, enc.age,diastolic.value_numeric as diastolic,sistolic.value_numeric as sistolic, pregnant as pregnancy_status,breast_feeding_value as bfeeding,DATE_FORMAT(date_of_menstruation.value_datetime, "%d/%m/%Y") as menstruation_date, table_WHO_staging.name as WHO, condom_value, weight.value_numeric as weight,
 height.value_numeric as altura,bperimeter.value_numeric as PB,bmi.value_numeric as IMC, nutritional_eval as nut_eval,odema.odemas_value as edemas,nutritional_education.received as nut_ed_received, nutritional_supplement.supplement as nutritional_supplements, suppl_quant.value_numeric as quantidade,has_symptoms.symptoms_value as got_symptoms,
@@ -40,7 +43,8 @@ symptoms_list.symptoms as list_of_symptoms,date_of_diagnosis.value_datetime as T
 DATE_FORMAT(date_of_prophylaxis_start.value_datetime, "%d/%m/%Y") as prophylaxis_start,DATE_FORMAT(date_of_prophylaxis_end.value_datetime, "%d/%m/%Y") as prophylaxis_end,
 sec_efects.has_sec_efects as SEF_INH,sec_efects_ctz.has_sec_efects_ctz as SEF_CTZ,symptoms_of_its.has_its_symptoms as its_symptoms,
 male_syndromic_appr.approach as synd_appr_male,female_syndromic_appr.approach as synd_appr_female,op_infections.infections as infects,viral_load.value_numeric as cv,cd4.value_numeric as cd4,hb.value_numeric as hb, ast.value_numeric as ast,alt.value_numeric as alt,glicemia.value_numeric as glicemia, amilase.value_numeric as amilase,creatinina.value_numeric as creatinina,
-lab_test_other.value_numeric as outro_test, line_dispense.LD as line_dispense,drugs_regime.drugs as drugs_regime,frqncy.freq as regime_frequency, Concat('Activo em ',patient_state.patient_status) as p_state, services_list.services as c_services, gr_apoio.g_apoio_list as grupo_apoio, table_mdc.states as mdc_states, enc.encounter_id
+lab_test_other.value_numeric as outro_test, line_dispense.LD as line_dispense,drugs_regime.drugs as drugs_regime,frqncy.freq as regime_frequency, Concat('Activo em ',patient_state.patient_status) as p_state, services_list.services as c_services, gr_apoio.g_apoio_list as grupo_apoio, table_mdc.states as mdc_states,
+sg_list.list_sg as grupo_apoio_list,mdc_eligibility.mdc_yes_no as eligibility_mdc,mdc_table1.modelos_diferenciados as mdc_code, enc.encounter_id
 from (select identifier,person.person_id,full_name,date_created,encounter_datetime,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
 inner join
 (select identifier,concat(pn.given_name," ", COALESCE(pn.middle_name,'')," ", COALESCE(pn.family_name,'')) as full_name, pn.person_id, p.birthdate from person_name pn join patient_identifier pi on pn.person_id = pi.patient_id join person p on p.person_id = pn.person_id) person
@@ -509,8 +513,63 @@ LEFT JOIN
 					AND c_name_status.concept_name_type = "SHORT"
 					AND c_name_status.locale = "pt"
 				) mdc_status
-				ON mdc_status.concept_id = mdc_obs.value_coded) mdc_table group by encounter_id) table_mdc on table_mdc.encounter_id = obs.encounter_id) global_table;
+				ON mdc_status.concept_id = mdc_obs.value_coded) mdc_table group by encounter_id) table_mdc on table_mdc.encounter_id = obs.encounter_id
+LEFT JOIN
+(SELECT GROUP_CONCAT(name) as list_sg, encounter_id
+FROM (SELECT sg_obs.obs_id,sg_shortname.name,sg_obs.encounter_id, sg_obs.concept_id, sg_obs.person_id, sg_obs.value_coded
+		FROM obs AS sg_obs
+		JOIN
+			(SELECT c_name_pt.concept_id, c_name_pt.name
+				FROM concept_name AS c_name_pt
+				WHERE c_name_pt.concept_id IN
+					(SELECT concept_id
+						FROM concept_name
+						WHERE name IN ("Reference_CR", "Reference_PC", "Reference_AR", "Reference_MPS")
+							AND concept_name_type = "FULLY_SPECIFIED"
+							AND locale = "en"
+							ORDER BY concept_id ASC)
+					AND c_name_pt.concept_name_type = "SHORT"
+					AND c_name_pt.locale = "pt"
+			) sg_shortname
+			ON sg_obs.concept_id = sg_shortname.concept_id) support_group GROUP BY encounter_id) sg_list on sg_list.encounter_id = obs.encounter_id
 
+            LEFT JOIN
+(SELECT
+	mdc_obs.encounter_id,
+	CASE
+			WHEN mdc_obs.value_coded = 1 THEN "Sim"
+			WHEN mdc_obs.value_coded = 2 THEN "Não"
+	END AS mdc_yes_no
+FROM
+	(SELECT obs_mdc.obs_id,obs_mdc.encounter_id, obs_mdc.concept_id, obs_mdc.person_id, obs_mdc.value_coded
+		FROM obs as obs_mdc
+		WHERE obs_mdc.concept_id IN
+				(SELECT mdc_concept.concept_id
+					FROM concept_name AS mdc_concept
+					WHERE name IN ("Reference_Eligible")
+						AND mdc_concept.concept_name_type = "FULLY_SPECIFIED"
+						AND mdc_concept.locale = "en"
+					ORDER BY mdc_concept.concept_id ASC)
+	) AS mdc_obs) mdc_eligibility on mdc_eligibility.encounter_id = obs.encounter_id
+LEFT JOIN
+(SELECT mdc_obs.encounter_id,GROUP_CONCAT(name SEPARATOR ', ') as modelos_diferenciados
+FROM
+    (
+	(SELECT obs_mdc.obs_id, obs_mdc.encounter_id, obs_mdc.concept_id, obs_mdc.person_id, obs_mdc.value_coded
+		FROM obs as obs_mdc
+	) mdc_obs
 
-
-                
+	JOIN
+		(SELECT c_name_pt.concept_id, c_name_pt.name
+			FROM concept_name AS c_name_pt
+			WHERE c_name_pt.concept_id IN
+				(SELECT concept_id
+					FROM concept_name
+					WHERE name IN ("Reference_GA", "Reference_AF", "Reference_CA", "Reference_PU", "Reference_FR", "Reference_DT", "Reference_DC", "Reference_MDC_Other")
+						AND concept_name_type = "FULLY_SPECIFIED"
+						AND locale = "en"
+						ORDER BY concept_id ASC)
+				AND c_name_pt.concept_name_type = "SHORT"
+                AND c_name_pt.locale = "pt"
+		) mdc_shortname
+		ON mdc_obs.concept_id = mdc_shortname.concept_id) group by encounter_id) mdc_table1 on mdc_table1.encounter_id = obs.encounter_id) global_table
