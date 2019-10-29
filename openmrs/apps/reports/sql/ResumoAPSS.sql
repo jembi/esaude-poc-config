@@ -61,7 +61,7 @@ where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHO
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'PP_Key_population') as ch on ch.person_id = p.patient_id and ch.encounter_id = me.encounter_id
+and cn.name = 'PP_If_Key_population_yes') as ch on ch.person_id = p.patient_id and ch.encounter_id = me.encounter_id
 
  left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name 
  from concept_name 
