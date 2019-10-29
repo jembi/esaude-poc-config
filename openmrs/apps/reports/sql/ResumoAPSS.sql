@@ -26,9 +26,7 @@ select distinct pi.identifier as NID
 ,ptar.tarv_ad as 'ADESÃO ao TARV - Boa; Risco; Má;'
 ,ppv.pp_visit as 'MOTIVO da consulta'
 ,refall.grupos as 'GRUPOS DE APOIO'
-,refother.grupo as 'GRUPO DE APOIO - OUTRO'
 ,mdc.grupos as 'Modelos Diferenciados de Cuidados (MDC)'
-,mdc_o.other as 'MDC - OUTRO'
 ,prp.prep as 'Está preparado para iniciar o TARV'
 ,date_format(date(model.dia),'%d-%m-%Y') as 'DATA'
 ,prov.provider as 'Provedor'
@@ -251,8 +249,8 @@ where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.co
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Reason_For_The_Visit') as ppv on ppv.person_id = p.patient_id and ppv.encounter_id = me.encounter_id
 
-left join (select e.encounter_id,ob.person_id,group_concat(concat((select substr(name,1,2)
- from concept_name where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT'),'-',(select name
+left join (select e.encounter_id,ob.person_id,group_concat(concat( case when name='Reference_Other_Specify_Group' then 'Outro' else (select substr(name,1,2)
+ from concept_name where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT') end,'-',(select name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT'))) as grupos
 from obs ob, encounter e, concept_name cn
@@ -264,17 +262,10 @@ where o.concept_id = cn.concept_id and o.person_id = ob.person_id and e.patient_
  and cn.name in ('Reference_Other_Specify_Group','Reference_MPS','Reference_PR','Reference_CR','Reference_CA','Reference_AR') group by e.patient_id)) 
  as refall on refall.person_id = p.patient_id and refall.encounter_id = me.encounter_id
 
-left join (select e.encounter_id,ob.person_id,ob.value_text as grupo
-from obs ob, encounter e, concept_name cn
-where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
-and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Reference_Other_Specify_Group_Other'
-) as refother on refother.person_id = p.patient_id and refother.encounter_id = me.encounter_id
-
-left join (select e.encounter_id,ob.person_id,group_concat(concat(
+left join (select e.encounter_id,ob.person_id,group_concat(concat( case when name='Reference_MDC_Other' then 'Outro' else
 (select substr(name,1,2)
  from concept_name 
-where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT'),'-',(select name
+where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT') end,'-',(select name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT'))) as grupos
 from obs ob, encounter e, concept_name cn
@@ -282,13 +273,6 @@ where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.co
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name in ('Reference_MDC_Other','Reference_DC','Reference_PU','Reference_CA','Reference_AF','Reference_GA')
 group by ob.person_id,e.encounter_id) as mdc on mdc.person_id = p.patient_id and mdc.encounter_id = me.encounter_id
-
-left join (select e.encounter_id,ob.person_id,ob.value_text as other
-from obs ob, encounter e, concept_name cn
-where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
-and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Reference_MDC_Other_comments'
-) as mdc_o on mdc_o.person_id = p.patient_id and mdc_o.encounter_id = me.encounter_id
 
 left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name 
  from concept_name 
