@@ -607,5 +607,5 @@ FROM (SELECT sg_obs.obs_id,sg_shortname.name,sg_obs.encounter_id, sg_obs.concept
 					AND c_name_pt.concept_name_type = "SHORT"
 					AND c_name_pt.locale = "pt"
 			) sg_shortname
-			ON sg_obs.concept_id = sg_shortname.concept_id) f_planning GROUP BY encounter_id) fplanning on fplanning.encounter_id = obs.obs_id
+			ON sg_obs.concept_id = sg_shortname.concept_id) f_planning GROUP BY encounter_id) fplanning on fplanning.encounter_id = obs.encounter_id
 		) global_table
