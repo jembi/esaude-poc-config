@@ -31,7 +31,7 @@ select
     on erp1.patient_id=o.person_id
     and erp1.id = (select max(id) from erpdrug_order 
                       where
-                         (ob.date_created <= DATE_SUB(erp1.dispensed_date, INTERVAL 3 MONTH))
+                         (erp1.dispensed_date <= DATE_SUB(ob.date_created, INTERVAL 3 MONTH))
                         and erpdrug_order.dispensed=1
                             and erpdrug_order.arv_dispensed=1
                             and erpdrug_order.first_arv_dispensed=1 and erpdrug_order.patient_id=erp1.patient_id)
@@ -100,7 +100,7 @@ from
     on erp1.patient_id=o.person_id
     and erp1.id = (select max(id) from erpdrug_order 
                       where
-                        (ob.date_created <= DATE_SUB(erp1.dispensed_date, INTERVAL 3 MONTH))
+                        (erp1.dispensed_date <= DATE_SUB(ob.date_created, INTERVAL 3 MONTH))
                         and erpdrug_order.dispensed=1
                             and erpdrug_order.arv_dispensed=1
                             and erpdrug_order.first_arv_dispensed=1 and erpdrug_order.patient_id=erp1.patient_id)
@@ -168,7 +168,7 @@ from
     on erp1.patient_id=o.person_id
     and erp1.id = (select max(id) from erpdrug_order
                       where
-                        (ob.date_created <= DATE_SUB(erp1.dispensed_date, INTERVAL 3 MONTH))
+                        (erp1.dispensed_date <= DATE_SUB(ob.date_created, INTERVAL 3 MONTH))
                         and erpdrug_order.dispensed=1
                             and erpdrug_order.arv_dispensed=1
                             and erpdrug_order.first_arv_dispensed=1 and erpdrug_order.patient_id=erp1.patient_id)
@@ -239,7 +239,7 @@ from
     on erp1.patient_id=o.person_id
     and erp1.id = (select max(id) from erpdrug_order 
                       where
-                         (ob.date_created <= DATE_SUB(erp1.dispensed_date, INTERVAL 3 MONTH))
+                         (erp1.dispensed_date <= DATE_SUB(ob.date_created, INTERVAL 3 MONTH))
                         and erpdrug_order.dispensed=1
                             and erpdrug_order.arv_dispensed=1
                             and erpdrug_order.first_arv_dispensed=1 and erpdrug_order.patient_id=erp1.patient_id)
@@ -375,15 +375,11 @@ from
             p.person_id
       )
       as Viralload
-      on Viralload.obs_id = o.obs_id
-   Inner JOIN
-      person_attribute pa 
-      on pa.person_id = p.person_id 
-      and pa.voided = 0 
-      inner join
+      on Viralload.obs_id = o.obs_id 
+    inner join
       erpdrug_order erp
       on erp.patient_id=pt.patient_id
-      and (Viralload.viralCreateddate <= DATE_SUB(erp.dispensed_date, INTERVAL 3 MONTH))
+      and (erp.dispensed_date <= DATE_SUB(Viralload.viralCreateddate, INTERVAL 3 MONTH))
       where erp.id = (select max(id) from erpdrug_order 
                       where erpdrug_order.dispensed=1
                             and erpdrug_order.arv_dispensed=1
