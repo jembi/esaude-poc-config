@@ -632,4 +632,4 @@ name IN ("LO_ViralLoad",
                         "LO_CREATININE(4.2-132Hmol/L)",
                         "LO_Other")
 and obs.value_numeric <> 0) res_table join concept_name co_name on co_name.concept_id= res_table.concept_id and co_name.concept_name_type = "SHORT" and co_name.locale = "pt" group by encounter_id) gr_results on gr_results.encounter_id = obs.encounter_id
-		) global_table
+		order by encounter_datetime asc) global_table
