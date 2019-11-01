@@ -1,6 +1,9 @@
-SELECT global_table.NID AS "Processo-NID",
+SELECT @rownum:=(@rownum+1) AS "No",
+global_table.NID AS "Processo-NID",
 Nome AS "Processo-Nome",
-DATE_FORMAT(encounter_datetime, "%d/%m/%Y") AS "1. Consulta Atual / Outros (d/m/a)",
+kpop AS "População Chave",
+vul_pop AS "População Vulnerável (Especifique)",
+DATE_FORMAT(encounter_datetime, "%d-%m-%Y") AS "1. Consulta Atual / Outros (d-m-a)",
 next_cons AS "1. Próxima Consulta (d/m/a)",
 age AS "2. Idade (Se > 5 anos-em anos; Se ≤ 5 anos - em meses)",
 CONCAT (COALESCE(diastolic,'-'),'/',COALESCE(sistolic,'-'))AS "2. Tensão Arterial",
@@ -27,9 +30,8 @@ SEF_CTZ AS "12. CTZ Ef. Secundarios (S/N)",
 its_symptoms AS "13. ITS Tem sintomas? (S/N)",
 synd_appr_female AS "13. ITS Diagnóstico ITS (Código)",
 infects as "14. Infeções oportunistas, incluindo Sarcoma Kaposi, Outras doenças (Não/ Diagnóstico)",
-cv AS "15. Carga viral (Pedido/Cópias/ ml)",
-cd4 AS "15. CD4 (Pedido/Se < 5A - CD4%)",
-CONCAT(COALESCE(hb,'-'),'/',COALESCE(ast,'-'),'/',COALESCE(alt,'-'),'/',COALESCE(glicemia,'-'),'/',COALESCE(creatinina,'-'),'/', COALESCE(amilase,'-'),'/',COALESCE(outro_test,'-'))AS "16. Hemoglobina (Hg)/ Transaminases (AST/ALT)/ Glicemia(GL)/ Creatinina(CR)/ Amilase (AM)/Outros (O)",
+test_requests AS "15. Exames Pedidos",
+laboratory_results AS "16. Exames Resultados",
 line_dispense as "17. Linha - Dispensa mensal/ trimestral (1.ª/ 2.ª/ 3.ª Linha - DM/ DT/DS)",
 drugs_regime as "17. Regime (siglas)",
 regime_frequency as "18. Para cada ARV Posologia de cada dose e N.º de doses/dia",
@@ -46,14 +48,15 @@ grupo_apoio AS "24. Grupo Apoio Início/ Continua/ Fim (I/ C/ F)",
 mdc_code AS "24. Modelo Diferenciado Cuidados (MDC)(Código)",
 eligibility_mdc AS "24. Modelo Diferenciado Cuidados (MDC) Elegível(S/ N)",
 mdc_states as "24. Modelo Diferenciado Cuidados (MDC) Início/ Continua/ Fim (I/ C/ F)"
-FROM (SELECT  DISTINCT enc.identifier AS NID, enc.full_name AS Nome,encounter_datetime,appointment.next_consultation AS next_cons, enc.age,diastolic.value_numeric as diastolic,sistolic.value_numeric as sistolic, pregnant as pregnancy_status,breast_feeding_value as bfeeding,DATE_FORMAT(date_of_menstruation.value_datetime, "%d/%m/%Y") as menstruation_date, table_WHO_staging.name as WHO, condom_value, weight.value_numeric as weight,
+FROM (SELECT @rownum:=0) as initialization,(SELECT  DISTINCT enc.identifier AS NID, enc.full_name AS Nome,encounter_datetime,appointment.next_consultation AS next_cons, enc.age,diastolic.value_numeric as diastolic,sistolic.value_numeric as sistolic, pregnant as pregnancy_status,breast_feeding_value as bfeeding,DATE_FORMAT(date_of_menstruation.value_datetime, "%d-%m-%Y") as menstruation_date, table_WHO_staging.name as WHO, condom_value, weight.value_numeric as weight,
 height.value_numeric AS altura,bperimeter.value_numeric AS PB,bmi.value_numeric AS IMC, nutritional_eval AS nut_eval,odema.odemas_value as edemas,nutritional_education.received as nut_ed_received, nutritional_supplement.supplement as nutritional_supplements, suppl_quant.value_numeric as quantidade,has_symptoms.symptoms_value as got_symptoms,
-symptoms_list.symptoms AS list_of_symptoms,date_of_diagnosis.value_datetime as TB_diagosis_date, DATE_FORMAT(date_of_TB_start.value_datetime, "%d/%m/%Y") as TB_start,DATE_FORMAT(date_of_TB_end.value_datetime, "%d/%m/%Y") as TB_end,state_of_TB.state as TB_state,type_of_prophilaxis.type_of_pfx as prophilaxis_type,state_of_prophylaxis.state as prophilaxis_state,
-DATE_FORMAT(date_of_prophylaxis_start.value_datetime, "%d/%m/%Y") AS prophylaxis_start,DATE_FORMAT(date_of_prophylaxis_end.value_datetime, "%d/%m/%Y") as prophylaxis_end,
+symptoms_list.symptoms AS list_of_symptoms,COALESCE(date_of_diagnosis.v_datetime,'NÃO') as TB_diagosis_date, DATE_FORMAT(date_of_TB_start.value_datetime, "%d-%m-%Y") as TB_start,DATE_FORMAT(date_of_TB_end.value_datetime, "%d-%m-%Y") as TB_end,state_of_TB.state as TB_state,type_of_prophilaxis.type_of_pfx as prophilaxis_type,state_of_prophylaxis.state as prophilaxis_state,
+DATE_FORMAT(date_of_prophylaxis_start.value_datetime, "%d-%m-%Y") AS prophylaxis_start,DATE_FORMAT(date_of_prophylaxis_end.value_datetime, "%d-%m-%Y") as prophylaxis_end,
 sec_efects.has_sec_efects AS SEF_INH,sec_efects_ctz.has_sec_efects_ctz as SEF_CTZ,symptoms_of_its.has_its_symptoms as its_symptoms,
-male_syndromic_appr.approach AS synd_appr_male,female_syndromic_appr.approach as synd_appr_female,op_infections.infections as infects,viral_load.value_numeric as cv,cd4.value_numeric as cd4,CONCAT('Hg-',hb.value_numeric) as hb, CONCAT('AST-',ast.value_numeric) as ast,CONCAT('ALT-',alt.value_numeric) as alt, CONCAT('GL-',glicemia.value_numeric) as glicemia, CONCAT('AM-',amilase.value_numeric) as amilase,CONCAT('CR-',creatinina.value_numeric) as creatinina,
-CONCAT('O-',lab_test_other.value_numeric) as outro_test, line_dispense.LD as line_dispense,drugs_regime.drugs as drugs_regime,frqncy.freq as regime_frequency, Concat('Activo em ',patient_state.patient_status) as p_state, services_list.services as c_services, gr_apoio.g_apoio_list as grupo_apoio, table_mdc.states as mdc_states,
-sg_list.list_sg as grupo_apoio_list,mdc_eligibility.mdc_yes_no as eligibility_mdc,mdc_table1.modelos_diferenciados as mdc_code,fplanning.family_planning as fam_planning, enc.encounter_id
+male_syndromic_appr.approach AS synd_appr_male,female_syndromic_appr.approach as synd_appr_female,op_infections.infections as infects,viral_load.value_numeric as cv,lab_requests.lab_tests as test_requests,
+line_dispense.LD as line_dispense,drugs_regime.drugs as drugs_regime,frqncy.freq as regime_frequency, Concat('Activo em ',patient_state.patient_status) as p_state, services_list.services as c_services, gr_apoio.g_apoio_list as grupo_apoio, table_mdc.states as mdc_states,
+sg_list.list_sg as grupo_apoio_list,mdc_eligibility.mdc_yes_no as eligibility_mdc,mdc_table1.modelos_diferenciados as mdc_code,fplanning.family_planning as fam_planning,
+key_population.pop_chave as kpop,vp.pop_vul as vul_pop,gr_results.res as laboratory_results, enc.encounter_id
 from (select identifier,person.person_id,full_name,date_created,encounter_datetime,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
 inner join
 (select identifier,concat(pn.given_name," ", COALESCE(pn.middle_name,'')," ", COALESCE(pn.family_name,'')) as full_name, pn.person_id, p.birthdate from person_name pn join patient_identifier pi on pn.person_id = pi.patient_id join person p on p.person_id = pn.person_id) person
@@ -65,7 +68,7 @@ Left join
  (select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Blood_Pressure_–_Systolic_VS1") as sistolic on sistolic.encounter_id = obs.encounter_id
 Left join
 (SELECT
-  DATE_FORMAT(start_date_time, "%d/%m/%Y") as next_consultation,
+  DATE_FORMAT(start_date_time, "%d-%m-%Y") as next_consultation,
   p.person_id,
   pa.status
 FROM
@@ -85,10 +88,10 @@ LEFT JOIN
 case
 when
 cn_pregnancy.name = "Pregnancy_Yes"
-then 'SIM'
+then 'G'
 when
 cn_pregnancy.name = "Pregnancy_No"
-then 'NÃO'
+then ''
 end
 as pregnant
  from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Pregnancy_Yes_No") preg
@@ -98,10 +101,10 @@ Left join
 case
 when
 cn_breast_feeding.name = "True"
-then 'SIM'
+then 'L'
 when
 cn_breast_feeding.name = "False"
-then 'NÃO'
+then ''
 end
 as breast_feeding_value
  from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Breastfeeding_ANA") breast_feeding
@@ -256,7 +259,12 @@ as supplement
  from (select value_text,value_numeric,value_coded, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Symptoms Prophylaxis_New") symptomslist
 join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_symptomslist on cn_symptomslist.concept_id = symptomslist.value_coded) list_of_symptoms group by encounter_id) symptoms_list on symptoms_list.encounter_id = obs.encounter_id
 LEFT JOIN
- (select value_datetime,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Date of Diagnosis") as date_of_diagnosis on date_of_diagnosis.encounter_id = obs.encounter_id
+ (select case
+ WHEN value_datetime IS NULL
+ THEN 'NÃO'
+ WHEN value_datetime IS NOT NULL
+ THEN 'SIM' END
+ as v_datetime,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Date of Diagnosis") as date_of_diagnosis on date_of_diagnosis.encounter_id = obs.encounter_id
  LEFT JOIN
  (select value_datetime,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "SP_Treatment Start Date") as date_of_TB_start on date_of_TB_start.encounter_id = obs.encounter_id
   LEFT JOIN
@@ -386,23 +394,6 @@ LEFT JOIN
 join (select name, concept_id from concept_name where concept_name_type = "FULLY_SPECIFIED" and locale = "en") cn_secondary_efects on cn_secondary_efects.concept_id = secondary_efects.value_coded) opp_infections group by encounter_id) op_infections on op_infections.encounter_id = obs.encounter_id
 LEFT JOIN
  (select value_numeric,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "LO_ViralLoad" and obs.value_numeric <> 0) as viral_load on viral_load.encounter_id = obs.encounter_id
-LEFT JOIN
- (select value_numeric,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "LO_CD4" and obs.value_numeric <> 0) as cd4 on cd4.encounter_id = obs.encounter_id
- LEFT JOIN
- (select value_numeric,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "LO_HB" and obs.value_numeric <> 0) as hb on hb.encounter_id = obs.encounter_id
-LEFT JOIN
- (select value_numeric,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "LO_AST" and obs.value_numeric <> 0) as ast on ast.encounter_id = obs.encounter_id
- LEFT JOIN
- (select value_numeric,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "LO_ALT" and obs.value_numeric <> 0) as alt on alt.encounter_id = obs.encounter_id
- LEFT JOIN
- (select value_numeric,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "LO_GLYCEMIA(3.05-6.05mmol/L)" and obs.value_numeric <> 0) as glicemia on glicemia.encounter_id = obs.encounter_id
- LEFT JOIN
- (select value_numeric,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "LO_AMILASE(600-1600/UL)" and obs.value_numeric <> 0) as amilase on amilase.encounter_id = obs.encounter_id
- LEFT JOIN
- (select value_numeric,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "LO_CREATININE(4.2-132Hmol/L)" and obs.value_numeric <> 0) as creatinina on creatinina.encounter_id = obs.encounter_id
- LEFT JOIN
- (select value_numeric,concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "LO_Other:" and obs.value_numeric <> 0) as lab_test_other on lab_test_other.encounter_id = obs.encounter_id
-
  LEFT JOIN
  (select  patient_id, encounter_id, GROUP_CONCAT(LD) as LD from (select drug,patient_id, encounter_id, order_id, GROUP_CONCAT(LD) as LD from (select concat(d.line_of_treatment,'-',d.dosing_instructions) as LD,d.order_id, d.encounter_id, d.patient_id, d.drug from (select drug.order_id, drug.concept_id, drug.encounter_id,drug.patient_id, drug.dose_units,
 case
@@ -608,4 +599,37 @@ FROM (SELECT sg_obs.obs_id,sg_shortname.name,sg_obs.encounter_id, sg_obs.concept
 					AND c_name_pt.locale = "pt"
 			) sg_shortname
 			ON sg_obs.concept_id = sg_shortname.concept_id) f_planning GROUP BY encounter_id) fplanning on fplanning.encounter_id = obs.encounter_id
+LEFT JOIN
+(select e.encounter_id,ob.person_id,ob.value_coded,(select name
+ from concept_name
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as pop_chave
+from obs ob, encounter e, concept_name cn
+where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
+and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
+and cn.name = 'PP_If_Key_population_yes') key_population on key_population.encounter_id = obs.encounter_id
+
+LEFT JOIN
+(select e.encounter_id,ob.person_id,ob.value_coded,(select name
+ from concept_name
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as pop_vul
+from obs ob, encounter e, concept_name cn
+where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
+and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
+and cn.name = 'PP_IF_Vulnerable_Population_Yes') vp on vp.encounter_id = obs.encounter_id
+
+LEFT JOIN
+(select concept_name_type, GROUP_CONCAT(name) as lab_tests,locale,encounter_id, orders.concept_id from orders  join concept_name c on c.concept_id = orders.concept_id where concept_name_type = "SHORT" and locale = "pt" group by encounter_id) lab_requests on lab_requests.encounter_id = enc.encounter_id
+LEFT JOIN
+(select GROUP_CONCAT(concat(co_name.name,'-',value_numeric)) as res, encounter_id  from (select value_numeric,concept_name_type, name, locale, encounter_id, obs_id,obs.concept_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and
+name IN ("LO_ViralLoad",
+                        "LO_CD4",
+                        "LO_HB",
+                        "LO_AST",
+                        "LO_ALT",
+                        "LO_ViralLoad",
+                        "LO_GLYCEMIA(3.05-6.05mmol/L)",
+                        "LO_AMILASE(600-1600/UL)",
+                        "LO_CREATININE(4.2-132Hmol/L)",
+                        "LO_Other")
+and obs.value_numeric <> 0) res_table join concept_name co_name on co_name.concept_id= res_table.concept_id and co_name.concept_name_type = "SHORT" and co_name.locale = "pt" group by encounter_id) gr_results on gr_results.encounter_id = obs.encounter_id
 		) global_table
