@@ -41,7 +41,8 @@ FROM
     INNER JOIN concept_name cn
     ON cn.concept_id = ords.concept_id
       AND locale ='en'
-    LEFT JOIN
+    INNER JOIN
     erpdrug_order edo
     ON edo.patient_id = ords.patient_id
+    AND edo.dispensed_date IS NOT NULL
 ;
