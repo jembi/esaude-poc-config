@@ -1,4 +1,5 @@
 SELECT DISTINCT
+  @rownum:=(@rownum+1) AS "No",
   (pi.identifier) AS "NID",
   CONCAT( pn.given_name, " ", COALESCE( pn.middle_name, '' ), " ", COALESCE( pn.family_name, '' ) ) AS "Nome Completo ",
 
@@ -15,6 +16,7 @@ SELECT DISTINCT
   DATE_FORMAT(edo.dispensed_date,'%d-%m-%Y') AS "Data do Levantamento"
 
 FROM
+  (SELECT @rownum:=0) as initialization,
   person p
     INNER JOIN
     person_name pn
