@@ -6,13 +6,18 @@
       "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/List_of_Patients_Summary.sql"
     }
   },
-
-  "PEPFAR_ MER_TX-NEW": {
-        "name": "TX_NEW: Number of adults and children newly enrolled on antiretroviral therapy (ART)",
+    "ListPatientsDailyVisit": {
+        "name": "Lista de Pacientes com consultas diarias",
         "type": "MRSGeneric",
         "config": {
-            "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/MER Indicators in POC: TX_NEW.sql",
-             "macroTemplatePath": "/var/www/bahmni_config/openmrs/apps/reports/template/template-TX_NEW.xls"
+            "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/ResumoVisitasDiarias.sql"
+        }
+    },
+    "ListPatientsAPSS": {
+        "name": " Lista de Pacientes com consulta APSS",
+        "type": "MRSGeneric",
+        "config": {
+            "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/ResumoAPSS.sql"
         }
     },
   "ListPatientsnotsuppressed": {

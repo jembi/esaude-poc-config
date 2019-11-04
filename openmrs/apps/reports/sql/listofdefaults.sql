@@ -97,6 +97,6 @@ from
         obs o
         on orders.order_id=o.order_id
         and o.voided = 0
-        where o.order_id is null
+        where o.order_id is NOT null
         group by pappointment.patient_id
         ;
