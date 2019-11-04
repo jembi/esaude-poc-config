@@ -6,7 +6,13 @@
       "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/Patient_With_ARV_Drug_Pickups.sql"
     }
   },
-
+    "ListPatientsDailyVisit": {
+        "name": "Lista de Pacientes com consultas diarias",
+        "type": "MRSGeneric",
+        "config": {
+            "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/ResumoVisitasDiarias.sql"
+        }
+    },
     "ListPatientsAPSS": {
         "name": " Lista de Pacientes com consulta APSS",
         "type": "MRSGeneric",
