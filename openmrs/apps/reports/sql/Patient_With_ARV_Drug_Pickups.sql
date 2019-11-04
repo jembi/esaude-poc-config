@@ -45,4 +45,6 @@ FROM
     erpdrug_order edo
     ON edo.patient_id = ords.patient_id
     AND edo.dispensed_date IS NOT NULL
+    AND CAST(edo.dispensed_date AS DATE) BETWEEN '#startDate#' AND '#endDate#'
+
 ;
