@@ -4,7 +4,7 @@ t.given_name as Nome,
 t.family_name as Apelido,
 t.data1 as 'Data de Visita'
 from (select @rownum:=0) as init,
-(select
+(select distinct
 a.identifier, 
 b.given_name, 
 b.family_name,
