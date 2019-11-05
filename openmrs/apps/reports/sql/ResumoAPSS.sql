@@ -386,5 +386,4 @@ and cn.name in ('Reference_Form','Apss_Section_II_form','Apss_Section_I_form','A
 
 group by prt.date_app
 order by prt.date_app desc) as t
--- order by @rownum desc
 ;
