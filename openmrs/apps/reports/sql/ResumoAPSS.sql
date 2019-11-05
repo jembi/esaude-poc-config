@@ -330,9 +330,9 @@ where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.co
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Differentiated_Models_Date') as model on model.person_id = p.patient_id and model.encounter_id = me.encounter_id
 
-left join (select e.encounter_id,ob.person_id,ob.creator,(select concat(given_name,family_name)
+left join (select e.encounter_id,ob.person_id,ob.creator,(select concat(given_name,' ',family_name)
  from person_name 
-where person_id = ob.creator) as provider
+where person_id = (select person_id from users where user_id = ob.creator)) as provider
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
@@ -377,7 +377,13 @@ and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact') as cntype on cntype.person_id = p.patient_id  and cntype.encounter_id = me.encounter_id
 
 where pi.identifier_type = 3
+
+and me.encounter_id in (select e.encounter_id
+from obs ob, encounter e, concept_name cn
+where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
+and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
+and cn.name in ('Reference_Form','Apss_Section_II_form','Apss_Section_I_form','Apss_Section_III_form','Group_Priority_Population_obs_form'))
+
 group by prt.date_app
 order by prt.date_app desc) as t
--- order by @rownum desc
 ;
