@@ -48,27 +48,27 @@ grupo_apoio AS "24. Grupo Apoio Início/ Continua/ Fim (I/ C/ F)",
 mdc_code AS "24. Modelo Diferenciado Cuidados (MDC)(Código)",
 eligibility_mdc AS "24. Modelo Diferenciado Cuidados (MDC) Elegível(S/ N)",
 mdc_states as "24. Modelo Diferenciado Cuidados (MDC) Início/ Continua/ Fim (I/ C/ F)"
-FROM (SELECT @rownum:=0) as initialization,(SELECT  DISTINCT enc.identifier AS NID, enc.full_name AS Nome,encounter_datetime,appointment.next_consultation AS next_cons, enc.age,diastolic.value_numeric as diastolic,sistolic.value_numeric as sistolic, pregnant as pregnancy_status,breast_feeding_value as bfeeding,DATE_FORMAT(date_of_menstruation.value_datetime, "%d-%m-%Y") as menstruation_date, table_WHO_staging.name as WHO, condom_value, weight.value_numeric as weight,
-height.value_numeric AS altura,bperimeter.value_numeric AS PB,bmi.value_numeric AS IMC, nutritional_eval AS nut_eval,odema.odemas_value as edemas,nutritional_education.received as nut_ed_received, nutritional_supplement.supplement as nutritional_supplements, suppl_quant.value_numeric as quantidade,has_symptoms.symptoms_value as got_symptoms,
-symptoms_list.symptoms AS list_of_symptoms,COALESCE(date_of_diagnosis.v_datetime,'NÃO') as TB_diagosis_date, DATE_FORMAT(date_of_TB_start.value_datetime, "%d-%m-%Y") as TB_start,DATE_FORMAT(date_of_TB_end.value_datetime, "%d-%m-%Y") as TB_end,state_of_TB.state as TB_state,type_of_prophilaxis.type_of_pfx as prophilaxis_type,state_of_prophylaxis.state as prophilaxis_state,
-DATE_FORMAT(date_of_prophylaxis_start.value_datetime, "%d-%m-%Y") AS prophylaxis_start,DATE_FORMAT(date_of_prophylaxis_end.value_datetime, "%d-%m-%Y") as prophylaxis_end,
-sec_efects.has_sec_efects AS SEF_INH,sec_efects_ctz.has_sec_efects_ctz as SEF_CTZ,symptoms_of_its.has_its_symptoms as its_symptoms,
-male_syndromic_appr.approach AS synd_appr_male,female_syndromic_appr.approach as synd_appr_female,op_infections.infections as infects,viral_load.value_numeric as cv,lab_requests.lab_tests as test_requests,
-line_dispense.LD as line_dispense,drugs_regime.drugs as drugs_regime,frqncy.freq as regime_frequency, Concat('Activo em ',patient_state.patient_status) as p_state, services_list.services as c_services, gr_apoio.g_apoio_list as grupo_apoio, table_mdc.states as mdc_states,
-sg_list.list_sg as grupo_apoio_list,mdc_eligibility.mdc_yes_no as eligibility_mdc,mdc_table1.modelos_diferenciados as mdc_code,fplanning.family_planning as fam_planning,
-key_population.pop_chave as kpop,vp.pop_vul as vul_pop,gr_results.res as laboratory_results, enc.encounter_id
-from (select identifier,person.person_id,full_name,date_created,encounter_datetime,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) as age, encounter_id,patient_id from encounter
+FROM (SELECT @rownum:=0) AS initialization,(SELECT  DISTINCT enc.identifier AS NID, enc.full_name AS Nome,encounter_datetime,appointment.next_consultation AS next_cons, enc.age,diastolic.value_numeric AS diastolic,sistolic.value_numeric AS sistolic, pregnant AS pregnancy_status,breast_feeding_value AS bfeeding,DATE_FORMAT(date_of_menstruation.value_datetime, "%d-%m-%Y") AS menstruation_date, table_WHO_staging.name AS WHO, condom_value, weight.value_numeric AS weight,
+height.value_numeric AS altura,bperimeter.value_numeric AS PB,bmi.value_numeric AS IMC, nutritional_eval AS nut_eval,odema.odemas_value AS edemas,nutritional_education.received AS nut_ed_received, nutritional_supplement.supplement AS nutritional_supplements, suppl_quant.value_numeric AS quantidade,has_symptoms.symptoms_value AS got_symptoms,
+symptoms_list.symptoms AS list_of_symptoms,COALESCE(date_of_diagnosis.v_datetime,'NÃO') AS TB_diagosis_date, DATE_FORMAT(date_of_TB_start.value_datetime, "%d-%m-%Y") AS TB_start,DATE_FORMAT(date_of_TB_end.value_datetime, "%d-%m-%Y") AS TB_end,state_of_TB.state AS TB_state,type_of_prophilaxis.type_of_pfx AS prophilaxis_type,state_of_prophylaxis.state AS prophilaxis_state,
+DATE_FORMAT(date_of_prophylaxis_start.value_datetime, "%d-%m-%Y") AS prophylaxis_start,DATE_FORMAT(date_of_prophylaxis_end.value_datetime, "%d-%m-%Y") AS prophylaxis_end,
+sec_efects.has_sec_efects AS SEF_INH,sec_efects_ctz.has_sec_efects_ctz AS SEF_CTZ,symptoms_of_its.has_its_symptoms AS its_symptoms,
+male_syndromic_appr.approach AS synd_appr_male,female_syndromic_appr.approach AS synd_appr_female,op_infections.infections AS infects,viral_load.value_numeric AS cv,lab_requests.lab_tests AS test_requests,
+line_dispense.LD AS line_dispense,drugs_regime.drugs AS drugs_regime,frqncy.freq AS regime_frequency, Concat('Activo em ',patient_state.patient_status) AS p_state, services_list.services AS c_services, gr_apoio.g_apoio_list AS grupo_apoio, table_mdc.states AS mdc_states,
+sg_list.list_sg AS grupo_apoio_list,mdc_eligibility.mdc_yes_no AS eligibility_mdc,mdc_table1.modelos_diferenciados AS mdc_code,fplanning.family_planning AS fam_planning,
+key_population.pop_chave AS kpop,vp.pop_vul AS vul_pop,gr_results.res AS laboratory_results, enc.encounter_id
+from (SELECT identifier,person.person_id,full_name,date_created,encounter_datetime,TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) AS age, encounter_id,patient_id from encounter
 inner join
-(select identifier,concat(pn.given_name," ", COALESCE(pn.middle_name,'')," ", COALESCE(pn.family_name,'')) as full_name, pn.person_id, p.birthdate from person_name pn join patient_identifier pi on pn.person_id = pi.patient_id join person p on p.person_id = pn.person_id) person
-on person_id=patient_id and encounter.encounter_datetime BETWEEN '#startDate#' and '#endDate#') enc
-inner join obs on obs.encounter_id = enc.encounter_id
-Left join
- (select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "BP_Diastolic_VSNormal") as diastolic on diastolic.encounter_id = obs.encounter_id
-Left join
- (select value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Blood_Pressure_–_Systolic_VS1") as sistolic on sistolic.encounter_id = obs.encounter_id
-Left join
+(SELECT identifier,concat(pn.given_name," ", COALESCE(pn.middle_name,'')," ", COALESCE(pn.family_name,'')) AS full_name, pn.person_id, p.birthdate from person_name pn join patient_identifier pi on pn.person_id = pi.patient_id join person p on p.person_id = pn.person_id) person
+ON person_id=patient_id AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' AND '#endDate#') enc
+INNER JOIN obs ON obs.encounter_id = enc.encounter_id
+LEFT JOIN
+ (SELECT value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "BP_Diastolic_VSNormal") as diastolic on diastolic.encounter_id = obs.encounter_id
+LEFT JOIN
+ (SELECT value_text,value_numeric, concept_name_type, name, locale, encounter_id, obs_id from obs  join concept_name c on c.concept_id = obs.concept_id where concept_name_type = "FULLY_SPECIFIED" and locale = "en" and name = "Blood_Pressure_–_Systolic_VS1") as sistolic on sistolic.encounter_id = obs.encounter_id
+LEFT JOIN
 (SELECT
-  DATE_FORMAT(start_date_time, "%d-%m-%Y") as next_consultation,
+  DATE_FORMAT(start_date_time, "%d-%m-%Y") AS next_consultation,
   p.person_id,
   pa.status
 FROM
