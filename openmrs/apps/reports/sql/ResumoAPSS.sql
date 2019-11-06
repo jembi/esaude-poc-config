@@ -256,7 +256,11 @@ from obs ob, concept_name cn, encounter e
 where 
  ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'CONFIDENT_RELATIONSHIP'
+and cn.name = 'CONFIDENT_RELATIONSHIP' and ob.obs_group_id = (select obs_id 
+from obs 
+where encounter_id = ob.encounter_id and concept_id = (select concept_id 
+from concept_name 
+where name ='Apss_Adherence_follow_up' and locale = 'en' and concept_name_type = 'FULLY_SPECIFIED'))
 and ob.encounter_id = e.encounter_id
 and ob.person_id = e.patient_id
 ) as ppp  on ppp.person_id = p.patient_id and ppp.encounter_id = me.encounter_id
