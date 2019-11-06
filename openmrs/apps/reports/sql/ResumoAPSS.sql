@@ -351,13 +351,14 @@ and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted'
 ) as conf on conf.person_id = p.patient_id and conf.encounter_id = me.encounter_id
 
-left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
+left join (select e.encounter_id,ob.person_id,ob.value_coded,group_concat((select name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as contact
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT')) as contact
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Agreement_Terms_Type_Contact') as ctype on ctype.person_id = p.patient_id  and ctype.encounter_id = me.encounter_id
+and cn.name = 'Apss_Agreement_Terms_Type_Contact'
+group by ob.person_id,e.encounter_id) as ctype on ctype.person_id = p.patient_id  and ctype.encounter_id = me.encounter_id
 
 left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
  from concept_name 
@@ -370,13 +371,14 @@ and cn.name = 'Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted'
 ) as care on care.person_id = p.patient_id  and care.encounter_id = me.encounter_id
 
 
-left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
+left join (select e.encounter_id,ob.person_id,ob.value_coded,group_concat((select name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as contactcn
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT')) as contactcn
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact') as cntype on cntype.person_id = p.patient_id  and cntype.encounter_id = me.encounter_id
+and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact'
+group by ob.person_id,e.encounter_id) as cntype on cntype.person_id = p.patient_id  and cntype.encounter_id = me.encounter_id
 
 where pi.identifier_type = 3
 
