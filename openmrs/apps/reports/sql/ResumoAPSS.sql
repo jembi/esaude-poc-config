@@ -20,7 +20,7 @@ t.identifier as '1.NID'
 ,t.rel as '9.(Parentesco)'
 ,t.pptype as '9.Se criança, adolescente, idoso, se tem deficiência física ou mental - Quem administra os ARVS?'
 ,t.name as '9.(Nome/ Próprio)'
-,t.pp_par as '9.(Parentesco)'
+,t.pp_par as '9. (Parentesco)'
 ,t.pp_plan as '9.PLANO DE ADESÃO - Horário; Dose; Esquecimento da dose; Viagem - (S/N)'
 ,t.pp_se as '9.EFEITOS SECUNDÁRIOS - O que pode ocorrer; Como manejar efeitos secundários -  (S/N)'
 ,t.tarv_ad as '9.ADESÃO ao TARV - Boa; Risco; Má;'
@@ -34,8 +34,8 @@ t.identifier as '1.NID'
 ,t.contact as '14.Contacto'
 ,t.data4 as '14.Data'
 ,t.contactcr as '14.O confidente concorda em ser contactado, se necessário?'
-,t.contactcn as '14.Contacto'
-,t.data5 as '14.Data'
+,t.contactcn as '14. Contacto'
+,t.data5 as '14. Data'
 
 from (select @rownum:=0) as init, 
 
@@ -91,7 +91,10 @@ left join (select distinct person_id,given_name,family_name from person_name whe
 left join (select encounter_id,patient_id,(encounter_datetime) as  date_app
 from encounter) as prt on prt.patient_id = pr.person_id and prt.encounter_id = me.encounter_id
 
-left join (select patient_id,max(start_date_time) as  next_app
+left join (select patient_id,
+case when HOUR(start_date_time)<22 then max(start_date_time) 
+when HOUR(start_date_time)>=22 and HOUR(end_date_time)<7 then max(end_date_time) 
+else max(start_date_time)  end as  next_app
 from patient_appointment group by patient_id) as prx on prx.patient_id = pr.person_id
 
 left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
@@ -290,18 +293,17 @@ where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.co
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Reason_For_The_Visit') as ppv on ppv.person_id = p.patient_id and ppv.encounter_id = me.encounter_id
 
-left join (select e.encounter_id,ob.person_id,group_concat(concat( case when name='Reference_Other_Specify_Group' then 'Outro' else (select substr(name,1,2)
- from concept_name where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT') end,'-',(select name
+left join (select e.encounter_id,ob.person_id,group_concat(concat( case when name='Reference_Other_Specify_Group' then 'Outro' else 
+(select substr(name,1,2)
+ from concept_name 
+ where concept_id = ob.concept_id and locale = 'pt' and concept_name_type = 'SHORT') end,'-',(select name
  from concept_name 
 where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT'))) as grupos
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name in ('Reference_Other_Specify_Group','Reference_MPS','Reference_PR','Reference_CR','Reference_CA','Reference_AR')
-and ob.encounter_id in (select max(e.encounter_id) from encounter e,obs o, concept_name 
-where o.concept_id = cn.concept_id and o.person_id = ob.person_id and e.patient_id = o.person_id and e.encounter_id = o.encounter_id
- and cn.name in ('Reference_Other_Specify_Group','Reference_MPS','Reference_PR','Reference_CR','Reference_CA','Reference_AR') group by e.patient_id)) 
- as refall on refall.person_id = p.patient_id and refall.encounter_id = me.encounter_id
+and cn.name in ('Reference_Other_Specify_Group','Reference_MPS','Reference_PC','Reference_CR','Reference_AR')
+ group by ob.person_id,e.encounter_id) as refall on refall.person_id = p.patient_id and refall.encounter_id = me.encounter_id
 
 left join (select e.encounter_id,ob.person_id,group_concat(concat( case when name='Reference_MDC_Other' then 'Outro' else
 (select substr(name,1,2)
@@ -312,7 +314,7 @@ where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHO
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name in ('Reference_MDC_Other','Reference_DC','Reference_PU','Reference_CA','Reference_AF','Reference_GA')
+and cn.name in ('Reference_MDC_Other','Reference_DC','Reference_PU','Reference_CA','Reference_AF','Reference_GA','Reference_DT','Reference_FR')
 group by ob.person_id,e.encounter_id) as mdc on mdc.person_id = p.patient_id and mdc.encounter_id = me.encounter_id
 
 left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name 
@@ -349,13 +351,14 @@ and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted'
 ) as conf on conf.person_id = p.patient_id and conf.encounter_id = me.encounter_id
 
-left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
+left join (select e.encounter_id,ob.person_id,ob.value_coded,group_concat((select name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as contact
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT')) as contact
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Agreement_Terms_Type_Contact') as ctype on ctype.person_id = p.patient_id  and ctype.encounter_id = me.encounter_id
+and cn.name = 'Apss_Agreement_Terms_Type_Contact'
+group by ob.person_id,e.encounter_id) as ctype on ctype.person_id = p.patient_id  and ctype.encounter_id = me.encounter_id
 
 left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
  from concept_name 
@@ -368,13 +371,14 @@ and cn.name = 'Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted'
 ) as care on care.person_id = p.patient_id  and care.encounter_id = me.encounter_id
 
 
-left join (select e.encounter_id,ob.person_id,ob.value_coded,(select name
+left join (select e.encounter_id,ob.person_id,ob.value_coded,group_concat((select name
  from concept_name 
-where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT') as contactcn
+where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHORT')) as contactcn
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact') as cntype on cntype.person_id = p.patient_id  and cntype.encounter_id = me.encounter_id
+and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contact'
+group by ob.person_id,e.encounter_id) as cntype on cntype.person_id = p.patient_id  and cntype.encounter_id = me.encounter_id
 
 where pi.identifier_type = 3
 
