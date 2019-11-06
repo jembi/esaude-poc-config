@@ -352,7 +352,7 @@ e.encounter_datetime as last
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted'
+and cn.name = 'Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted'
 ) as conf on conf.person_id = p.patient_id and conf.encounter_id = me.encounter_id
 
 left join (select e.encounter_id,ob.person_id,ob.value_coded,group_concat((select name
@@ -371,7 +371,7 @@ where concept_id = ob.value_coded and locale = 'pt' and concept_name_type = 'SHO
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'Apss_Agreement_Terms_Patient_Caregiver_agrees_contacted'
+and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted'
 ) as care on care.person_id = p.patient_id  and care.encounter_id = me.encounter_id
 
 
