@@ -256,7 +256,7 @@ from obs ob, concept_name cn, encounter e
 where 
  ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
-and cn.name = 'CONFIDENT_RELATIONSHIP' and ob.obs_group_id = (select obs_id 
+and cn.name = 'Apss_Adherence_follow_up_Who_administers_Relationship' and ob.obs_group_id = (select obs_id 
 from obs 
 where encounter_id = ob.encounter_id and concept_id = (select concept_id 
 from concept_name 
