@@ -15,11 +15,7 @@ SELECT
             COALESCE(menstruation_date, '-'),
             '/',
             COALESCE(bfeeding, '-')) AS '3. Gravidez/ Data Última Menstruaç/Lactante (G -Data DUM/ L)',
-    CONCAT(fp_condom,
-            fam_planning,
-            tubal_ligation,
-            amenorreia_method,
-            fp_other_method) AS '3. Plan. Familiar (Não/ Método)',
+    CONCAT(COALESCE(fp_condom,''),COALESCE(fam_planning,''),COALESCE(tubal_ligation,''),COALESCE(amenorreia_method,''),COALESCE(fp_other_method,'')) AS '3. Plan. Familiar (Não/ Método)',
     WHO AS '4. Estadio OMS (I,II,III,IV)',
     edemas AS '4. Criança - Edemas (0/ + a +++)',
     weight AS '5. Peso (kg)',
@@ -151,7 +147,7 @@ FROM
         person_name pn
     JOIN patient_identifier pi ON pn.person_id = pi.patient_id
     JOIN person p ON p.person_id = pn.person_id) person ON person_id = patient_id
-        AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' AND '#endDate#') enc
+        AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') enc
     INNER JOIN obs ON obs.encounter_id = enc.encounter_id
     LEFT JOIN (SELECT
         value_text,
@@ -191,18 +187,13 @@ FROM
         patient_appointment pa
     JOIN person p ON p.person_id = pa.patient_id
         AND pa.voided IS FALSE
-    JOIN appointment_service app_service ON app_service.appointment_service_id = pa.appointment_service_id
+    JOIN appointment_service app_service ON app_service.appointment_service_id = 1
         AND app_service.voided IS FALSE
-    LEFT JOIN provider prov ON prov.provider_id = pa.provider_id
-        AND prov.retired IS FALSE
-    LEFT JOIN person_name pn ON pn.person_id = prov.person_id
-        AND pn.voided IS FALSE
     LEFT JOIN appointment_service_type app_service_type ON app_service_type.appointment_service_type_id = pa.appointment_service_type_id
     WHERE
         (app_service_type.voided IS FALSE
-            OR app_service_type.voided IS NULL)
-    ORDER BY start_date_time DESC
-    LIMIT 1) AS appointment ON appointment.person_id = enc.person_id
+            OR app_service_type.voided IS NULL) group by person_id
+    ORDER BY start_date_time DESC ) AS appointment ON appointment.person_id = enc.person_id
     LEFT JOIN (SELECT
         preg.obs_id,
             preg.encounter_id,
@@ -568,7 +559,7 @@ FROM
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name = 'Breastfeeding_ANA') symptoms
+            AND name = 'Has TB Symptoms') symptoms
     JOIN (SELECT
         name, concept_id
     FROM
