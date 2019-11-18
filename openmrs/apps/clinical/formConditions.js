@@ -336,7 +336,7 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             }
         } else {
             return {
-                hide: ["Apss_Adherence_follow_up_Administers_ARV_Alone", "Apss_Adherence_follow_up_Who_administers_Full_Name", "CONFIDENT_RELATIONSHIP"]
+                hide: ["Apss_Adherence_follow_up_Administers_ARV_Alone", "Apss_Adherence_follow_up_Who_administers_Full_Name", "Apss_Adherence_follow_up_Who_administers_Relationship"]
             }
         }
     },
@@ -344,11 +344,11 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
         var answer = formFieldValues["Apss_Adherence_follow_up_Administers_ARV_Alone"];
         if (answer === "Apss_Adherence_follow_up_Administers_ARV_Alone_No") {
             return {
-                show: ["Apss_Adherence_follow_up_Who_administers_Full_Name", "CONFIDENT_RELATIONSHIP"]
+                show: ["Apss_Adherence_follow_up_Who_administers_Full_Name", "Apss_Adherence_follow_up_Who_administers_Relationship"]
             }
         } else {
             return {
-                hide: ["Apss_Adherence_follow_up_Who_administers_Full_Name", "CONFIDENT_RELATIONSHIP"]
+                hide: ["Apss_Adherence_follow_up_Who_administers_Full_Name", "Apss_Adherence_follow_up_Who_administers_Relationship"]
             }
         }
     },
