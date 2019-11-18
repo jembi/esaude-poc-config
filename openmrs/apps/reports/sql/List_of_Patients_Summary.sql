@@ -709,7 +709,7 @@ FROM
     FROM
         concept_name
     WHERE
-        concept_name_type = 'FULLY_SPECIFIED'
+        concept_name_type = 'SHORT'
             AND locale = 'en') cn_TB_state ON cn_TB_state.concept_id = TB_state.value_coded) state_of_TB ON state_of_TB.encounter_id = obs.encounter_id
     LEFT JOIN (SELECT
         prophilaxis_type.obs_id,
