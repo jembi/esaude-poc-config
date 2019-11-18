@@ -737,7 +737,7 @@ FROM
     FROM
         concept_name
     WHERE
-        concept_name_type = 'FULLY_SPECIFIED'
+        concept_name_type = 'SHORT'
             AND locale = 'en') cn_prophilaxis_type ON cn_prophilaxis_type.concept_id = prophilaxis_type.value_coded) type_of_prophilaxis ON type_of_prophilaxis.encounter_id = obs.encounter_id
     LEFT JOIN (SELECT
         prophylaxis_state.obs_id,
