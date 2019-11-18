@@ -1,4 +1,3 @@
-use openmrs;
 SELECT
 (SELECT count(p.person_id) AS "a-1" FROM person p JOIN (SELECT person_id, cn.name FROM person_attribute pa JOIN concept_name cn on cn.concept_id = pa.value AND cn.locale="en" AND  cn.concept_name_type = "FULLY_SPECIFIED" AND cn.name = 'Pre Tarv') p_status ON p_status.person_id= p.person_id
 JOIN (SELECT person_id, cn.name FROM person_attribute pa JOIN concept_name cn ON cn.concept_id = pa.value AND cn.locale="en" AND  cn.concept_name_type = "FULLY_SPECIFIED" AND cn.name = 'NEW_PATIENT') type_of_registration ON type_of_registration.person_id = p.person_id
@@ -508,7 +507,7 @@ JOIN
 
 (SELECT REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(property_value,',',1),':',-1),'\"','')FROM global_property WHERE property = 'healthFacility.info' LIMIT 1) AS NID,
 (SELECT REPLACE(REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(property_value,',',-1),':',-1),'\"',''),'}','')FROM global_property WHERE property = 'healthFacility.info' LIMIT 1) AS hf_name,
-(SELECT YEAR(CURDATE())) AS rep_month,
+(SELECT YEAR(CURDATE())) AS rep_year,
 (SELECT MONTHNAME(CURDATE())) AS rep_month,
 (select  name from address_hierarchy_entry WHERE address_hierarchy_entry_id = (select parent_id from address_hierarchy_entry join (SELECT REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(property_value,',',1),':',-1),'\"','') as nid FROM global_property WHERE property = 'healthFacility.info' LIMIT 1) NID_table ON address_hierarchy_entry.name Like CONCAT('%',NID_table.nid,'%'))) AS hf_district,
 (SELECT address_hierarchy_entry.name FROM address_hierarchy_entry WHERE address_hierarchy_entry_id =(select parent_id from address_hierarchy_entry WHERE address_hierarchy_entry_id = (select parent_id from address_hierarchy_entry join (SELECT REPLACE(SUBSTRING_INDEX(SUBSTRING_INDEX(property_value,',',1),':',-1),'\"','') as nid FROM global_property WHERE property = 'healthFacility.info' LIMIT 1) NID_table ON address_hierarchy_entry.name Like CONCAT('%',NID_table.nid,'%')))) AS hf_province;
