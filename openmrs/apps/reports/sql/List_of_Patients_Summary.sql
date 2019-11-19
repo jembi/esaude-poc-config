@@ -147,6 +147,7 @@ FROM
         person_name pn
     JOIN patient_identifier pi ON pn.person_id = pi.patient_id
     JOIN person p ON p.person_id = pn.person_id) person ON person_id = patient_id
+    AND encounter_type != 2
         AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') enc
     INNER JOIN obs ON obs.encounter_id = enc.encounter_id
     LEFT JOIN (SELECT
