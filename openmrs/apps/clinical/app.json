@@ -600,6 +600,10 @@
       "Apss_Adherence_follow_up_Who_administers_Full_Name": {
         "disableAddNotes": true
       },
+      "Apss_Adherence_follow_up_Who_administers_Relationship": {
+        "disableAddNotes": true,
+        "dropdown": true
+      },
       "Apss_Adherence_follow_up_Administers_ARV_Alone": {
         "disableAddNotes": true
       },
@@ -937,6 +941,9 @@
       },
       "HOF_LAB_SITUATION_Carga_Viral_Absolute_Retrospective": {
         "disableAddNotes": true
+      },
+      "Prophilaxis_Group_V": {
+        "allowAddMore": true
       },
       "defaults": {
         "Number of living children": 1,
