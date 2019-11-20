@@ -36,12 +36,16 @@ SELECT
             COALESCE(TB_state, '-'),
             '/',
             COALESCE(TB_end, '-')) AS '10. Tratamento TB (Cartão TB -Data de Inicio e Fim) (Início/ Continua/ Fim) (d/m/a- I/C/F)',
-    prophilaxis_type AS '11. Tipo de Profilaxia',
     CONCAT(COALESCE(prophylaxis_start, '-'),
             '/',
             COALESCE(prophilaxis_state, '-'),
             '/',
-            COALESCE(prophylaxis_end, '-')) AS '11. Profilaxia Data de Inicio/(Início/ Continua/Fim -I/ C/ F)/Data de Fim',
+            COALESCE(prophylaxis_end, '-')) AS '11. Profilaxia INH (Inicio/Continua/Fim - I/C/F)',
+            CONCAT(COALESCE(CTZ_prophylaxis_start, '-'),
+            '/',
+            COALESCE(CTZ_prophilaxis_state, '-'),
+            '/',
+            COALESCE(CTZ_prophylaxis_end, '-')) AS '11. Profilaxia CTZ (Inicio/Continua/Fim - I/C/F)',
     SEF_INH AS '12. INH Ef. Secundários  (S/ N)',
     SEF_CTZ AS '12. CTZ Ef. Secundarios (S/N)',
     its_symptoms AS '13. ITS Tem sintomas? (S/N)',
@@ -95,10 +99,12 @@ FROM
             DATE_FORMAT(date_of_TB_start.value_datetime, '%d-%m-%Y') AS TB_start,
             DATE_FORMAT(date_of_TB_end.value_datetime, '%d-%m-%Y') AS TB_end,
             state_of_TB.state AS TB_state,
-            type_of_prophilaxis.type_of_pfx AS prophilaxis_type,
             state_of_prophylaxis.state AS prophilaxis_state,
+            state_of_prophylaxis_CTZ.state AS CTZ_prophilaxis_state,
             DATE_FORMAT(date_of_prophylaxis_start.value_datetime, '%d-%m-%Y') AS prophylaxis_start,
             DATE_FORMAT(date_of_prophylaxis_end.value_datetime, '%d-%m-%Y') AS prophylaxis_end,
+            DATE_FORMAT(date_of_CTZ_prophylaxis_start.value_datetime, '%d-%m-%Y') AS CTZ_prophylaxis_start,
+            DATE_FORMAT(date_of_CTZ_prophylaxis_end.value_datetime, '%d-%m-%Y') AS CTZ_prophylaxis_end,
             sec_efects.has_sec_efects AS SEF_INH,
             sec_efects_ctz.has_sec_efects_ctz AS SEF_CTZ,
             symptoms_of_its.has_its_symptoms AS its_symptoms,
@@ -147,6 +153,7 @@ FROM
         person_name pn
     JOIN patient_identifier pi ON pn.person_id = pi.patient_id
     JOIN person p ON p.person_id = pn.person_id) person ON person_id = patient_id
+		AND encounter_type = 1
         AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') enc
     INNER JOIN obs ON obs.encounter_id = enc.encounter_id
     LEFT JOIN (SELECT
@@ -664,7 +671,7 @@ FROM
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name = 'Start Date_Prophylaxis') AS date_of_prophylaxis_start ON date_of_prophylaxis_start.encounter_id = obs.encounter_id
+            AND name = 'Start_Date_Prophylaxis_INH') AS date_of_prophylaxis_start ON date_of_prophylaxis_start.encounter_id = obs.encounter_id
     LEFT JOIN (SELECT
         value_datetime,
             concept_name_type,
@@ -678,7 +685,35 @@ FROM
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name = 'End Date') AS date_of_prophylaxis_end ON date_of_prophylaxis_end.encounter_id = obs.encounter_id
+            AND name = 'End_Date_Prophylaxis_INH') AS date_of_prophylaxis_end ON date_of_prophylaxis_end.encounter_id = obs.encounter_id
+LEFT JOIN (SELECT
+        value_datetime,
+            concept_name_type,
+            name,
+            locale,
+            encounter_id,
+            obs_id
+    FROM
+        obs
+    JOIN concept_name c ON c.concept_id = obs.concept_id
+    WHERE
+        concept_name_type = 'FULLY_SPECIFIED'
+            AND locale = 'en'
+            AND name = 'Start_Date_Prophylaxis_CTZ') AS date_of_CTZ_prophylaxis_start ON date_of_CTZ_prophylaxis_start.encounter_id = obs.encounter_id
+LEFT JOIN (SELECT
+        value_datetime,
+            concept_name_type,
+            name,
+            locale,
+            encounter_id,
+            obs_id
+    FROM
+        obs
+    JOIN concept_name c ON c.concept_id = obs.concept_id
+    WHERE
+        concept_name_type = 'FULLY_SPECIFIED'
+            AND locale = 'en'
+            AND name = 'End_Date_Prophylaxis_CTZ') AS date_of_CTZ_prophylaxis_end ON date_of_CTZ_prophylaxis_end.encounter_id = obs.encounter_id
     LEFT JOIN (SELECT
         TB_state.obs_id,
             TB_state.encounter_id,
@@ -712,34 +747,6 @@ FROM
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en') cn_TB_state ON cn_TB_state.concept_id = TB_state.value_coded) state_of_TB ON state_of_TB.encounter_id = obs.encounter_id
     LEFT JOIN (SELECT
-        prophilaxis_type.obs_id,
-            prophilaxis_type.encounter_id,
-            cn_prophilaxis_type.name AS type_of_pfx
-    FROM
-        (SELECT
-        value_text,
-            value_numeric,
-            value_coded,
-            concept_name_type,
-            name,
-            locale,
-            encounter_id,
-            obs_id
-    FROM
-        obs
-    JOIN concept_name c ON c.concept_id = obs.concept_id
-    WHERE
-        concept_name_type = 'FULLY_SPECIFIED'
-            AND locale = 'en'
-            AND name = 'Type_Prophylaxis') prophilaxis_type
-    JOIN (SELECT
-        name, concept_id
-    FROM
-        concept_name
-    WHERE
-        concept_name_type = 'FULLY_SPECIFIED'
-            AND locale = 'en') cn_prophilaxis_type ON cn_prophilaxis_type.concept_id = prophilaxis_type.value_coded) type_of_prophilaxis ON type_of_prophilaxis.encounter_id = obs.encounter_id
-    LEFT JOIN (SELECT
         prophylaxis_state.obs_id,
             prophylaxis_state.encounter_id,
             CASE
@@ -763,7 +770,7 @@ FROM
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name = 'SP_Side_Effects_INH') prophylaxis_state
+            AND name = 'State_prophylaxis_INH') prophylaxis_state
     JOIN (SELECT
         name, concept_id
     FROM
@@ -771,6 +778,41 @@ FROM
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en') cn_prophylaxis_state ON cn_prophylaxis_state.concept_id = prophylaxis_state.value_coded) state_of_prophylaxis ON state_of_prophylaxis.encounter_id = obs.encounter_id
+
+    LEFT JOIN (
+    SELECT
+        prophylaxis_state.obs_id,
+            prophylaxis_state.encounter_id,
+            CASE
+                WHEN cn_prophylaxis_state.name = 'Inicio_Prophylaxis' THEN 'Início'
+                WHEN cn_prophylaxis_state.name = 'Em Curso_Prophylaxis' THEN 'Em curso'
+                WHEN cn_prophylaxis_state.name = 'Fim_Prophylaxis' THEN 'Fim'
+            END AS state
+    FROM
+        (SELECT
+        value_text,
+            value_numeric,
+            value_coded,
+            concept_name_type,
+            name,
+            locale,
+            encounter_id,
+            obs_id
+    FROM
+        obs
+    JOIN concept_name c ON c.concept_id = obs.concept_id
+    WHERE
+        concept_name_type = 'FULLY_SPECIFIED'
+            AND locale = 'en'
+            AND name = 'State_prophylaxis_CTZ') prophylaxis_state
+    JOIN (SELECT
+        name, concept_id
+    FROM
+        concept_name
+    WHERE
+        concept_name_type = 'FULLY_SPECIFIED'
+            AND locale = 'en') cn_prophylaxis_state ON cn_prophylaxis_state.concept_id = prophylaxis_state.value_coded) state_of_prophylaxis_CTZ ON state_of_prophylaxis_CTZ.encounter_id = obs.encounter_id
+
     LEFT JOIN (SELECT
         secondary_efects.obs_id,
             secondary_efects.encounter_id,
@@ -1574,4 +1616,4 @@ FROM
         AND co_name.concept_name_type = 'SHORT'
         AND co_name.locale = 'pt'
     GROUP BY encounter_id) gr_results ON gr_results.encounter_id = obs.encounter_id
-    ORDER BY encounter_datetime ASC) global_table
+    ORDER BY encounter_datetime DESC) global_table

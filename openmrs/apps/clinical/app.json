@@ -262,6 +262,11 @@
         "required": true,
         "buttonSelect": true
       },
+      "State_Prophylaxis_INH": {
+        "disableAddNotes": true,
+        "required": true,
+        "buttonSelect": true
+      },
       "Start Date_Prophylaxis": {
         "disableAddNotes": true,
         "required": true
@@ -273,6 +278,33 @@
       "Start Date_Prophylaxis_Fluconazol": {
         "disableAddNotes": true,
         "required": true
+      },
+      "Start_Date_Prophylaxis_Fluconazol": {
+        "disableAddNotes": true,
+        "required": true
+      },
+      "Start_Date_Prophylaxis_INH": {
+        "disableAddNotes": true,
+        "required": true
+      },
+      "Start_Date_Prophylaxis_CTZ": {
+        "disableAddNotes": true,
+        "required": true
+      },
+      "End_Date_Prophylaxis_Fluconazol": {
+        "disableAddNotes": true,
+        "required": true,
+        "allowFutureDates": true
+      },
+      "End_Date_Prophylaxis_INH": {
+        "disableAddNotes": true,
+        "required": true,
+        "allowFutureDates": true
+      },
+      "End_Date_Prophylaxis_CTZ": {
+        "disableAddNotes": true,
+        "required": true,
+        "allowFutureDates": true
       },
       "Received nutritional support": {
         "disableAddNotes": true
