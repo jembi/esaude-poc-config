@@ -671,7 +671,7 @@ FROM
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name = 'Start_Date_Prophylaxis_CTZ') AS date_of_prophylaxis_start ON date_of_prophylaxis_start.encounter_id = obs.encounter_id
+            AND name = 'Start_Date_Prophylaxis_INH') AS date_of_prophylaxis_start ON date_of_prophylaxis_start.encounter_id = obs.encounter_id
     LEFT JOIN (SELECT
         value_datetime,
             concept_name_type,
@@ -685,7 +685,7 @@ FROM
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name = 'End_Date_Prophylaxis_CTZ') AS date_of_prophylaxis_end ON date_of_prophylaxis_end.encounter_id = obs.encounter_id
+            AND name = 'End_Date_Prophylaxis_INH') AS date_of_prophylaxis_end ON date_of_prophylaxis_end.encounter_id = obs.encounter_id
 LEFT JOIN (SELECT
         value_datetime,
             concept_name_type,
