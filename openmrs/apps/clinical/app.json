@@ -271,6 +271,10 @@
         "disableAddNotes": true,
         "required": true
       },
+      "End Date Prophylaxis": {
+        "disableAddNotes": true,
+        "required": true
+      },
       "Start Date_Prophylaxis_CTZ": {
         "disableAddNotes": true,
         "required": true
