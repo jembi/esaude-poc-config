@@ -161,6 +161,25 @@
       "Nutritional_States_new": {
         "disableAddNotes": true
       },
+      "Side_Effects_ana": {
+        "multiSelect": true,
+        "disableAddNotes": true
+      },
+      "Geralmente_não Severas_ana_type": {
+        "multiSelect": true,
+        "disableAddNotes": true,
+        "required": true
+      }, 
+      "Severas_ana_type": {
+        "multiSelect": true,
+        "disableAddNotes": true,
+        "required": true
+      },
+      "Com_risco_de_Vida_type": {
+        "multiSelect": true,
+        "disableAddNotes": true,
+        "required": true
+      },
       "Probable delivery date": {
         "allowFutureDates": true,
         "disableAddNotes": true
