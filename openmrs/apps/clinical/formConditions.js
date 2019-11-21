@@ -166,6 +166,44 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
         }
     }
 },
+"Side_Effects_ana" (formName, formFieldValues, patient) {
+    var answer = formFieldValues["Side_Effects_ana"];
+    var returnShowValue = [];
+    var returnHideValue = [];
+    if (answer.includes("Geralmente_não Severas_ana")) {
+            returnShowValue.push("Geralmente_não Severas_ana_type");
+
+        } else {
+            returnHideValue.push("Geralmente_não Severas_ana_type");
+
+        }
+        if (answer.includes("Severas_ana")) {
+
+            returnShowValue.push("Severas_ana_type");
+
+        } else {
+            returnHideValue.push("Severas_ana_type");
+
+        }
+        if (answer.includes("Com_risco_de_Vida")) {
+
+            returnShowValue.push("Com_risco_de_Vida_type");
+
+        } else {
+            returnHideValue.push("Com_risco_de_Vida_type");
+
+        }
+
+
+        return {
+
+            show: returnShowValue,
+            hide: returnHideValue
+        }
+
+
+},
+
     "HOF_TARV_PROPHILAXIS_Type_Prophylaxis" (formName, formFieldValues) {
     var dia = formFieldValues["HOF_TARV_PROPHILAXIS_Type_Prophylaxis"];
     var returnShowValue = [];
