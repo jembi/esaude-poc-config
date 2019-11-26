@@ -72,11 +72,11 @@ SELECT
 FROM
     (SELECT @rownum:=0) AS initialization,
     (SELECT DISTINCT
-        enc.identifier AS NID,
-            enc.full_name AS Nome,
+        obs.identifier AS NID,
+            obs.full_name AS Nome,
             encounter_datetime,
             appointment.next_consultation AS next_cons,
-            enc.age,
+            obs.age,
             diastolic.value_numeric AS diastolic,
             sistolic.value_numeric AS sistolic,
             pregnant AS pregnancy_status,
@@ -131,7 +131,7 @@ FROM
             fp_tubal_ligation.tubal_ligation,
             fp_amenorreia.amenorreia_method,
             fp_other.fp_other_method,
-            enc.encounter_id
+            obs.encounter_id
     FROM
         (SELECT
         identifier,
@@ -153,9 +153,9 @@ FROM
         person_name pn
     JOIN patient_identifier pi ON pn.person_id = pi.patient_id
     JOIN person p ON p.person_id = pn.person_id) person ON person_id = patient_id
-    AND encounter_type != 2
-        AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') enc
-    INNER JOIN obs ON obs.encounter_id = enc.encounter_id
+		AND encounter_type != 2
+        AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') obs
+
     LEFT JOIN (SELECT
         value_text,
             value_numeric,
@@ -200,7 +200,7 @@ FROM
     WHERE
         (app_service_type.voided IS FALSE
             OR app_service_type.voided IS NULL) group by person_id
-    ORDER BY start_date_time DESC ) AS appointment ON appointment.person_id = enc.person_id
+    ORDER BY start_date_time DESC ) AS appointment ON appointment.person_id = obs.person_id
     LEFT JOIN (SELECT
         preg.obs_id,
             preg.encounter_id,
@@ -658,7 +658,7 @@ FROM
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
             AND name = 'SP_Treatment End Date') AS date_of_TB_end ON date_of_TB_end.encounter_id = obs.encounter_id
-    LEFT JOIN (SELECT
+    LEFT JOIN (SELECT * FROM (SELECT
         value_datetime,
             concept_name_type,
             name,
@@ -671,8 +671,8 @@ FROM
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name = 'Start_Date_Prophylaxis_INH') AS date_of_prophylaxis_start ON date_of_prophylaxis_start.encounter_id = obs.encounter_id
-    LEFT JOIN (SELECT
+            AND name = 'Start_Date_Prophylaxis_INH' ORDER BY obs_id)t GROUP BY encounter_id) AS date_of_prophylaxis_start ON date_of_prophylaxis_start.encounter_id = obs.encounter_id
+    LEFT JOIN (SELECT * FROM (SELECT
         value_datetime,
             concept_name_type,
             name,
@@ -685,8 +685,8 @@ FROM
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name = 'End_Date_Prophylaxis_INH') AS date_of_prophylaxis_end ON date_of_prophylaxis_end.encounter_id = obs.encounter_id
-LEFT JOIN (SELECT
+            AND name = 'End_Date_Prophylaxis_INH' ORDER BY obs_id)t GROUP BY encounter_id) AS date_of_prophylaxis_end ON date_of_prophylaxis_end.encounter_id = obs.encounter_id
+LEFT JOIN (SELECT * FROM (SELECT
         value_datetime,
             concept_name_type,
             name,
@@ -699,8 +699,8 @@ LEFT JOIN (SELECT
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name = 'Start_Date_Prophylaxis_CTZ') AS date_of_CTZ_prophylaxis_start ON date_of_CTZ_prophylaxis_start.encounter_id = obs.encounter_id
-LEFT JOIN (SELECT
+            AND name = 'Start_Date_Prophylaxis_CTZ' ORDER BY obs_id DESC)t GROUP BY encounter_id) AS date_of_CTZ_prophylaxis_start ON date_of_CTZ_prophylaxis_start.encounter_id = obs.encounter_id
+LEFT JOIN (SELECT * FROM (SELECT
         value_datetime,
             concept_name_type,
             name,
@@ -713,8 +713,8 @@ LEFT JOIN (SELECT
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name = 'End_Date_Prophylaxis_CTZ') AS date_of_CTZ_prophylaxis_end ON date_of_CTZ_prophylaxis_end.encounter_id = obs.encounter_id
-    LEFT JOIN (SELECT
+            AND name = 'End_Date_Prophylaxis_CTZ' ORDER BY obs.obs_id DESC) t GROUP BY encounter_id ) AS date_of_CTZ_prophylaxis_end  ON date_of_CTZ_prophylaxis_end.encounter_id = obs.encounter_id
+    LEFT JOIN (SELECT * FROM (SELECT
         TB_state.obs_id,
             TB_state.encounter_id,
             CASE
@@ -745,8 +745,8 @@ LEFT JOIN (SELECT
         concept_name
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
-            AND locale = 'en') cn_TB_state ON cn_TB_state.concept_id = TB_state.value_coded) state_of_TB ON state_of_TB.encounter_id = obs.encounter_id
-    LEFT JOIN (SELECT
+            AND locale = 'en') cn_TB_state ON cn_TB_state.concept_id = TB_state.value_coded ORDER BY obs_id) t GROUP BY obs_id) state_of_TB ON state_of_TB.encounter_id = obs.encounter_id
+    LEFT JOIN (SELECT * FROM (SELECT
         prophylaxis_state.obs_id,
             prophylaxis_state.encounter_id,
             CASE
@@ -777,9 +777,9 @@ LEFT JOIN (SELECT
         concept_name
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
-            AND locale = 'en') cn_prophylaxis_state ON cn_prophylaxis_state.concept_id = prophylaxis_state.value_coded) state_of_prophylaxis ON state_of_prophylaxis.encounter_id = obs.encounter_id
+            AND locale = 'en') cn_prophylaxis_state ON cn_prophylaxis_state.concept_id = prophylaxis_state.value_coded ORDER BY obs_id DESC) t GROUP BY encounter_id) state_of_prophylaxis ON state_of_prophylaxis.encounter_id = obs.encounter_id
 
-    LEFT JOIN (
+    LEFT JOIN (SELECT * FROM(
     SELECT
         prophylaxis_state.obs_id,
             prophylaxis_state.encounter_id,
@@ -811,7 +811,7 @@ LEFT JOIN (SELECT
         concept_name
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
-            AND locale = 'en') cn_prophylaxis_state ON cn_prophylaxis_state.concept_id = prophylaxis_state.value_coded) state_of_prophylaxis_CTZ ON state_of_prophylaxis_CTZ.encounter_id = obs.encounter_id
+            AND locale = 'en') cn_prophylaxis_state ON cn_prophylaxis_state.concept_id = prophylaxis_state.value_coded ORDER BY obs_id DESC) t GROUP BY encounter_id) state_of_prophylaxis_CTZ ON state_of_prophylaxis_CTZ.encounter_id = obs.encounter_id
 
     LEFT JOIN (SELECT
         secondary_efects.obs_id,
@@ -1066,6 +1066,7 @@ LEFT JOIN (SELECT
         orders ord
     JOIN drug_order dorder ON ord.order_id = dorder.order_id
     INNER JOIN drug_order_relationship dor ON dor.drug_order_id = ord.order_id
+     AND dor.category_id = (select concept_id as inh_details_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals')
     JOIN concept_name cn ON cn.concept_id = ord.concept_id
         AND cn.locale = 'en'
         AND cn.concept_name_type = 'FULLY_SPECIFIED') drug
@@ -1074,7 +1075,7 @@ LEFT JOIN (SELECT
         AND concept_name.concept_name_type = 'FULLY_SPECIFIED') d) p_table
     GROUP BY order_id) p1_table
     GROUP BY encounter_id) line_dispense ON line_dispense.encounter_id = obs.encounter_id
-    LEFT JOIN (SELECT
+     LEFT JOIN (SELECT
         order_id,
             encounter_id,
             dose_units,
@@ -1111,6 +1112,7 @@ LEFT JOIN (SELECT
         orders ord
     JOIN drug_order dorder ON ord.order_id = dorder.order_id
     INNER JOIN drug_order_relationship dor ON dor.drug_order_id = ord.order_id
+     AND dor.category_id = (select concept_id as inh_details_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals')
     JOIN concept_name cn ON cn.concept_id = ord.concept_id
         AND cn.locale = 'en'
         AND cn.concept_name_type = 'FULLY_SPECIFIED') drug
@@ -1146,6 +1148,7 @@ LEFT JOIN (SELECT
         orders ord
     JOIN drug_order dorder ON ord.order_id = dorder.order_id
     INNER JOIN drug_order_relationship dor ON dor.drug_order_id = ord.order_id
+     AND dor.category_id = (select concept_id as inh_details_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals')
     JOIN order_frequency of ON of.order_frequency_id = dorder.frequency
     JOIN concept_name cn ON cn.concept_id = of.concept_id
         AND cn.locale = 'pt'
@@ -1161,7 +1164,7 @@ LEFT JOIN (SELECT
                 MAX(id)
             FROM
                 patient_status_state posts
-            GROUP BY patient_id)) patient_state ON patient_state.patient_id = enc.patient_id
+            GROUP BY patient_id)) patient_state ON patient_state.patient_id = obs.patient_id
     LEFT JOIN (SELECT
         encounter_id, GROUP_CONCAT(other_services) AS services
     FROM
@@ -1591,7 +1594,7 @@ LEFT JOIN (SELECT
     WHERE
         concept_name_type = 'SHORT'
             AND locale = 'pt'
-    GROUP BY encounter_id) lab_requests ON lab_requests.encounter_id = enc.encounter_id
+    GROUP BY encounter_id) lab_requests ON lab_requests.encounter_id = obs.encounter_id
     LEFT JOIN (SELECT
         GROUP_CONCAT(CONCAT(co_name.name, '-', value_numeric)) AS res,
             encounter_id
