@@ -1,5 +1,4 @@
 SELECT
-	encounter_id,
     @rownum:=(@rownum + 1) AS 'No',
     global_table.NID AS 'Processo-NID',
     Nome AS 'Processo-Nome',
