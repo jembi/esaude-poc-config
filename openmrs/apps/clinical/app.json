@@ -316,17 +316,17 @@
       },
       "End_Date_Prophylaxis_Fluconazol": {
         "disableAddNotes": true,
-        "required": true,
+        "required": false,
         "allowFutureDates": true
       },
       "End_Date_Prophylaxis_INH": {
         "disableAddNotes": true,
-        "required": true,
+        "required": false,
         "allowFutureDates": true
       },
       "End_Date_Prophylaxis_CTZ": {
         "disableAddNotes": true,
-        "required": true,
+        "required": false,
         "allowFutureDates": true
       },
       "Received nutritional support": {
