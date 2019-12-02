@@ -1044,7 +1044,7 @@ LEFT JOIN (SELECT
             GROUP_CONCAT(LD) AS LD
     FROM
         (SELECT
-        CONCAT(d.line_of_treatment, '-', d.dosing_instructions) AS LD,
+        CONCAT(COALESCE(d.line_of_treatment,''), '-', COALESCE(d.dosing_instructions,'')) AS LD,
             d.order_id,
             d.encounter_id,
             d.patient_id,
