@@ -509,6 +509,16 @@
       "Reference_Eligible": {
         "disableAddNotes": true
       },
+      "User_type": {
+        "disableAddNotes": true,
+        "required": true,
+        "dropdown": true
+      },
+      "User_type_pop": {
+        "disableAddNotes": true,
+        "required": true,
+        "dropdown": true
+      },
       "Family_Planning_Contraceptive_Methods_PRES_Condom_button": {
         "disableAddNotes": true
       },
