@@ -19,7 +19,7 @@ CONCAT(COALESCE(fp_condom,''),COALESCE(fam_planning,''),COALESCE(tubal_ligation,
 WHO AS '4. Estadio OMS (I,II,III,IV)',
 edemas AS '4. Criança - Edemas (0/ + a +++)',
 weight AS '5. Peso (kg)',
-altura AS '5. Comprimento/ Altura (Se > 5 anos - em metros; Se ≤ 5 anos - em cm)',
+height AS '5. Comprimento/ Altura (Se > 5 anos - em metros; Se ≤ 5 anos - em cm)',
 PB AS '6. PB (Grávida; 6 meses do Pós- Parto; Criança6-59 meses)',
 IMC AS '6. IMC (Kg/m2)',
 '' AS '7. Avaliação Nutricional -Indicador(IMC; PB; IMC/Idade; P/E)',
@@ -72,7 +72,18 @@ mdc_states AS '24. Referência - Modelo Diferenciado Cuidados (MDC) Início/ Con
 provider AS '25. Provedor'
 FROM
     (SELECT @rownum:=0) AS initialization,
-(SELECT DISTINCT
+(SELECT
+ NID,Nome, encounter_datetime,next_cons,age, MAX(diastolic) AS diastolic, MAX(sistolic) AS sistolic,
+ MAX(pregnancy_status) AS pregnancy_status,MAX(bfeeding) AS bfeeding, MAX(menstruation_date) AS menstruation_date, MAX(WHO) AS WHO, MAX(condom_value) AS condom_value,
+ MAX(weight) AS weight, MAX(altura) AS height, MAX(PB) AS PB, MAX(IMC) AS IMC, MAX(nut_eval) nut_eval, MAX(edemas) edemas, MAX(nut_ed_received) AS nut_ed_received, MAX(nutritional_supplements) AS nutritional_supplements,
+ MAX(quantidade) AS quantidade, MAX(got_symptoms) AS got_symptoms, MAX(list_of_symptoms) AS list_of_symptoms, MAX(TB_diagosis_date) AS TB_diagosis_date, MAX(TB_start) AS TB_start, MAX(TB_end) AS TB_end,
+ MAX(TB_state) AS TB_state,MAX(prophilaxis_state) AS prophilaxis_state, MAX(CTZ_prophilaxis_state) AS CTZ_prophilaxis_state, MAX(prophylaxis_start) AS prophylaxis_start, MAX(prophylaxis_end) AS prophylaxis_end,
+ MAX(CTZ_prophylaxis_start) AS CTZ_prophylaxis_start, MAX(CTZ_prophylaxis_end) AS CTZ_prophylaxis_end,MAX(SEF_INH) AS SEF_INH, MAX(SEF_CTZ) AS SEF_CTZ, MAX(its_symptoms) AS its_symptoms, MAX(synd_appr_male) AS synd_appr_male,
+ MAX(synd_appr_female) AS synd_appr_female, MAX(infects) AS infects, MAX(cv) AS cv, MAX(test_requests) AS test_requests,MAX(line_dispense) AS line_dispense, MAX(drugs_regime) AS drugs_regime, MAX(regime_frequency) AS regime_frequency,
+ MAX(p_state) AS p_state, MAX(c_services) AS c_services, MAX(grupo_apoio) AS grupo_apoio,MAX(mdc_states) AS mdc_states,MAX(grupo_apoio_list) AS grupo_apoio_list,MAX(eligibility_mdc) AS eligibility_mdc,
+ MAX(mdc_code) AS mdc_code,MAX(fam_planning) AS fam_planning,MAX(kpop) AS kpop,MAX(vul_pop) AS vul_pop, MAX(laboratory_results) AS laboratory_results,MAX(fp_condom) AS fp_condom, MAX(tubal_ligation) AS tubal_ligation,
+ MAX(amenorreia_method) AS amenorreia_method,MAX(fp_other_method) AS fp_other_method, MAX(provider) AS provider,MAX(patient_id) AS patient_id, MAX(encounter_id) AS encounter_id
+ FROM (SELECT DISTINCT
  obs.identifier AS NID,
  obs.full_name AS Nome,
  encounter_datetime,
@@ -133,6 +144,7 @@ FROM
  fp_amenorreia.amenorreia_method,
  fp_other.fp_other_method,
  prov.provider,
+ obs.patient_id,
  obs.encounter_id
  FROM
  (SELECT
@@ -1032,7 +1044,7 @@ LEFT JOIN (SELECT
             GROUP_CONCAT(LD) AS LD
     FROM
         (SELECT
-        CONCAT(d.line_of_treatment, '-', d.dosing_instructions) AS LD,
+        CONCAT(COALESCE(d.line_of_treatment,''), '-', COALESCE(d.dosing_instructions,'')) AS LD,
             d.order_id,
             d.encounter_id,
             d.patient_id,
@@ -1628,4 +1640,4 @@ WHERE person_id = (SELECT person_id FROM users WHERE user_id = e.creator)) AS pr
 FROM  encounter e
     ) prov ON prov.encounter_id = obs.encounter_id
 
-ORDER BY encounter_datetime DESC) global_table
+ORDER BY encounter_datetime DESC)temp_table GROUP BY encounter_datetime, patient_id) global_table
