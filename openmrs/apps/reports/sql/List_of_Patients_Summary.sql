@@ -166,7 +166,27 @@ FROM
               FROM
               person_name pn
                 JOIN patient_identifier pi ON pn.person_id = pi.patient_id
-                JOIN person p ON p.person_id = pn.person_id) person ON person_id = patient_id
+                JOIN person p ON p.person_id = pn.person_id
+                INNER join obs ob1 on ob1.person_id=p.person_id
+                inner join
+                        concept_name cn 
+                        on cn.concept_id=ob1.concept_id
+                        and cn.concept_name_type='FULLY_SPECIFIED'
+                        and cn.locale='en'
+                        and ob1.voided=0 and (cn.name='User_type_pop' or cn.name='User_type')
+                group by ob1.person_id
+                having max(obs_id)=(SELECT max(ob.obs_id) as iobs_id
+                    from
+                    obs ob 
+                    inner join person on person.person_id=ob.person_id
+                    INNER join concept_name cn on cn.concept_id=ob.value_coded
+                       where cn.concept_name_type='FULLY_SPECIFIED'
+                       and ob.voided=0
+                       and cn.locale='en'
+                       and (cn.name='Clinical_user_pop' OR cn.name='APSS_an_Clinical_user_pop' OR cn.name='Clinical_user' OR cn.name='APSS_an_Clinical_user')
+                       and ob.person_id=ob1.person_id                
+                    )   
+                ) person ON person_id = patient_id
   AND encounter_type != 2
   AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') obs
 
