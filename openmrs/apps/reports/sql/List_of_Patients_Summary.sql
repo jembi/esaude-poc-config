@@ -1057,8 +1057,11 @@ LEFT JOIN (SELECT
             drug.patient_id,
             drug.dose_units,
             CASE
-                WHEN drug.dosing_instructions = '{"instructions":"Month"}' THEN 'Mensal'
+				WHEN drug.dosing_instructions = '{"instructions":"Month"}' THEN 'Mensal'
                 WHEN drug.dosing_instructions = '{"instructions":"Trimester"}' THEN 'Trimestral'
+                WHEN drug.dosing_instructions = '{"instructions":"Semiannual"}' THEN 'Semestral'
+                WHEN drug.dosing_instructions = '{"instructions":"Mensal"}' THEN 'Mensal'
+                WHEN drug.dosing_instructions = '{"instructions":"Trimestral"}' THEN 'Trimestral'
                 WHEN drug.dosing_instructions = '{"instructions":"Semestral"}' THEN 'Semestral'
             END AS dosing_instructions,
             drug.quantity,
