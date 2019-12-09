@@ -161,6 +161,25 @@
       "Nutritional_States_new": {
         "disableAddNotes": true
       },
+      "Side_Effects_ana": {
+        "multiSelect": true,
+        "disableAddNotes": true
+      },
+      "Geralmente_não Severas_ana_type": {
+        "multiSelect": true,
+        "disableAddNotes": true,
+        "required": true
+      }, 
+      "Severas_ana_type": {
+        "multiSelect": true,
+        "disableAddNotes": true,
+        "required": true
+      },
+      "Com_risco_de_Vida_type": {
+        "multiSelect": true,
+        "disableAddNotes": true,
+        "required": true
+      },
       "Probable delivery date": {
         "allowFutureDates": true,
         "disableAddNotes": true
@@ -271,6 +290,10 @@
         "disableAddNotes": true,
         "required": true
       },
+      "End Date Prophylaxis": {
+        "disableAddNotes": true,
+        "required": true
+      },
       "Start Date_Prophylaxis_CTZ": {
         "disableAddNotes": true,
         "required": true
@@ -293,17 +316,17 @@
       },
       "End_Date_Prophylaxis_Fluconazol": {
         "disableAddNotes": true,
-        "required": true,
+        "required": false,
         "allowFutureDates": true
       },
       "End_Date_Prophylaxis_INH": {
         "disableAddNotes": true,
-        "required": true,
+        "required": false,
         "allowFutureDates": true
       },
       "End_Date_Prophylaxis_CTZ": {
         "disableAddNotes": true,
-        "required": true,
+        "required": false,
         "allowFutureDates": true
       },
       "Received nutritional support": {
@@ -485,6 +508,16 @@
       },
       "Reference_Eligible": {
         "disableAddNotes": true
+      },
+      "User_type": {
+        "disableAddNotes": true,
+        "required": true,
+        "dropdown": true
+      },
+      "User_type_pop": {
+        "disableAddNotes": true,
+        "required": true,
+        "dropdown": true
       },
       "Family_Planning_Contraceptive_Methods_PRES_Condom_button": {
         "disableAddNotes": true
