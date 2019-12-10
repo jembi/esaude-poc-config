@@ -264,7 +264,7 @@
       },
       "Type_Prophylaxis": {
         "disableAddNotes": true,
-        "multiSelect": false
+        "multiSelect": true
       },
       "State_Prophylaxis": {
         "disableAddNotes": true,
@@ -1006,9 +1006,6 @@
       },
       "HOF_LAB_SITUATION_Carga_Viral_Absolute_Retrospective": {
         "disableAddNotes": true
-      },
-      "Prophilaxis_Group_V": {
-        "allowAddMore": true
       },
       "defaults": {
         "Number of living children": 1,

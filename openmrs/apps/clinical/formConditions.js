@@ -126,32 +126,30 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
     }
 
 },
-"Type_Prophylaxis" (formName, formFieldValues) {
-    var dia = formFieldValues["Type_Prophylaxis"];
+
+
+"Type_Prophylaxis" (formName, formFieldValues, patient) {
+    var answer = formFieldValues["Type_Prophylaxis"];
     var returnShowValue = [];
     var returnHideValue = [];
-    if(formName !== "Clinical_History_Obs_Form" && formName !== "Tarv_and_Prophilaxis") {
-        if (dia === "INH") {
+    if (answer.includes("INH")) {
             returnShowValue.push("INH_Details");
-            returnHideValue.push("Secondary effects_INH");
 
         } else {
             returnHideValue.push("INH_Details");
 
         }
-        if (dia === "CTZ") {
+        if (answer.includes("CTZ")) {
 
             returnShowValue.push("CTZ_Details");
-            returnHideValue.push("Secondary effects_CTZ");
 
         } else {
             returnHideValue.push("CTZ_Details");
 
         }
-        if (dia === "Fluconazol") {
+        if (answer.includes("Fluconazol")) {
 
             returnShowValue.push("Fluconazol_Details");
-            returnHideValue.push("Secondary effects_Fluconazol");
 
         } else {
             returnHideValue.push("Fluconazol_Details");
@@ -164,8 +162,11 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             show: returnShowValue,
             hide: returnHideValue
         }
-    }
+
+
 },
+
+
 "Side_Effects_ana" (formName, formFieldValues, patient) {
     var answer = formFieldValues["Side_Effects_ana"];
     var returnShowValue = [];
