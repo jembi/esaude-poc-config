@@ -1096,13 +1096,13 @@ LEFT JOIN (SELECT
         order_id,
             encounter_id,
             dose_units,
-            GROUP_CONCAT(drugs) AS drugs
+            GROUP_CONCAT(distinct drugs) AS drugs
     FROM
         (SELECT
         order_id,
             encounter_id,
             dose_units,
-            GROUP_CONCAT(drug) AS drugs
+            GROUP_CONCAT(distinct drug) AS drugs
     FROM
         (SELECT
         drug.order_id,
@@ -1160,7 +1160,7 @@ LEFT JOIN (SELECT
             quantity,
             dor.category_id,
             dor.treatment_line_id,
-            cn.name AS freq
+            CONCAT(dose,'-',cn.name) AS freq
     FROM
         orders ord
     JOIN drug_order dorder ON ord.order_id = dorder.order_id
