@@ -1160,7 +1160,7 @@ LEFT JOIN (SELECT
             quantity,
             dor.category_id,
             dor.treatment_line_id,
-            CONCAT(cn.name,'-',dose) AS freq
+            CONCAT(dose,'-',cn.name) AS freq
     FROM
         orders ord
     JOIN drug_order dorder ON ord.order_id = dorder.order_id
