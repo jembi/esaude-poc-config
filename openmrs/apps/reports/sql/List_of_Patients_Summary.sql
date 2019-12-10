@@ -1096,13 +1096,13 @@ LEFT JOIN (SELECT
         order_id,
             encounter_id,
             dose_units,
-            GROUP_CONCAT(drugs) AS drugs
+            GROUP_CONCAT(distinct drugs) AS drugs
     FROM
         (SELECT
         order_id,
             encounter_id,
             dose_units,
-            GROUP_CONCAT(drug) AS drugs
+            GROUP_CONCAT(distinct drug) AS drugs
     FROM
         (SELECT
         drug.order_id,
