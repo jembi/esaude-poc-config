@@ -127,38 +127,35 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
 
 },
 "Type_Prophylaxis" (formName, formFieldValues) {
-    var dia = formFieldValues["Type_Prophylaxis"];
+    var answer = formFieldValues["Type_Prophylaxis"];
     var returnShowValue = [];
     var returnHideValue = [];
     if(formName !== "Clinical_History_Obs_Form" && formName !== "Tarv_and_Prophilaxis") {
-        if (dia === "INH") {
+    if (answer.includes("INH")) {
+        
             returnShowValue.push("INH_Details");
-            returnHideValue.push("Secondary effects_INH");
 
         } else {
             returnHideValue.push("INH_Details");
 
         }
-        if (dia === "CTZ") {
+        if (answer.includes("CTZ")) {
 
             returnShowValue.push("CTZ_Details");
-            returnHideValue.push("Secondary effects_CTZ");
 
         } else {
+            
             returnHideValue.push("CTZ_Details");
 
         }
-        if (dia === "Fluconazol") {
+        if (answer.includes("Fluconazol")) {
 
             returnShowValue.push("Fluconazol_Details");
-            returnHideValue.push("Secondary effects_Fluconazol");
 
         } else {
             returnHideValue.push("Fluconazol_Details");
 
         }
-
-
         return {
 
             show: returnShowValue,
@@ -166,7 +163,7 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
         }
     }
 },
-"Side_Effects_ana" (formName, formFieldValues, patient) {
+"Side_Effects_ana" (formName, formFieldValues) {
     var answer = formFieldValues["Side_Effects_ana"];
     var returnShowValue = [];
     var returnHideValue = [];
@@ -193,17 +190,12 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             returnHideValue.push("Com_risco_de_Vida_type");
 
         }
-
-
         return {
 
             show: returnShowValue,
             hide: returnHideValue
         }
-
-
 },
-
     "HOF_TARV_PROPHILAXIS_Type_Prophylaxis" (formName, formFieldValues) {
     var dia = formFieldValues["HOF_TARV_PROPHILAXIS_Type_Prophylaxis"];
     var returnShowValue = [];
@@ -228,8 +220,6 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
             returnHideValue.push("HOF_TARV_PROPHILAXIS_Fluconazol_Details");
 
         }
-
-
         return {
 
             show: returnShowValue,
