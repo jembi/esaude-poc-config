@@ -80,9 +80,7 @@ from (select @rownum:=0) as init,
 
 from  
 person as pr
-
-
- INNER join 
+INNER join 
  (  
      select ob1.person_id as pids
      from
@@ -108,8 +106,6 @@ person as pr
                     )
  ) result on result.pids=pr.person_id
 inner join (select e.patient_id,e.encounter_id as encounter_id from encounter e
-
-
 where date(e.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') as me on me.patient_id = pr.person_id
 
 left join (select distinct patient_id from patient where voided = 0) as p on p.patient_id = pr.person_id
