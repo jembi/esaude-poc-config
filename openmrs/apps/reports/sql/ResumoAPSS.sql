@@ -80,18 +80,16 @@ from (select @rownum:=0) as init,
 
 from  
 person as pr
-INNER join 
- (  
-     select ob1.person_id as pids
-     from
-     obs ob1 
-                inner join
-                        concept_name cn 
+left join
+					(select p.person_id as personid
+					from  person p
+					INNER join obs ob1 on ob1.person_id=p.person_id
+					inner join
+					concept_name cn 
                         on cn.concept_id=ob1.concept_id
                         and cn.concept_name_type='FULLY_SPECIFIED'
                         and cn.locale='en'
-                        and ob1.voided=0
-                and (cn.name='User_type_pop' or cn.name='User_type')
+                        and ob1.voided=0 and (cn.name='User_type_pop' or cn.name='User_type')
                 group by ob1.person_id
                 having max(obs_id)=(SELECT max(ob.obs_id) as iobs_id
                     from
@@ -101,10 +99,8 @@ INNER join
                        where cn.concept_name_type='FULLY_SPECIFIED'
                        and ob.voided=0
                        and cn.locale='en'
-                       and (cn.name='APSS_user_pop' OR cn.name='APSS_an_Clinical_user_pop' OR cn.name='APSS_user' OR cn.name='APSS_an_Clinical_user')
-                       and ob.person_id=ob1.person_id                
-                    )
- ) result on result.pids=pr.person_id
+                       and (cn.name='Clinical_user_pop' OR cn.name='APSS_an_Clinical_user_pop' OR cn.name='Clinical_user' OR cn.name='APSS_an_Clinical_user')
+                       and ob.person_id=ob1.person_id)) result on result.personid=pr.person_id 
 inner join (select e.patient_id,e.encounter_id as encounter_id from encounter e
 where date(e.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') as me on me.patient_id = pr.person_id
 
@@ -415,7 +411,7 @@ from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
 and cn.concept_name_type = 'FULLY_SPECIFIED' and cn.locale = 'en'
 and cn.name in ('Reference_Form','Apss_Section_II_form','Apss_Section_I_form','Apss_Section_III_form','Group_Priority_Population_obs_form'))
-
+and result.personid is null
 group by prt.date_app
 order by prt.date_app desc) as t
 ;

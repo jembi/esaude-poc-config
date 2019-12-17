@@ -158,18 +158,20 @@ FROM
         patient_id
         FROM
         encounter
-        INNER JOIN (SELECT
-                    identifier,
-                    CONCAT(pn.given_name, ' ', COALESCE(pn.middle_name, ''), ' ', COALESCE(pn.family_name, '')) AS full_name,
-                    pn.person_id,
-                    p.birthdate
-                    FROM
-                    person_name pn
-                      JOIN patient_identifier pi ON pn.person_id = pi.patient_id
-                       JOIN person p ON p.person_id = pn.person_id
-                INNER join obs ob1 on ob1.person_id=p.person_id
-                inner join
-                        concept_name cn 
+        INNER JOIN (SELECT identifier,
+                   CONCAT(pn.given_name, ' ', COALESCE(pn.middle_name, ''), ' ', COALESCE(pn.family_name, '')) AS full_name,
+                   pn.person_id,
+                   p.birthdate
+            FROM
+            person_name pn
+            JOIN patient_identifier pi ON pn.person_id = pi.patient_id
+            JOIN person p ON p.person_id = pn.person_id
+            left join
+					(select p.person_id as personid
+					from  person p
+					INNER join obs ob1 on ob1.person_id=p.person_id
+					inner join
+					concept_name cn 
                         on cn.concept_id=ob1.concept_id
                         and cn.concept_name_type='FULLY_SPECIFIED'
                         and cn.locale='en'
@@ -183,9 +185,8 @@ FROM
                        where cn.concept_name_type='FULLY_SPECIFIED'
                        and ob.voided=0
                        and cn.locale='en'
-                       and (cn.name='Clinical_user_pop' OR cn.name='APSS_an_Clinical_user_pop' OR cn.name='Clinical_user' OR cn.name='APSS_an_Clinical_user')
-                       and ob.person_id=ob1.person_id                
-                    )   
+                       and (cn.name='APSS_user_pop' OR cn.name='APSS_an_Clinical_user_pop' OR cn.name='APSS_user' OR cn.name='APSS_an_Clinical_user')
+                       and ob.person_id=ob1.person_id)) result on result.personid=p.person_id where result.personid is null
                 ) person ON person_id = patient_id
         AND encounter_type != 2
         AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') obs
