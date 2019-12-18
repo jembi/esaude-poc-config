@@ -84,135 +84,135 @@ FROM
  MAX(mdc_code) AS mdc_code,MAX(fam_planning) AS fam_planning,MAX(kpop) AS kpop,MAX(vul_pop) AS vul_pop, MAX(laboratory_results) AS laboratory_results,MAX(fp_condom) AS fp_condom, MAX(tubal_ligation) AS tubal_ligation,
  MAX(amenorreia_method) AS amenorreia_method,MAX(fp_other_method) AS fp_other_method, MAX(provider) AS provider,MAX(patient_id) AS patient_id, MAX(encounter_id) AS encounter_id
  FROM (SELECT DISTINCT
- obs.identifier AS NID,
- obs.full_name AS Nome,
- encounter_datetime,
- appointment.next_consultation AS next_cons,
- obs.age,
- diastolic.value_numeric AS diastolic,
- sistolic.value_numeric AS sistolic,
- pregnant AS pregnancy_status,
- breast_feeding_value AS bfeeding,
- DATE_FORMAT(date_of_menstruation.value_datetime, '%d-%m-%Y') AS menstruation_date,
- table_WHO_staging.name AS WHO,
- condom_value,
- weight.value_numeric AS weight,
- height.value_numeric AS altura,
- bperimeter.value_numeric AS PB,
- bmi.value_numeric AS IMC,
- nutritional_eval AS nut_eval,
- odema.odemas_value AS edemas,
- nutritional_education.received AS nut_ed_received,
- nutritional_supplement.supplement AS nutritional_supplements,
- suppl_quant.value_numeric AS quantidade,
- has_symptoms.symptoms_value AS got_symptoms,
- symptoms_list.symptoms AS list_of_symptoms,
- COALESCE(date_of_diagnosis.v_datetime, 'NÃO') AS TB_diagosis_date,
- DATE_FORMAT(date_of_TB_start.value_datetime, '%d-%m-%Y') AS TB_start,
- DATE_FORMAT(date_of_TB_end.value_datetime, '%d-%m-%Y') AS TB_end,
- state_of_TB.state AS TB_state,
- state_of_prophylaxis.state AS prophilaxis_state,
- state_of_prophylaxis_CTZ.state AS CTZ_prophilaxis_state,
- DATE_FORMAT(date_of_prophylaxis_start.value_datetime, '%d-%m-%Y') AS prophylaxis_start,
- DATE_FORMAT(date_of_prophylaxis_end.value_datetime, '%d-%m-%Y') AS prophylaxis_end,
- DATE_FORMAT(date_of_CTZ_prophylaxis_start.value_datetime, '%d-%m-%Y') AS CTZ_prophylaxis_start,
- DATE_FORMAT(date_of_CTZ_prophylaxis_end.value_datetime, '%d-%m-%Y') AS CTZ_prophylaxis_end,
- sec_efects.has_sec_efects AS SEF_INH,
- sec_efects_ctz.has_sec_efects_ctz AS SEF_CTZ,
- symptoms_of_its.has_its_symptoms AS its_symptoms,
- male_syndromic_appr.approach AS synd_appr_male,
- female_syndromic_appr.approach AS synd_appr_female,
- op_infections.infections AS infects,
- viral_load.value_numeric AS cv,
- lab_requests.lab_tests AS test_requests,
- line_dispense.LD AS line_dispense,
- drugs_regime.drugs AS drugs_regime,
- frqncy.freq AS regime_frequency,
- CONCAT('Activo em ', patient_state.patient_status) AS p_state,
- services_list.services AS c_services,
- gr_apoio.g_apoio_list AS grupo_apoio,
- table_mdc.states AS mdc_states,
- sg_list.list_sg AS grupo_apoio_list,
- mdc_eligibility.mdc_yes_no AS eligibility_mdc,
- mdc_table1.modelos_diferenciados AS mdc_code,
- fplanning.family_planning AS fam_planning,
- key_population.pop_chave AS kpop,
- vp.pop_vul AS vul_pop,
- gr_results.res AS laboratory_results,
- fpcond.fp_condom,
- fp_tubal_ligation.tubal_ligation,
- fp_amenorreia.amenorreia_method,
- fp_other.fp_other_method,
- prov.provider,
- obs.patient_id,
- obs.encounter_id
- FROM
- (SELECT
-  identifier,
-  person.person_id,
-  full_name,
-  date_created,
-  encounter_datetime,
-  TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) AS age,
-  encounter_id,
-  patient_id
-  FROM
-  encounter
-  INNER JOIN (SELECT
-              identifier,
-              CONCAT(pn.given_name, ' ', COALESCE(pn.middle_name, ''), ' ', COALESCE(pn.family_name, '')) AS full_name,
-              pn.person_id,
-              p.birthdate
-              FROM
-              person_name pn
-                JOIN patient_identifier pi ON pn.person_id = pi.patient_id
-                JOIN person p ON p.person_id = pn.person_id) person ON person_id = patient_id
-  AND encounter_type != 2
-  AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') obs
+       obs.identifier AS NID,
+       obs.full_name AS Nome,
+       DATE(encounter_datetime) AS encounter_datetime,
+       appointment.next_consultation AS next_cons,
+       obs.age,
+       diastolic.value_numeric AS diastolic,
+       sistolic.value_numeric AS sistolic,
+       pregnant AS pregnancy_status,
+       breast_feeding_value AS bfeeding,
+       DATE_FORMAT(date_of_menstruation.value_datetime, '%d-%m-%Y') AS menstruation_date,
+       table_WHO_staging.name AS WHO,
+       condom_value,
+       weight.value_numeric AS weight,
+       height.value_numeric AS altura,
+       bperimeter.value_numeric AS PB,
+       bmi.value_numeric AS IMC,
+       nutritional_eval AS nut_eval,
+       odema.odemas_value AS edemas,
+       nutritional_education.received AS nut_ed_received,
+       nutritional_supplement.supplement AS nutritional_supplements,
+       suppl_quant.value_numeric AS quantidade,
+       has_symptoms.symptoms_value AS got_symptoms,
+       symptoms_list.symptoms AS list_of_symptoms,
+       COALESCE(date_of_diagnosis.v_datetime, 'NÃO') AS TB_diagosis_date,
+       DATE_FORMAT(date_of_TB_start.value_datetime, '%d-%m-%Y') AS TB_start,
+       DATE_FORMAT(date_of_TB_end.value_datetime, '%d-%m-%Y') AS TB_end,
+       state_of_TB.state AS TB_state,
+       state_of_prophylaxis.state AS prophilaxis_state,
+       state_of_prophylaxis_CTZ.state AS CTZ_prophilaxis_state,
+       DATE_FORMAT(date_of_prophylaxis_start.value_datetime, '%d-%m-%Y') AS prophylaxis_start,
+       DATE_FORMAT(date_of_prophylaxis_end.value_datetime, '%d-%m-%Y') AS prophylaxis_end,
+       DATE_FORMAT(date_of_CTZ_prophylaxis_start.value_datetime, '%d-%m-%Y') AS CTZ_prophylaxis_start,
+       DATE_FORMAT(date_of_CTZ_prophylaxis_end.value_datetime, '%d-%m-%Y') AS CTZ_prophylaxis_end,
+       sec_efects.has_sec_efects AS SEF_INH,
+       sec_efects_ctz.has_sec_efects_ctz AS SEF_CTZ,
+       symptoms_of_its.has_its_symptoms AS its_symptoms,
+       male_syndromic_appr.approach AS synd_appr_male,
+       female_syndromic_appr.approach AS synd_appr_female,
+       op_infections.infections AS infects,
+       viral_load.value_numeric AS cv,
+       lab_requests.lab_tests AS test_requests,
+       line_dispense.LD AS line_dispense,
+       drugs_regime.drugs AS drugs_regime,
+       frqncy.freq AS regime_frequency,
+       CONCAT('Activo em ', patient_state.patient_status) AS p_state,
+       services_list.services AS c_services,
+       gr_apoio.g_apoio_list AS grupo_apoio,
+       table_mdc.states AS mdc_states,
+       sg_list.list_sg AS grupo_apoio_list,
+       mdc_eligibility.mdc_yes_no AS eligibility_mdc,
+       mdc_table1.modelos_diferenciados AS mdc_code,
+       fplanning.family_planning AS fam_planning,
+       key_population.pop_chave AS kpop,
+       vp.pop_vul AS vul_pop,
+       gr_results.res AS laboratory_results,
+       fpcond.fp_condom,
+       fp_tubal_ligation.tubal_ligation,
+       fp_amenorreia.amenorreia_method,
+       fp_other.fp_other_method,
+       prov.provider,
+       obs.patient_id,
+       obs.encounter_id
+       FROM
+       (SELECT
+        identifier,
+        person.person_id,
+        full_name,
+        date_created,
+        encounter_datetime,
+        TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) AS age,
+        encounter_id,
+        patient_id
+        FROM
+        encounter
+        INNER JOIN (SELECT
+                    identifier,
+                    CONCAT(pn.given_name, ' ', COALESCE(pn.middle_name, ''), ' ', COALESCE(pn.family_name, '')) AS full_name,
+                    pn.person_id,
+                    p.birthdate
+                    FROM
+                    person_name pn
+                      JOIN patient_identifier pi ON pn.person_id = pi.patient_id
+                      JOIN person p ON p.person_id = pn.person_id) person ON person_id = patient_id
+        AND encounter_type != 2
+        AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') obs
 
-   LEFT JOIN (SELECT
-              value_text,
-              value_numeric,
-              concept_name_type,
-              name,
-              locale,
-              encounter_id,
-              obs_id
-              FROM
-              obs
-                JOIN concept_name c ON c.concept_id = obs.concept_id
-              WHERE
-              concept_name_type = 'FULLY_SPECIFIED'
-              AND locale = 'en'
-              AND name = 'BP_Diastolic_VSNormal') AS diastolic ON diastolic.encounter_id = obs.encounter_id
-   LEFT JOIN (SELECT
-              value_text,
-              value_numeric,
-              concept_name_type,
-              name,
-              locale,
-              encounter_id,
-              obs_id
-              FROM
-              obs
-                JOIN concept_name c ON c.concept_id = obs.concept_id
-              WHERE
-              concept_name_type = 'FULLY_SPECIFIED'
-              AND locale = 'en'
-              AND name = 'Blood_Pressure_–_Systolic_VS1') AS sistolic ON sistolic.encounter_id = obs.encounter_id
-   LEFT JOIN (SELECT
-              DATE_FORMAT(start_date_time, '%d-%m-%Y') AS next_consultation,
-              p.person_id,
-              pa.status
-              FROM
-              patient_appointment pa
-                JOIN person p ON p.person_id = pa.patient_id
-                AND pa.voided IS FALSE
-JOIN appointment_service app_service ON app_service.appointment_service_id = 1
-AND app_service.voided IS FALSE
-LEFT JOIN appointment_service_type app_service_type ON app_service_type.appointment_service_type_id = pa.appointment_service_type_id
-WHERE
-(app_service_type.voided IS FALSE
+         LEFT JOIN (SELECT
+                    value_text,
+                    value_numeric,
+                    concept_name_type,
+                    name,
+                    locale,
+                    encounter_id,
+                    obs_id
+                    FROM
+                    obs
+                      JOIN concept_name c ON c.concept_id = obs.concept_id
+                    WHERE
+                    concept_name_type = 'FULLY_SPECIFIED'
+                    AND locale = 'en'
+                    AND name = 'BP_Diastolic_VSNormal') AS diastolic ON diastolic.encounter_id = obs.encounter_id
+         LEFT JOIN (SELECT
+                    value_text,
+                    value_numeric,
+                    concept_name_type,
+                    name,
+                    locale,
+                    encounter_id,
+                    obs_id
+                    FROM
+                    obs
+                      JOIN concept_name c ON c.concept_id = obs.concept_id
+                    WHERE
+                    concept_name_type = 'FULLY_SPECIFIED'
+                    AND locale = 'en'
+                    AND name = 'Blood_Pressure_–_Systolic_VS1') AS sistolic ON sistolic.encounter_id = obs.encounter_id
+         LEFT JOIN (SELECT
+                    DATE_FORMAT(start_date_time, '%d-%m-%Y') AS next_consultation,
+                    p.person_id,
+                    pa.status
+                    FROM
+                    patient_appointment pa
+                      JOIN person p ON p.person_id = pa.patient_id
+                      AND pa.voided IS FALSE
+   JOIN appointment_service app_service ON app_service.appointment_service_id = 1
+   AND app_service.voided IS FALSE
+   LEFT JOIN appointment_service_type app_service_type ON app_service_type.appointment_service_type_id = pa.appointment_service_type_id
+ WHERE
+ (app_service_type.voided IS FALSE
 OR app_service_type.voided IS NULL) group by person_id
 ORDER BY start_date_time DESC ) AS appointment ON appointment.person_id = obs.person_id
 LEFT JOIN (SELECT
@@ -1057,8 +1057,11 @@ LEFT JOIN (SELECT
             drug.patient_id,
             drug.dose_units,
             CASE
-                WHEN drug.dosing_instructions = '{"instructions":"Month"}' THEN 'Mensal'
+				WHEN drug.dosing_instructions = '{"instructions":"Month"}' THEN 'Mensal'
                 WHEN drug.dosing_instructions = '{"instructions":"Trimester"}' THEN 'Trimestral'
+                WHEN drug.dosing_instructions = '{"instructions":"Semiannual"}' THEN 'Semestral'
+                WHEN drug.dosing_instructions = '{"instructions":"Mensal"}' THEN 'Mensal'
+                WHEN drug.dosing_instructions = '{"instructions":"Trimestral"}' THEN 'Trimestral'
                 WHEN drug.dosing_instructions = '{"instructions":"Semestral"}' THEN 'Semestral'
             END AS dosing_instructions,
             drug.quantity,
@@ -1093,13 +1096,13 @@ LEFT JOIN (SELECT
         order_id,
             encounter_id,
             dose_units,
-            GROUP_CONCAT(drugs) AS drugs
+            GROUP_CONCAT(distinct drugs) AS drugs
     FROM
         (SELECT
         order_id,
             encounter_id,
             dose_units,
-            GROUP_CONCAT(drug) AS drugs
+            GROUP_CONCAT(distinct drug) AS drugs
     FROM
         (SELECT
         drug.order_id,
@@ -1157,7 +1160,7 @@ LEFT JOIN (SELECT
             quantity,
             dor.category_id,
             dor.treatment_line_id,
-            cn.name AS freq
+            CONCAT(dose,'-',cn.name) AS freq
     FROM
         orders ord
     JOIN drug_order dorder ON ord.order_id = dorder.order_id
