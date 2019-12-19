@@ -1,0 +1,41 @@
+Private Sub Workbook_Open()
+Worksheets("Resumo").Range("G10").Value = Worksheets("Report").Range("B7").Value
+Worksheets("Resumo").Range("H10").Value = Worksheets("Report").Range("C7").Value
+Worksheets("Resumo").Range("I10").Value = Worksheets("Report").Range("D7").Value
+Worksheets("Resumo").Range("J10").Value = Worksheets("Report").Range("E7").Value
+Worksheets("Resumo").Range("K10").Value = Worksheets("Report").Range("F7").Value
+Worksheets("Resumo").Range("L10").Value = Worksheets("Report").Range("G7").Value
+Worksheets("Resumo").Range("M10").Value = Worksheets("Report").Range("H7").Value
+Worksheets("Resumo").Range("N10").Value = Worksheets("Report").Range("I7").Value
+Worksheets("Resumo").Range("P10").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("G10:J10"))
+Worksheets("Resumo").Range("Q10").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("K10:N10"))
+Worksheets("Resumo").Range("T10").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("P10,Q10"))
+Worksheets("Resumo").Range("W10").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("I10:N10"))
+
+Worksheets("Resumo").Range("G11").Value = Worksheets("Report").Range("J7").Value
+Worksheets("Resumo").Range("H11").Value = Worksheets("Report").Range("K7").Value
+Worksheets("Resumo").Range("I11").Value = Worksheets("Report").Range("L7").Value
+Worksheets("Resumo").Range("J11").Value = Worksheets("Report").Range("M7").Value
+Worksheets("Resumo").Range("K11").Value = Worksheets("Report").Range("N7").Value
+Worksheets("Resumo").Range("L11").Value = Worksheets("Report").Range("O7").Value
+Worksheets("Resumo").Range("M11").Value = Worksheets("Report").Range("P7").Value
+Worksheets("Resumo").Range("N11").Value = Worksheets("Report").Range("Q7").Value
+
+Worksheets("Resumo").Range("P11").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("G11:J11"))
+Worksheets("Resumo").Range("Q11").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("K11:N11"))
+Worksheets("Resumo").Range("T11").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("P11,Q11"))
+Worksheets("Resumo").Range("W11").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("I11:N11"))
+
+Worksheets("Resumo").Range("G12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("G10:G11"))
+Worksheets("Resumo").Range("H12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("H10:H11"))
+Worksheets("Resumo").Range("I12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("I10:I11"))
+Worksheets("Resumo").Range("J12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("J10:J11"))
+Worksheets("Resumo").Range("K12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("K10:K11"))
+Worksheets("Resumo").Range("L12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("L10:L11"))
+Worksheets("Resumo").Range("M12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("M10:M11"))
+Worksheets("Resumo").Range("N12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("N10:N11"))
+
+Worksheets("Resumo").Range("P12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("P10:P11"))
+Worksheets("Resumo").Range("Q12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("Q10:Q11"))
+Worksheets("Resumo").Range("T12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("T10,T11"))
+Worksheets("Resumo").Range("W12").Value = Application.WorksheetFunction.Sum(Worksheets("Resumo").Range("W10:W11"))
