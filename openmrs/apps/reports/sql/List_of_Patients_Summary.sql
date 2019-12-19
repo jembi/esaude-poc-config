@@ -1034,14 +1034,14 @@ LEFT JOIN (SELECT
             AND name = 'LO_ViralLoad'
             AND obs.value_numeric <> 0) AS viral_load ON viral_load.encounter_id = obs.encounter_id
 LEFT JOIN (SELECT
-        patient_id, encounter_id, GROUP_CONCAT(LD) AS LD
+        patient_id, encounter_id, GROUP_CONCAT(DISTINCT LD) AS LD
     FROM
         (SELECT
         drug,
             patient_id,
             encounter_id,
             order_id,
-            GROUP_CONCAT(LD) AS LD
+            GROUP_CONCAT(DISTINCT LD) AS LD
     FROM
         (SELECT
         CONCAT(COALESCE(d.line_of_treatment,''), '-', COALESCE(d.dosing_instructions,'')) AS LD,
@@ -1142,13 +1142,13 @@ LEFT JOIN (SELECT
         order_id,
             encounter_id,
             patient_id,
-            GROUP_CONCAT(freq) AS freq
+            GROUP_CONCAT(DISTINCT freq) AS freq
     FROM
         (SELECT
         order_id,
             encounter_id,
             patient_id,
-            GROUP_CONCAT(freq) AS freq
+            GROUP_CONCAT(DISTINCT freq) AS freq
     FROM
         (SELECT
         ord.order_id,
