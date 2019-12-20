@@ -87,7 +87,7 @@ FROM
        obs.identifier AS NID,
        obs.full_name AS Nome,
        DATE(encounter_datetime) AS encounter_datetime,
-       appointment.next_consultation AS next_cons,
+       DATE_FORMAT(appointment.next_consultation,'%d-%m-%Y') AS next_cons,
        obs.age,
        diastolic.value_numeric AS diastolic,
        sistolic.value_numeric AS sistolic,
@@ -201,20 +201,17 @@ FROM
                     AND locale = 'en'
                     AND name = 'Blood_Pressure_–_Systolic_VS1') AS sistolic ON sistolic.encounter_id = obs.encounter_id
          LEFT JOIN (SELECT
-                    DATE_FORMAT(start_date_time, '%d-%m-%Y') AS next_consultation,
+					MAX(start_date_time) AS next_consultation,
                     p.person_id,
                     pa.status
                     FROM
                     patient_appointment pa
                       JOIN person p ON p.person_id = pa.patient_id
                       AND pa.voided IS FALSE
-   JOIN appointment_service app_service ON app_service.appointment_service_id = 1
-   AND app_service.voided IS FALSE
-   LEFT JOIN appointment_service_type app_service_type ON app_service_type.appointment_service_type_id = pa.appointment_service_type_id
- WHERE
- (app_service_type.voided IS FALSE
-OR app_service_type.voided IS NULL) group by person_id
-ORDER BY start_date_time DESC ) AS appointment ON appointment.person_id = obs.person_id
+					JOIN appointment_service aps on aps.appointment_service_id = pa.appointment_service_id
+                    AND aps.name like "%Clinica%"
+ group by person_id
+ORDER BY start_date_time DESC) AS appointment ON appointment.person_id = obs.person_id
 LEFT JOIN (SELECT
         preg.obs_id,
             preg.encounter_id,
