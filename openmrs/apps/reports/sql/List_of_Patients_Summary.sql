@@ -87,7 +87,7 @@ FROM
        obs.identifier AS NID,
        obs.full_name AS Nome,
        DATE(encounter_datetime) AS encounter_datetime,
-       appointment.next_consultation AS next_cons,
+       DATE_FORMAT(appointment.next_consultation,'%d-%m-%Y') AS next_cons,
        obs.age,
        diastolic.value_numeric AS diastolic,
        sistolic.value_numeric AS sistolic,
@@ -158,15 +158,36 @@ FROM
         patient_id
         FROM
         encounter
-        INNER JOIN (SELECT
-                    identifier,
-                    CONCAT(pn.given_name, ' ', COALESCE(pn.middle_name, ''), ' ', COALESCE(pn.family_name, '')) AS full_name,
-                    pn.person_id,
-                    p.birthdate
-                    FROM
-                    person_name pn
-                      JOIN patient_identifier pi ON pn.person_id = pi.patient_id
-                      JOIN person p ON p.person_id = pn.person_id) person ON person_id = patient_id
+        INNER JOIN (SELECT identifier,
+                   CONCAT(pn.given_name, ' ', COALESCE(pn.middle_name, ''), ' ', COALESCE(pn.family_name, '')) AS full_name,
+                   pn.person_id,
+                   p.birthdate
+            FROM
+            person_name pn
+            JOIN patient_identifier pi ON pn.person_id = pi.patient_id
+            JOIN person p ON p.person_id = pn.person_id
+            left join
+					(select p.person_id as personid
+					from  person p
+					INNER join obs ob1 on ob1.person_id=p.person_id
+					inner join
+					concept_name cn 
+                        on cn.concept_id=ob1.concept_id
+                        and cn.concept_name_type='FULLY_SPECIFIED'
+                        and cn.locale='en'
+                        and ob1.voided=0 and (cn.name='User_type_pop' or cn.name='User_type')
+                group by ob1.person_id
+                having max(obs_id)=(SELECT max(ob.obs_id) as iobs_id
+                    from
+                    obs ob 
+                    inner join person on person.person_id=ob.person_id
+                    INNER join concept_name cn on cn.concept_id=ob.value_coded
+                       where cn.concept_name_type='FULLY_SPECIFIED'
+                       and ob.voided=0
+                       and cn.locale='en'
+                       and (cn.name='APSS_user_pop' OR cn.name='APSS_an_Clinical_user_pop' OR cn.name='APSS_user' OR cn.name='APSS_an_Clinical_user')
+                       and ob.person_id=ob1.person_id)) result on result.personid=p.person_id where result.personid is null
+                ) person ON person_id = patient_id
         AND encounter_type != 2
         AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') obs
 
@@ -201,20 +222,17 @@ FROM
                     AND locale = 'en'
                     AND name = 'Blood_Pressure_–_Systolic_VS1') AS sistolic ON sistolic.encounter_id = obs.encounter_id
          LEFT JOIN (SELECT
-                    DATE_FORMAT(start_date_time, '%d-%m-%Y') AS next_consultation,
+					MAX(start_date_time) AS next_consultation,
                     p.person_id,
                     pa.status
                     FROM
                     patient_appointment pa
                       JOIN person p ON p.person_id = pa.patient_id
                       AND pa.voided IS FALSE
-   JOIN appointment_service app_service ON app_service.appointment_service_id = 1
-   AND app_service.voided IS FALSE
-   LEFT JOIN appointment_service_type app_service_type ON app_service_type.appointment_service_type_id = pa.appointment_service_type_id
- WHERE
- (app_service_type.voided IS FALSE
-OR app_service_type.voided IS NULL) group by person_id
-ORDER BY start_date_time DESC ) AS appointment ON appointment.person_id = obs.person_id
+					JOIN appointment_service aps on aps.appointment_service_id = pa.appointment_service_id
+                    AND aps.name like "%Clinica%"
+ group by person_id
+ORDER BY start_date_time DESC) AS appointment ON appointment.person_id = obs.person_id
 LEFT JOIN (SELECT
         preg.obs_id,
             preg.encounter_id,
@@ -1034,14 +1052,14 @@ LEFT JOIN (SELECT
             AND name = 'LO_ViralLoad'
             AND obs.value_numeric <> 0) AS viral_load ON viral_load.encounter_id = obs.encounter_id
 LEFT JOIN (SELECT
-        patient_id, encounter_id, GROUP_CONCAT(LD) AS LD
+        patient_id, encounter_id, GROUP_CONCAT(DISTINCT LD) AS LD
     FROM
         (SELECT
         drug,
             patient_id,
             encounter_id,
             order_id,
-            GROUP_CONCAT(LD) AS LD
+            GROUP_CONCAT(DISTINCT LD) AS LD
     FROM
         (SELECT
         CONCAT(COALESCE(d.line_of_treatment,''), '-', COALESCE(d.dosing_instructions,'')) AS LD,
@@ -1142,13 +1160,13 @@ LEFT JOIN (SELECT
         order_id,
             encounter_id,
             patient_id,
-            GROUP_CONCAT(freq) AS freq
+            GROUP_CONCAT(DISTINCT freq) AS freq
     FROM
         (SELECT
         order_id,
             encounter_id,
             patient_id,
-            GROUP_CONCAT(freq) AS freq
+            GROUP_CONCAT(DISTINCT freq) AS freq
     FROM
         (SELECT
         ord.order_id,
