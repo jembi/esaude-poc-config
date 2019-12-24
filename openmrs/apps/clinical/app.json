@@ -133,14 +133,16 @@
         "allowAddMore": true
       },
       "PP_Key_population": {
-        "disableAddNotes": true
+        "disableAddNotes": true,
+        "required": true
       },
       "PP_If_Key_population_yes": {
         "disableAddNotes": true,
         "required": true
       },
       "PP_Vulnerable_Population": {
-        "disableAddNotes": true
+        "disableAddNotes": true,
+        "required": true
       },
       "PP_IF_Vulnerable_Population_Yes": {
         "disableAddNotes": true,
