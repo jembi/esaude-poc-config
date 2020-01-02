@@ -533,7 +533,7 @@ LEFT JOIN (SELECT
             nutrition_supplement.encounter_id,
             CASE
                 WHEN cn_nutrition_supplement.name = 'Soya__Prophylaxis' THEN 'Soja'
-                WHEN cn_nutrition_supplement.name = 'ATPUS__Prophylaxis' THEN 'ATPUS'
+                WHEN cn_nutrition_supplement.name = 'ATPUS__Prophylaxis' THEN 'ATPU'
                 WHEN cn_nutrition_supplement.name = 'Other__Prophylaxis' THEN 'Outro'
             END AS supplement
     FROM
