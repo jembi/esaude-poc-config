@@ -1,4 +1,15 @@
 {
+
+  "MonthlyReport": {
+    "name": "Resumo Mensal HIV/SIDA",
+    "type": "MRSGeneric",
+    "config": {
+      "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/monthly_report.sql",
+      "macroTemplatePath": "/var/www/bahmni_config/openmrs/apps/reports/template/monthly_report.xls"
+    }
+  },
+
+
   "ListPatientSummary": {
     "name": " Lista de Resumo de pacientes",
     "type": "MRSGeneric",
