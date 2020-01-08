@@ -1100,6 +1100,8 @@ LEFT JOIN (SELECT
     FROM
         orders ord
     JOIN drug_order dorder ON ord.order_id = dorder.order_id
+    AND  ISNULL(ord.date_stopped)
+    AND  ISNULL(ord.previous_order_id)
     INNER JOIN drug_order_relationship dor ON dor.drug_order_id = ord.order_id
      AND dor.category_id = (select concept_id as inh_details_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals')
     JOIN concept_name cn ON cn.concept_id = ord.concept_id
@@ -1146,6 +1148,8 @@ LEFT JOIN (SELECT
     FROM
         orders ord
     JOIN drug_order dorder ON ord.order_id = dorder.order_id
+    AND  ISNULL(ord.date_stopped)
+    AND  ISNULL(ord.previous_order_id)
     INNER JOIN drug_order_relationship dor ON dor.drug_order_id = ord.order_id
      AND dor.category_id = (select concept_id as inh_details_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals')
     JOIN concept_name cn ON cn.concept_id = ord.concept_id
@@ -1182,6 +1186,8 @@ LEFT JOIN (SELECT
     FROM
         orders ord
     JOIN drug_order dorder ON ord.order_id = dorder.order_id
+    AND  ISNULL(ord.date_stopped)
+    AND  ISNULL(ord.previous_order_id)
     INNER JOIN drug_order_relationship dor ON dor.drug_order_id = ord.order_id
      AND dor.category_id = (select concept_id as inh_details_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals')
     JOIN order_frequency of ON of.order_frequency_id = dorder.frequency
