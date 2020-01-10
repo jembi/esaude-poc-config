@@ -1103,7 +1103,7 @@ LEFT JOIN (SELECT
     AND  ISNULL(ord.date_stopped)
     AND  ISNULL(ord.previous_order_id)
     INNER JOIN drug_order_relationship dor ON dor.drug_order_id = ord.order_id
-     AND dor.category_id = (select concept_id as inh_details_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals')
+       AND dor.category_id IN ((select concept_id as drug_concept_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals'),(select concept_id as drug_concept_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Other Category'))
     JOIN concept_name cn ON cn.concept_id = ord.concept_id
         AND cn.locale = 'en'
         AND cn.concept_name_type = 'FULLY_SPECIFIED') drug
@@ -1151,7 +1151,7 @@ LEFT JOIN (SELECT
     AND  ISNULL(ord.date_stopped)
     AND  ISNULL(ord.previous_order_id)
     INNER JOIN drug_order_relationship dor ON dor.drug_order_id = ord.order_id
-     AND dor.category_id = (select concept_id as inh_details_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals')
+       AND dor.category_id IN ((select concept_id as drug_concept_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals'),(select concept_id as drug_concept_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Other Category'))
     JOIN concept_name cn ON cn.concept_id = ord.concept_id
         AND cn.locale = 'en'
         AND cn.concept_name_type = 'FULLY_SPECIFIED') drug
@@ -1189,7 +1189,7 @@ LEFT JOIN (SELECT
     AND  ISNULL(ord.date_stopped)
     AND  ISNULL(ord.previous_order_id)
     INNER JOIN drug_order_relationship dor ON dor.drug_order_id = ord.order_id
-     AND dor.category_id = (select concept_id as inh_details_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals')
+       AND dor.category_id IN ((select concept_id as drug_concept_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Antirretrovirals'),(select concept_id as drug_concept_id from concept_name where locale = 'en' and  concept_name_type = 'FULLY_SPECIFIED' AND name = 'Other Category'))
     JOIN order_frequency of ON of.order_frequency_id = dorder.frequency
     JOIN concept_name cn ON cn.concept_id = of.concept_id
         AND cn.locale = 'pt'
