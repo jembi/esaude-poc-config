@@ -1,12 +1,14 @@
 select (@rownum:=@rownum+1) as No,
 t.identifier as NID, 
-t.given_name as Nome, 
+t.given_name as Nome,
+t.middle_name as 'Nome do Meio',
 t.family_name as Apelido,
 t.data1 as 'Data de Visita'
 from (select @rownum:=0) as init,
 (select distinct
 a.identifier, 
-b.given_name, 
+b.given_name,
+b.middle_name,
 b.family_name, d.visit_id,
 date(c.encounter_datetime) as data1
 from (select @rownum:=0) as init,patient_identifier a, person_name b, encounter c, visit d 

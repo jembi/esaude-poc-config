@@ -41,7 +41,7 @@ from (select @rownum:=0) as init,
 
 (select
  pi.identifier 
-,concat(pn.given_name,' ',pn.family_name) as nome
+,CONCAT(pn.given_name, ' ', COALESCE(pn.middle_name, ''), ' ', COALESCE(pn.family_name, '')) as nome
 ,ch.pop_chave 
 ,cv.pop_vul 
 ,date_format(date(prt.date_app),'%d-%m-%Y') as data1
@@ -106,7 +106,7 @@ where date(e.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') as me on
 
 left join (select distinct patient_id from patient where voided = 0) as p on p.patient_id = pr.person_id
 left join (select distinct patient_id,identifier,identifier_type from patient_identifier where voided = 0) as pi on pi.patient_id = p.patient_id
-left join (select distinct person_id,given_name,family_name from person_name where voided = 0) as pn on pn.person_id = p.patient_id
+left join (select distinct person_id,given_name,middle_name,family_name from person_name where voided = 0) as pn on pn.person_id = p.patient_id
 
 left join (select encounter_id,patient_id,(encounter_datetime) as  date_app
 from encounter) as prt on prt.patient_id = pr.person_id and prt.encounter_id = me.encounter_id
