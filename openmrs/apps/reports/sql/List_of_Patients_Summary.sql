@@ -1156,7 +1156,7 @@ LEFT JOIN (SELECT
         AND cn.locale = 'en'
         AND cn.concept_name_type = 'FULLY_SPECIFIED') drug
     JOIN concept_name ON concept_name.concept_id = drug.treatment_line_id
-        AND concept_name.locale = 'pt'
+        AND concept_name.locale = 'en'
         AND concept_name.concept_name_type = 'FULLY_SPECIFIED') drug_table
     GROUP BY order_id) drugs_table
     GROUP BY drugs_table.encounter_id) drugs_regime ON drugs_regime.encounter_id = obs.encounter_id
