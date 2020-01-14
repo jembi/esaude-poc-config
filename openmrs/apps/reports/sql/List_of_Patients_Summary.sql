@@ -186,7 +186,7 @@ FROM
                        and ob.voided=0
                        and cn.locale='en'
                        and (cn.name='APSS_user_pop' OR cn.name='APSS_an_Clinical_user_pop' OR cn.name='APSS_user' OR cn.name='APSS_an_Clinical_user')
-                       and ob.person_id=ob1.person_id)) result on result.personid=p.person_id where result.personid is null
+                       and ob.person_id=ob1.person_id)) result on result.personid=p.person_id
                 ) person ON person_id = patient_id
         AND encounter_type != 2
         AND DATE(encounter.encounter_datetime) BETWEEN '#startDate#' and '#endDate#') obs
