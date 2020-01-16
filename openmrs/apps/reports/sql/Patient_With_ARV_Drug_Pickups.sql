@@ -12,7 +12,8 @@ SELECT DISTINCT
   'Sim'
 END
 AS "Levantou ARV (S/N)",
-DATE_FORMAT(edo.dispensed_date,'%d-%m-%Y') AS "Data do Levantamento"
+DATE_FORMAT(edo.dispensed_date,'%d-%m-%Y') AS "Data do Levantamento",
+DATE_FORMAT(papp.start_date_time, '%d-%m-%Y') as "Data do Próximo Levantamento"
 FROM
 (SELECT @rownum:=0) as initialization,
 person p
@@ -41,4 +42,8 @@ and edo.dispensed=1
 and edo.arv_dispensed=1
 AND edo.dispensed_date IS NOT NULL
 AND CAST(edo.dispensed_date AS DATE) BETWEEN '#startDate#' AND '#endDate#'
+LEFT JOIN
+patient_appointment papp
+ON papp.patient_id = p.person_id
+AND papp.appointment_service_id = 5
 ;
