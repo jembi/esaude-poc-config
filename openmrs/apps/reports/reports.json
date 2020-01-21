@@ -8,7 +8,13 @@
       "macroTemplatePath": "/var/www/bahmni_config/openmrs/apps/reports/template/monthly_report.xls"
     }
   },
-
+  "ListA": {
+    "name": " Lista A: Support MPOC-646",
+    "type": "MRSGeneric",
+    "config": {
+      "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/LIST_A.sql"
+    }
+  },
 
   "ListPatientSummary": {
     "name": " Lista de Resumo de pacientes",
