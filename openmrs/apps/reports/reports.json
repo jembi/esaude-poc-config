@@ -15,7 +15,13 @@
       "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/LIST_A.sql"
     }
   },
-
+  "ListB": {
+    "name": " Lista B: Support MPOC-646",
+    "type": "MRSGeneric",
+    "config": {
+      "sqlPath": "/var/www/bahmni_config/openmrs/apps/reports/sql/LIST_B.sql"
+    }
+  },
   "ListPatientSummary": {
     "name": " Lista de Resumo de pacientes",
     "type": "MRSGeneric",
