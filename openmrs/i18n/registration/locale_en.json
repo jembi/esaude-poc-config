@@ -42,5 +42,6 @@
   "REGISTRATION_CONTACT_INFORMATION":"Contact Information",
   "REGISTRATION_INVALID_MOTHER_NAME_FIELD" : "MOTHER NAME should contain characters only",
   "REGISTRATION_INVALID_FATHER_NAME_FIELD" : "FATHER NAME should contain characters only.",
-  "REGISTRATION_INVALID_MIDDLE_NAME_FIELD" : "MIDDLE NAME should contain characters only"
+  "REGISTRATION_INVALID_MIDDLE_NAME_FIELD" : "MIDDLE NAME should contain characters only",
+  "NICKNAME_OR_ADDITIONAL_IDS": "Nick Nmae/Additional IDs"
 }
