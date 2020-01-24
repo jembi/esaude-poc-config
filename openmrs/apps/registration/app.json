@@ -159,11 +159,19 @@
             },		
             "patientSearch": {
                 "address": {},
-		"customAttributes": { 
-                 "label": "Alcunha",
-                    "placeholder": "Alcunha",
-                    "fields": ["NICK_NAME"]
-        }
+                "customAttributes": {
+                         "label": "NICKNAME_OR_ADDITIONAL_IDS",
+                            "placeholder": "NICKNAME_OR_ADDITIONAL_IDS",
+                            "fields": ["NICK_NAME",
+                                        "PASSAPORTE_ESTRANGEIRO",
+                                        "NUIT",
+                                        "NUIC",
+                                        "BI",
+                                        "DIRE",
+                                        "CARTAO_DE_ELEITOR",
+                                        "CEDULA_DE_NASCIMENTO"
+                            ]
+                }
         	}    
         }
 }
