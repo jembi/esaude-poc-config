@@ -43,5 +43,5 @@
 	"REGISTRATION_INVALID_MOTHER_NAME_FIELD" : "NOME DA MÃE deve conter caracteres apenas",
 	"REGISTRATION_INVALID_FATHER_NAME_FIELD" : "NOME DO PAI deve conter caracteres apenas.",
 	"REGISTRATION_INVALID_MIDDLE_NAME_FIELD": "NOME DO MEIO deve conter caracteres apenas.",
-    "NICKNAME_OR_ADDITIONAL_IDS": "Alcunha/ID Adicional"
+    "ADDITIONAL_IDS": "ID Adicional"
 }
