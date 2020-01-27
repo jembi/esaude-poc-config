@@ -160,10 +160,9 @@
             "patientSearch": {
                 "address": {},
                 "customAttributes": {
-                         "label": "NICKNAME_OR_ADDITIONAL_IDS",
-                            "placeholder": "NICKNAME_OR_ADDITIONAL_IDS",
-                            "fields": ["NICK_NAME",
-                                        "PASSAPORTE_ESTRANGEIRO",
+                         "label": "ADDITIONAL_IDS",
+                            "placeholder": "ADDITIONAL_IDS",
+                            "fields": [ "PASSAPORTE_ESTRANGEIRO",
                                         "NUIT",
                                         "NUIC",
                                         "BI",
