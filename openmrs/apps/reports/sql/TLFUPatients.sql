@@ -58,7 +58,7 @@ SELECT DISTINCT
        DATE_FORMAT(max(missed_pickup.date_created),'%d-%m-%Y') AS 'Último Levantamento Perdido'
 FROM orders o
 JOIN order_type ot ON o.order_type_id = ot.order_type_id AND ot.uuid='131168f4-15f5-102d-96e4-000c29c2a5d7'
-JOIN person p ON o.patient_id = person_id
+JOIN person p ON o.patient_id = person_id and p.voided = 0
 JOIN person_name pn ON p.person_id = pn.person_id
 JOIN person_address pa ON p.person_id = pa.person_id
 JOIN
@@ -67,7 +67,7 @@ JOIN
    FROM person_attribute pat
    JOIN person_attribute_type patt ON pat.person_attribute_type_id = patt.person_attribute_type_id
    WHERE patt.name = 'PRIMARY_CONTACT_NUMBER_1') contact ON p.person_id = contact.person_id
-JOIN patient_identifier pi ON p.person_id = pi.patient_id
+JOIN patient_identifier pi ON p.person_id = pi.patient_id and pi.voided = 0
 JOIN
   (SELECT pss.patient_id,
           pss.patient_state,

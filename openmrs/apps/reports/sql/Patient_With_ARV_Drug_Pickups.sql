@@ -18,14 +18,13 @@ FROM
 person p
 INNER JOIN
 person_name pn
-ON pn.person_id = p.person_id
+ON pn.person_id = p.person_id and p.voided = 0
 INNER JOIN
 patient_identifier pi
-ON pi.patient_id = p.person_id
+ON pi.patient_id = p.person_id and pi.voided = 0
 INNER JOIN
 patient pt
 on pt.patient_id = p.person_id
-and pi.voided = 0
 INNER JOIN
 orders ords
 ON ords.patient_id = pt.patient_id

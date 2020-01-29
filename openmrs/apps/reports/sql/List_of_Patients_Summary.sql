@@ -164,8 +164,8 @@ FROM
                    p.birthdate
             FROM
             person_name pn
-            JOIN patient_identifier pi ON pn.person_id = pi.patient_id
-            JOIN person p ON p.person_id = pn.person_id
+            JOIN patient_identifier pi ON pn.person_id = pi.patient_id AND pn.voided = 0 AND pi.voided = 0
+            JOIN person p ON p.person_id = pn.person_id AND p.voided = 0
             left join
 					(select p.person_id as personid
 					from  person p
