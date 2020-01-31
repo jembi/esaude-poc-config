@@ -32,9 +32,12 @@ FROM
     INNER JOIN
     person_name pn
     ON pn.person_id = p.person_id
+    AND p.voided = 0
+    AND pn.voided = 0
     INNER JOIN
     patient_identifier pi
     ON pi.patient_id = p.person_id
+    AND pi.voided = 0
     LEFT JOIN
     person_attribute personAttributesonRegistration
     ON personAttributesonRegistration.person_id = p.person_id
@@ -105,9 +108,12 @@ FROM
     INNER JOIN
     person_name pn
     ON pn.person_id = p.person_id
+    AND p.voided = 0
+    AND pn.voided = 0
     INNER JOIN
     patient_identifier pi
     ON pi.patient_id = p.person_id
+    AND pi.voided = 0
     LEFT JOIN
     person_attribute personAttributesonRegistration
     ON personAttributesonRegistration.person_id = p.person_id
@@ -173,9 +179,12 @@ FROM
     INNER JOIN
     person_name pn
     ON pn.person_id = p.person_id
+    AND p.voided = 0
+    AND pn.voided = 0
     INNER JOIN
     patient_identifier pi
     ON pi.patient_id = p.person_id
+    AND pi.voided = 0
     LEFT JOIN
     person_attribute personAttributesonRegistration
     ON personAttributesonRegistration.person_id = p.person_id

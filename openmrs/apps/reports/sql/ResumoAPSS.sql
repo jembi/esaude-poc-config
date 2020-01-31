@@ -405,7 +405,7 @@ and cn.name = 'Apss_Agreement_Terms_Confidant_agrees_contacted_Type_of_TC_Contac
 group by ob.person_id,e.encounter_id) as cntype on cntype.person_id = p.patient_id  and cntype.encounter_id = me.encounter_id
 
 where pi.identifier_type = 3
-
+and pr.voided = 0
 and me.encounter_id in (select e.encounter_id
 from obs ob, encounter e, concept_name cn
 where ob.person_id = e.patient_id and ob.encounter_id = e.encounter_id and ob.concept_id = cn.concept_id
