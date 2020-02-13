@@ -1201,11 +1201,8 @@ LEFT JOIN (SELECT
     FROM
         patient_status_state
     WHERE
-        id IN (SELECT
-                MAX(id)
-            FROM
-                patient_status_state posts
-            GROUP BY patient_id)) patient_state ON patient_state.patient_id = obs.patient_id
+        date(patient_status_state.date_created) <= date('#endDate#')
+        ORDER BY patient_status_state.id) patient_state ON patient_state.patient_id = obs.patient_id AND date(patient_state.date_created) <=date(encounter_datetime)
 LEFT JOIN (SELECT
         encounter_id, GROUP_CONCAT(other_services) AS services
     FROM
