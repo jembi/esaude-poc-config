@@ -1654,7 +1654,7 @@ LEFT JOIN (SELECT
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en'
-            AND name IN ('LO_ViralLoad' , 'LO_CD4', 'LO_HB', 'LO_AST', 'LO_ALT', 'LO_ViralLoad', 'LO_GLYCEMIA(3.05-6.05mmol/L)', 'LO_AMILASE(600-1600/UL)', 'LO_CREATININE(4.2-132Hmol/L)', 'LO_Other')
+            AND name IN ('CD4 %', 'CD4 Abs', 'CARGA VIRAL (Absoluto-Rotina)', 'CARGA VIRAL (Absoluto-Suspeita)', 'CARGA VIRAL(Qualitativo-Suspeita)', 'CARGA VIRAL(Qualitativo-Rotina)', 'LO_ViralLoad' , 'LO_CD4', 'LO_HB', 'LO_AST', 'LO_ALT', 'LO_ViralLoad', 'LO_GLYCEMIA(3.05-6.05mmol/L)', 'LO_AMILASE(600-1600/UL)', 'LO_CREATININE(4.2-132Hmol/L)', 'LO_Other')
             AND obs.value_numeric <> 0) res_table
     JOIN concept_name co_name ON co_name.concept_id = res_table.concept_id
         AND co_name.concept_name_type = 'SHORT'
