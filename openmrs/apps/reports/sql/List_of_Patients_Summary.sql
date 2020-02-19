@@ -145,7 +145,8 @@ FROM
        fp_other.fp_other_method,
        prov.provider,
        obs.patient_id,
-       obs.encounter_id
+       obs.encounter_id,
+       obs.obs_group_id
        FROM
        (SELECT
         identifier,
@@ -155,19 +156,21 @@ FROM
         encounter_datetime,
         TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) AS age,
         encounter_id,
-        patient_id
+        patient_id,
+        person.obs_group_id
         FROM
         encounter
         INNER JOIN (SELECT identifier,
                    CONCAT(pn.given_name, ' ', COALESCE(pn.middle_name, ''), ' ', COALESCE(pn.family_name, '')) AS full_name,
                    pn.person_id,
-                   p.birthdate
+                   p.birthdate,
+                   result.obs_group_id
             FROM
             person_name pn
             JOIN patient_identifier pi ON pn.person_id = pi.patient_id AND pn.voided = 0 AND pi.voided = 0
             JOIN person p ON p.person_id = pn.person_id AND p.voided = 0
             left join
-					(select p.person_id as personid
+					(select p.person_id as personid, ob1.obs_group_id AS obs_group_id
 					from  person p
 					INNER join obs ob1 on ob1.person_id=p.person_id
 					inner join
