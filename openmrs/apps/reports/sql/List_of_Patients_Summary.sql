@@ -1604,7 +1604,61 @@ LEFT JOIN (SELECT
             AND ob.concept_id = cn.concept_id
             AND cn.concept_name_type = 'FULLY_SPECIFIED'
             AND cn.locale = 'en'
-            AND cn.name = 'PP_If_Key_population_yes') key_population ON key_population.encounter_id = obs.encounter_id
+            AND cn.name = 'PP_If_Key_population_yes') key_population2 ON key_population2.encounter_id = obs.encounter_id
+LEFT JOIN (
+    SELECT
+        key_population_form_name.encounter_id,
+        key_population_form_name.person_id,
+        key_population_form_name.obs_group_id,
+        kp_fields.concept_id,
+        kp_fields.value_coded,
+        key_population_form_name.pop_chave AS pop_chave
+    FROM
+        (SELECT
+            e.encounter_id,
+            ob.person_id,
+            ob.value_coded,
+            ob.obs_group_id,
+            ob.concept_id,
+            (SELECT
+                    name
+                FROM
+                    concept_name
+                WHERE
+                    concept_id = ob.value_coded
+                    AND locale = 'pt'
+                    AND concept_name_type = 'SHORT') AS pop_chave
+        FROM
+            obs ob, encounter e, concept_name cn
+        WHERE
+            e.encounter_id = ob.encounter_id
+            AND e.patient_id = ob.person_id
+            AND ob.concept_id = cn.concept_id
+            AND cn.concept_name_type = 'FULLY_SPECIFIED'
+            AND cn.locale = 'en'
+            AND cn.name = 'PP_If_Key_population_yes') AS key_population_form_name
+    INNER JOIN (
+        SELECT 
+            ob_kp.encounter_id,
+            ob_kp.person_id,
+            ob_kp.value_coded,
+            ob_kp.concept_id,
+            ob_kp.obs_group_id,
+            ob_kp.obs_id
+        FROM
+            obs ob_kp
+        WHERE
+            -- ob_kp.encounter_id = 247197
+            -- AND ob_kp.obs_group_id = 5017686
+            ob_kp.concept_id IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'User_type_pop' OR name = 'User_type') AND voided = 0)
+            AND ob_kp.value_coded IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'Clinical_user' OR name = 'APSS_an_Clinical_user' OR name = 'Clinical_user_pop' OR name = 'APSS_an_Clinical_user_pop') AND voided = 0)
+            AND ob_kp.voided = 0
+    ) kp_fields 
+        ON kp_fields.encounter_id = key_population_form_name.encounter_id
+        AND kp_fields.obs_group_id = key_population_form_name.obs_group_id
+) key_population
+    ON key_population.encounter_id = obs.encounter_id
+    AND key_population.obs_group_id = obs.obs_group_id
 LEFT JOIN (SELECT
         e.encounter_id,
             ob.person_id,
