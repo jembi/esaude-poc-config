@@ -1241,7 +1241,85 @@ LEFT JOIN (SELECT
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en') cn_serviceslist ON cn_serviceslist.concept_id = serviceslist.value_coded) list_of_services
-    GROUP BY encounter_id) services_list ON services_list.encounter_id = obs.encounter_id
+    GROUP BY encounter_id) services_list2 ON services_list2.encounter_id = obs.encounter_id
+LEFT JOIN (
+    SELECT
+        list_services.encounter_id,
+        list_services.services AS services
+    FROM
+        (SELECT
+            encounter_id,
+            GROUP_CONCAT(other_services) AS services
+        FROM
+            (SELECT
+                serviceslist.obs_id,
+                serviceslist.encounter_id,
+                CASE
+                    WHEN cn_serviceslist.name = 'Reference_TB' THEN 'TB'
+                    WHEN cn_serviceslist.name = 'Reference_PTV' THEN 'PTV'
+                    WHEN cn_serviceslist.name = 'Reference_PF' THEN 'PF'
+                    WHEN cn_serviceslist.name = 'Reference_APSS&PP' THEN 'APSS&PP'
+                    WHEN cn_serviceslist.name = 'Reference_In patient' THEN 'Internamento'
+                    WHEN cn_serviceslist.name = 'Reference_Other' THEN 'Outro'
+                END AS other_services
+            FROM
+                (SELECT
+                    value_text,
+                    value_numeric,
+                    value_coded,
+                    concept_name_type,
+                    name,
+                    locale,
+                    encounter_id,
+                    obs_id
+                FROM
+                    obs
+                JOIN concept_name c ON c.concept_id = obs.concept_id
+                WHERE
+                    concept_name_type = 'FULLY_SPECIFIED'
+                    AND locale = 'en'
+                    AND name = 'Reference_Other_Services'
+                    ) serviceslist
+            JOIN (
+                    SELECT
+                        name,
+                        concept_id
+                    FROM
+                        concept_name
+                    WHERE
+                        concept_name_type = 'FULLY_SPECIFIED'
+                        AND locale = 'en'
+                    ) cn_serviceslist ON cn_serviceslist.concept_id = serviceslist.value_coded
+                ) list_of_services
+        GROUP BY encounter_id) AS list_services
+    INNER JOIN (
+        SELECT
+            ob_service_form.encounter_id,
+            ob_service_form.obs_group_id
+        FROM
+            encounter e_service_form, obs ob_service_form, concept_name cn_service_form
+        WHERE
+            e_service_form.encounter_id = ob_service_form.encounter_id
+            AND cn_service_form.concept_id = ob_service_form.concept_id
+            AND cn_service_form.concept_name_type = 'FULLY_SPECIFIED'
+            AND cn_service_form.locale = 'en'
+            AND cn_service_form.name = 'Reference_Other_Services'
+    ) AS service_form
+        ON service_form.encounter_id = list_services.encounter_id
+    INNER JOIN (
+        SELECT
+            ob_service_user.encounter_id,
+            ob_service_user.concept_id,
+            ob_service_user.obs_group_id
+        FROM
+            obs ob_service_user
+        WHERE
+            ob_service_user.concept_id = (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND name = 'User_type')
+            AND ob_service_user.value_coded IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'Clinical_user' OR name = 'APSS_an_Clinical_user' OR name = 'Clinical_user_pop' OR name = 'APSS_an_Clinical_user_pop'))
+            AND ob_service_user.voided = 0
+    ) AS service_form_fields
+        ON service_form_fields.obs_group_id = service_form.obs_group_id
+) services_list ON services_list.encounter_id = obs.encounter_id
 LEFT JOIN (SELECT
         g_apoio.encounter_id,
             GROUP_CONCAT(g_apoio.sg_list_with_states) AS g_apoio_list
@@ -1621,7 +1699,7 @@ LEFT JOIN (
         FROM
             obs ob_kp
         WHERE
-            ob_kp.concept_id IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'User_type_pop' OR name = 'User_type'))
+            ob_kp.concept_id = (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND name = 'User_type_pop')
             AND ob_kp.value_coded IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'Clinical_user' OR name = 'APSS_an_Clinical_user' OR name = 'Clinical_user_pop' OR name = 'APSS_an_Clinical_user_pop'))
             AND ob_kp.voided = 0
     ) kp_fields 
