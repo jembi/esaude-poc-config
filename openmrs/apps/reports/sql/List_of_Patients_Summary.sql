@@ -1578,27 +1578,6 @@ LEFT JOIN (SELECT
     WHERE
         concept_name_type = 'FULLY_SPECIFIED'
             AND locale = 'en') cn_f_planning_other ON cn_f_planning_other.concept_id = f_planning_other.value_coded) fp_other ON fp_other.encounter_id = obs.encounter_id
-LEFT JOIN (SELECT
-        e.encounter_id,
-            ob.person_id,
-            ob.value_coded,
-            (SELECT
-                    name
-                FROM
-                    concept_name
-                WHERE
-                    concept_id = ob.value_coded
-                        AND locale = 'pt'
-                        AND concept_name_type = 'SHORT') AS pop_chave
-    FROM
-        obs ob, encounter e, concept_name cn
-    WHERE
-        ob.person_id = e.patient_id
-            AND ob.encounter_id = e.encounter_id
-            AND ob.concept_id = cn.concept_id
-            AND cn.concept_name_type = 'FULLY_SPECIFIED'
-            AND cn.locale = 'en'
-            AND cn.name = 'PP_If_Key_population_yes') key_population2 ON key_population2.encounter_id = obs.encounter_id
 LEFT JOIN (
     SELECT
         kp.encounter_id,
@@ -1642,14 +1621,10 @@ LEFT JOIN (
         FROM
             obs ob_kp
         WHERE
-            -- ob_kp.encounter_id = 247197
-            -- AND ob_kp.obs_group_id = 5017686
             ob_kp.concept_id IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'User_type_pop' OR name = 'User_type'))
             AND ob_kp.value_coded IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'Clinical_user' OR name = 'APSS_an_Clinical_user' OR name = 'Clinical_user_pop' OR name = 'APSS_an_Clinical_user_pop'))
             AND ob_kp.voided = 0
     ) kp_fields 
-        -- ON kp_fields.encounter_id = kp.encounter_id
-        -- AND kp_fields.obs_group_id = kp.obs_group_id
         ON kp_fields.obs_group_id = kp.obs_group_id
 ) key_population ON key_population.encounter_id = obs.encounter_id
 LEFT JOIN (SELECT
