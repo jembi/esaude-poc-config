@@ -1203,45 +1203,6 @@ LEFT JOIN (SELECT
     WHERE
         date(patient_status_state.date_created) <= date('#endDate#')
         ORDER BY patient_status_state.id) patient_state ON patient_state.patient_id = obs.patient_id AND date(patient_state.date_created) <=date(encounter_datetime)
-LEFT JOIN (SELECT
-        encounter_id, GROUP_CONCAT(other_services) AS services
-    FROM
-        (SELECT
-        serviceslist.obs_id,
-            serviceslist.encounter_id,
-            CASE
-                WHEN cn_serviceslist.name = 'Reference_TB' THEN 'TB'
-                WHEN cn_serviceslist.name = 'Reference_PTV' THEN 'PTV'
-                WHEN cn_serviceslist.name = 'Reference_PF' THEN 'PF'
-                WHEN cn_serviceslist.name = 'Reference_APSS&PP' THEN 'APSS&PP'
-                WHEN cn_serviceslist.name = 'Reference_In patient' THEN 'Internamento'
-                WHEN cn_serviceslist.name = 'Reference_Other' THEN 'Outro'
-            END AS other_services
-    FROM
-        (SELECT
-        value_text,
-            value_numeric,
-            value_coded,
-            concept_name_type,
-            name,
-            locale,
-            encounter_id,
-            obs_id
-    FROM
-        obs
-    JOIN concept_name c ON c.concept_id = obs.concept_id
-    WHERE
-        concept_name_type = 'FULLY_SPECIFIED'
-            AND locale = 'en'
-            AND name = 'Reference_Other_Services') serviceslist
-    JOIN (SELECT
-        name, concept_id
-    FROM
-        concept_name
-    WHERE
-        concept_name_type = 'FULLY_SPECIFIED'
-            AND locale = 'en') cn_serviceslist ON cn_serviceslist.concept_id = serviceslist.value_coded) list_of_services
-    GROUP BY encounter_id) services_list2 ON services_list2.encounter_id = obs.encounter_id
 LEFT JOIN (
     SELECT
         list_services.encounter_id,
