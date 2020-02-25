@@ -1206,15 +1206,18 @@ LEFT JOIN (SELECT
 LEFT JOIN (
     SELECT
         list_services.encounter_id,
-        list_services.services AS services
+        list_services.services AS services,
+        list_services.obs_group_id
     FROM
         (SELECT
             encounter_id,
+            MAX(obs_group_id) AS obs_group_id,
             GROUP_CONCAT(other_services) AS services
         FROM
             (SELECT
                 serviceslist.obs_id,
                 serviceslist.encounter_id,
+                serviceslist.obs_group_id,
                 CASE
                     WHEN cn_serviceslist.name = 'Reference_TB' THEN 'TB'
                     WHEN cn_serviceslist.name = 'Reference_PTV' THEN 'PTV'
@@ -1232,6 +1235,7 @@ LEFT JOIN (
                     name,
                     locale,
                     encounter_id,
+                    obs_group_id,
                     obs_id
                 FROM
                     obs
@@ -1255,20 +1259,6 @@ LEFT JOIN (
         GROUP BY encounter_id) AS list_services
     INNER JOIN (
         SELECT
-            ob_service_form.encounter_id,
-            ob_service_form.obs_group_id
-        FROM
-            encounter e_service_form, obs ob_service_form, concept_name cn_service_form
-        WHERE
-            e_service_form.encounter_id = ob_service_form.encounter_id
-            AND cn_service_form.concept_id = ob_service_form.concept_id
-            AND cn_service_form.concept_name_type = 'FULLY_SPECIFIED'
-            AND cn_service_form.locale = 'en'
-            AND cn_service_form.name = 'Reference_Other_Services'
-    ) AS service_form
-        ON service_form.encounter_id = list_services.encounter_id
-    INNER JOIN (
-        SELECT
             ob_service_user.encounter_id,
             ob_service_user.concept_id,
             ob_service_user.obs_group_id
@@ -1279,31 +1269,35 @@ LEFT JOIN (
             AND ob_service_user.value_coded IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'Clinical_user' OR name = 'APSS_an_Clinical_user' OR name = 'Clinical_user_pop' OR name = 'APSS_an_Clinical_user_pop'))
             AND ob_service_user.voided = 0
     ) AS service_form_fields
-        ON service_form_fields.obs_group_id = service_form.obs_group_id
-) services_list ON services_list.encounter_id = obs.encounter_id
--- //TODO adicionar modelos diferenciados de cuidado
+        ON service_form_fields.obs_group_id = list_services.obs_group_id
+) services_list
+    ON services_list.encounter_id = obs.encounter_id
 LEFT JOIN (
     SELECT
         grupo_de_apoio.encounter_id,
-        grupo_de_apoio.g_apoio_list
+        grupo_de_apoio.g_apoio_list,
+        grupo_de_apoio.obs_group_id
     FROM
         (SELECT
             g_apoio.encounter_id,
-            GROUP_CONCAT(g_apoio.sg_list_with_states) AS g_apoio_list
+            GROUP_CONCAT(g_apoio.sg_list_with_states) AS g_apoio_list,
+            MAX(g_apoio.obs_group_id) AS obs_group_id
         FROM
             (SELECT
                 sg_obs.obs_id,
                 sg_obs.encounter_id,
+                sg_obs.obs_group_id,
                 CONCAT_WS(' - ', sg_shortname.name, sg_status.name) AS sg_list_with_states
             FROM
                 (SELECT
-                    sg_obs.obs_id,
-                    sg_obs.encounter_id,
-                    sg_obs.concept_id,
-                    sg_obs.person_id,
-                    sg_obs.value_coded
+                    sg_obs_in.obs_id,
+                    sg_obs_in.obs_group_id,
+                    sg_obs_in.encounter_id,
+                    sg_obs_in.concept_id,
+                    sg_obs_in.person_id,
+                    sg_obs_in.value_coded
                 FROM
-                    obs AS sg_obs) AS sg_obs
+                    obs AS sg_obs_in) AS sg_obs
             JOIN (SELECT
                     c_name_pt.concept_id, c_name_pt.name
                 FROM
@@ -1349,7 +1343,7 @@ LEFT JOIN (
             AND cn_g_apoio_form.locale = 'en'
             AND cn_g_apoio_form.name = 'Reference_Section_Support_Group'
     ) AS g_apoio_form
-        ON g_apoio_form.encounter_id = grupo_de_apoio.encounter_id
+        ON g_apoio_form.encounter_id = grupo_de_apoio.obs_group_id
     INNER JOIN (
         SELECT
             ob_g_apoio_user.encounter_id,
@@ -1364,56 +1358,94 @@ LEFT JOIN (
     ) AS g_apoio_form_fields
         ON g_apoio_form_fields.obs_group_id = g_apoio_form.obs_group_id
 ) gr_apoio ON gr_apoio.encounter_id = obs.encounter_id
-LEFT JOIN (SELECT
-        GROUP_CONCAT(mdc_table.mdc_list_with_states) AS states,
-            mdc_table.encounter_id,
-            mdc_table.obs_id
+LEFT JOIN (
+    SELECT
+        mdc_table_data.encounter_id,
+        mdc_table_data.obs_group_id,
+        mdc_table_data.states AS states
     FROM
         (SELECT
-        CONCAT_WS(' - ', mdc_shortname.name, mdc_status.name) AS mdc_list_with_states,
-            mdc_obs.obs_id,
-            mdc_obs.encounter_id
-    FROM
-        (SELECT
-        obs_mdc.obs_id,
-            obs_mdc.concept_id,
-            obs_mdc.person_id,
-            obs_mdc.value_coded,
-            obs_mdc.encounter_id
-    FROM
-        obs AS obs_mdc) mdc_obs
-    JOIN (SELECT
-        c_name_pt.concept_id, c_name_pt.name
-    FROM
-        concept_name AS c_name_pt
-    WHERE
-        c_name_pt.concept_id IN (SELECT
-                concept_id
+                GROUP_CONCAT(mdc_table.mdc_list_with_states) AS states,
+                    mdc_table.encounter_id,
+                    mdc_table.obs_id,
+                    mdc_table.obs_group_id
             FROM
-                concept_name
-            WHERE
-                name IN ('Reference_GA' , 'Reference_AF', 'Reference_CA', 'Reference_PU', 'Reference_FR', 'Reference_DT', 'Reference_DC', 'Reference_MDC_Other')
-                    AND concept_name_type = 'FULLY_SPECIFIED'
-                    AND locale = 'en'
-            ORDER BY concept_id ASC)
-            AND c_name_pt.concept_name_type = 'SHORT'
-            AND c_name_pt.locale = 'pt') mdc_shortname ON mdc_obs.concept_id = mdc_shortname.concept_id
-    JOIN (SELECT
-        c_name_status.concept_id, c_name_status.name
-    FROM
-        concept_name AS c_name_status
-    WHERE
-        c_name_status.concept_id IN (SELECT
-                concept_id
+                (SELECT
+                CONCAT_WS(' - ', mdc_shortname.name, mdc_status.name) AS mdc_list_with_states,
+                    mdc_obs.obs_id,
+                    mdc_obs.encounter_id,
+                    mdc_obs.obs_group_id
             FROM
-                concept_name
+                (SELECT
+                obs_mdc.obs_id,
+                    obs_mdc.concept_id,
+                    obs_mdc.person_id,
+                    obs_mdc.value_coded,
+                    obs_mdc.encounter_id,
+                    obs_mdc.obs_group_id
+            FROM
+                obs AS obs_mdc) mdc_obs
+            JOIN (SELECT
+                c_name_pt.concept_id, c_name_pt.name
+            FROM
+                concept_name AS c_name_pt
             WHERE
-                name IN ('Reference_Start' , 'Reference_In_Progress', 'Reference_End')
-                    AND concept_name_type = 'FULLY_SPECIFIED'
-                    AND locale = 'en')
-            AND c_name_status.concept_name_type = 'SHORT'
-            AND c_name_status.locale = 'pt') mdc_status ON mdc_status.concept_id = mdc_obs.value_coded) mdc_table
-    GROUP BY encounter_id) table_mdc ON table_mdc.encounter_id = obs.encounter_id
+                c_name_pt.concept_id IN (SELECT
+                        concept_id
+                    FROM
+                        concept_name
+                    WHERE
+                        name IN ('Reference_GA' , 'Reference_AF', 'Reference_CA', 'Reference_PU', 'Reference_FR', 'Reference_DT', 'Reference_DC', 'Reference_MDC_Other')
+                            AND concept_name_type = 'FULLY_SPECIFIED'
+                            AND locale = 'en'
+                    ORDER BY concept_id ASC)
+                    AND c_name_pt.concept_name_type = 'SHORT'
+                    AND c_name_pt.locale = 'pt') mdc_shortname ON mdc_obs.concept_id = mdc_shortname.concept_id
+            JOIN (SELECT
+                c_name_status.concept_id, c_name_status.name
+            FROM
+                concept_name AS c_name_status
+            WHERE
+                c_name_status.concept_id IN (SELECT
+                        concept_id
+                    FROM
+                        concept_name
+                    WHERE
+                        name IN ('Reference_Start' , 'Reference_In_Progress', 'Reference_End')
+                            AND concept_name_type = 'FULLY_SPECIFIED'
+                            AND locale = 'en')
+                    AND c_name_status.concept_name_type = 'SHORT'
+                    AND c_name_status.locale = 'pt') mdc_status ON mdc_status.concept_id = mdc_obs.value_coded) mdc_table
+            GROUP BY encounter_id) AS mdc_table_data
+    INNER JOIN (
+        SELECT
+            ob_g_apoio_form.encounter_id,
+            ob_g_apoio_form.obs_group_id
+        FROM
+            encounter e_g_apoio_form, obs ob_g_apoio_form, concept_name cn_g_apoio_form
+        WHERE
+            e_g_apoio_form.encounter_id = ob_g_apoio_form.encounter_id
+            AND cn_g_apoio_form.concept_id = ob_g_apoio_form.concept_id
+            AND cn_g_apoio_form.concept_name_type = 'FULLY_SPECIFIED'
+            AND cn_g_apoio_form.locale = 'en'
+            AND cn_g_apoio_form.name = 'Reference_Section_Support_Group'
+    ) AS g_apoio_form
+        ON g_apoio_form.obs_group_id = mdc_table_data.obs_group_id
+    INNER JOIN (
+        SELECT
+            ob_g_apoio_user.encounter_id,
+            ob_g_apoio_user.concept_id,
+            ob_g_apoio_user.obs_group_id
+        FROM
+            obs ob_g_apoio_user
+        WHERE
+            ob_g_apoio_user.concept_id = (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND name = 'User_type')
+            AND ob_g_apoio_user.value_coded IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'Clinical_user' OR name = 'APSS_an_Clinical_user' OR name = 'Clinical_user_pop' OR name = 'APSS_an_Clinical_user_pop'))
+            AND ob_g_apoio_user.voided = 0
+    ) AS g_apoio_form_fields
+        ON g_apoio_form_fields.obs_group_id = g_apoio_form.obs_group_id    
+) table_mdc
+    ON table_mdc.encounter_id = obs.encounter_id
 LEFT JOIN (SELECT
         GROUP_CONCAT(name) AS list_sg, encounter_id
     FROM
@@ -1506,43 +1538,68 @@ LEFT JOIN (
         ON g_apoio_form_fields.obs_group_id = g_apoio_form.obs_group_id
 
 ) sg_list ON sg_list.encounter_id = obs.encounter_id
-LEFT JOIN (SELECT
-        mdc_obs.encounter_id,
-            CASE
-                WHEN mdc_obs.value_coded = 1 THEN 'Sim'
-                WHEN mdc_obs.value_coded = 2 THEN 'Não'
-            END AS mdc_yes_no
+LEFT JOIN ( 
+    SELECT
+        mdc_eligibility_data.encounter_id,
+        mdc_eligibility_data.obs_group_id,
+        mdc_eligibility_data.mdc_yes_no
     FROM
         (SELECT
-        obs_mdc.obs_id,
-            obs_mdc.encounter_id,
-            obs_mdc.concept_id,
-            obs_mdc.person_id,
-            obs_mdc.value_coded
-    FROM
-        obs AS obs_mdc
-    WHERE
-        obs_mdc.concept_id IN (SELECT
-                mdc_concept.concept_id
+                mdc_obs.encounter_id,
+                MAX(mdc_obs.obs_group_id) AS obs_group_id,
+                    CASE
+                        WHEN mdc_obs.value_coded = 1 THEN 'Sim'
+                        WHEN mdc_obs.value_coded = 2 THEN 'Não'
+                    END AS mdc_yes_no
             FROM
-                concept_name AS mdc_concept
+                (SELECT
+                    obs_mdc.obs_id,
+                    obs_mdc.obs_group_id,
+                    obs_mdc.encounter_id,
+                    obs_mdc.concept_id,
+                    obs_mdc.person_id,
+                    obs_mdc.value_coded
+            FROM
+                obs AS obs_mdc
             WHERE
-                name IN ('Reference_Eligible')
-                    AND mdc_concept.concept_name_type = 'FULLY_SPECIFIED'
-                    AND mdc_concept.locale = 'en'
-            ORDER BY mdc_concept.concept_id ASC)) AS mdc_obs) mdc_eligibility ON mdc_eligibility.encounter_id = obs.encounter_id
+                obs_mdc.concept_id IN (SELECT
+                        mdc_concept.concept_id
+                    FROM
+                        concept_name AS mdc_concept
+                    WHERE
+                        name IN ('Reference_Eligible')
+                            AND mdc_concept.concept_name_type = 'FULLY_SPECIFIED'
+                            AND mdc_concept.locale = 'en'
+                    ORDER BY mdc_concept.concept_id ASC)) AS mdc_obs) AS mdc_eligibility_data
+        INNER JOIN (
+            SELECT
+                ob_g_apoio_user.encounter_id,
+                ob_g_apoio_user.concept_id,
+                ob_g_apoio_user.obs_group_id
+            FROM
+                obs ob_g_apoio_user
+            WHERE
+                ob_g_apoio_user.concept_id = (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND name = 'User_type')
+                AND ob_g_apoio_user.value_coded IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'Clinical_user' OR name = 'APSS_an_Clinical_user' OR name = 'Clinical_user_pop' OR name = 'APSS_an_Clinical_user_pop'))
+                AND ob_g_apoio_user.voided = 0
+        ) g_apoio_form_fields ON g_apoio_form_fields.obs_group_id = mdc_eligibility_data.obs_group_id
+) mdc_eligibility
+    ON mdc_eligibility.encounter_id = obs.encounter_id
 LEFT JOIN (
     SELECT
         mdc_data.encounter_id,
+        mdc_data.obs_group_id,
         mdc_data.modelos_diferenciados AS modelos_diferenciados
     FROM 
         (SELECT
-        mdc_obs.encounter_id,
+            mdc_obs.encounter_id,
+            MAX(mdc_obs.obs_group_id) as obs_group_id,
             GROUP_CONCAT(name
                 SEPARATOR ', ') AS modelos_diferenciados
         FROM
         ((SELECT
         obs_mdc.obs_id,
+        obs_mdc.obs_group_id,
         obs_mdc.encounter_id,
         obs_mdc.concept_id,
         obs_mdc.person_id,
@@ -1579,7 +1636,7 @@ LEFT JOIN (
             AND cn_g_apoio_form.locale = 'en'
             AND cn_g_apoio_form.name = 'Reference_MDC_Section'
     ) AS g_apoio_form
-        ON g_apoio_form.encounter_id = mdc_data.encounter_id
+        ON g_apoio_form.obs_group_id = mdc_data.obs_group_id
     INNER JOIN (
         SELECT
             ob_g_apoio_user.encounter_id,
@@ -1802,7 +1859,7 @@ LEFT JOIN (
         populucao_vulneravel.pop_vul AS pop_vul,
         populucao_vulneravel.obs_group_id,
         vp_fields.concept_id,
-        vp_fields.value_coded,
+        vp_fields.value_coded
     FROM
         (SELECT
             e.encounter_id,
