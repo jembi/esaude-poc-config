@@ -1796,27 +1796,53 @@ LEFT JOIN (
     ) kp_fields 
         ON kp_fields.obs_group_id = kp.obs_group_id
 ) key_population ON key_population.encounter_id = obs.encounter_id
-LEFT JOIN (SELECT
-        e.encounter_id,
+LEFT JOIN (
+    SELECT
+        populucao_vulneravel.encounter_id,
+        populucao_vulneravel.pop_vul AS pop_vul,
+        populucao_vulneravel.obs_group_id,
+        vp_fields.concept_id,
+        vp_fields.value_coded,
+    FROM
+        (SELECT
+            e.encounter_id,
             ob.person_id,
             ob.value_coded,
+            ob.obs_group_id,
             (SELECT
-                    name
-                FROM
-                    concept_name
-                WHERE
-                    concept_id = ob.value_coded
-                        AND locale = 'pt'
-                        AND concept_name_type = 'SHORT') AS pop_vul
+                name
+            FROM
+                concept_name
+            WHERE
+                concept_id = ob.value_coded
+                AND locale = 'pt'
+                AND concept_name_type = 'SHORT') AS pop_vul
     FROM
         obs ob, encounter e, concept_name cn
     WHERE
         ob.person_id = e.patient_id
-            AND ob.encounter_id = e.encounter_id
-            AND ob.concept_id = cn.concept_id
-            AND cn.concept_name_type = 'FULLY_SPECIFIED'
-            AND cn.locale = 'en'
-            AND cn.name = 'PP_IF_Vulnerable_Population_Yes') vp ON vp.encounter_id = obs.encounter_id
+        AND ob.encounter_id = e.encounter_id
+        AND ob.concept_id = cn.concept_id
+        AND cn.concept_name_type = 'FULLY_SPECIFIED'
+        AND cn.locale = 'en'
+        AND cn.name = 'PP_IF_Vulnerable_Population_Yes') AS populucao_vulneravel
+    INNER JOIN (
+        SELECT 
+            ob_kp.encounter_id,
+            ob_kp.person_id,
+            ob_kp.value_coded,
+            ob_kp.concept_id,
+            ob_kp.obs_group_id,
+            ob_kp.obs_id
+        FROM
+            obs ob_kp
+        WHERE
+            ob_kp.concept_id = (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND name = 'User_type_pop')
+            AND ob_kp.value_coded IN (SELECT concept_id FROM concept_name WHERE concept_name_type = 'FULLY_SPECIFIED' AND locale = 'en' AND (name = 'Clinical_user' OR name = 'APSS_an_Clinical_user' OR name = 'Clinical_user_pop' OR name = 'APSS_an_Clinical_user_pop'))
+            AND ob_kp.voided = 0
+    ) vp_fields 
+        ON vp_fields.obs_group_id = populucao_vulneravel.obs_group_id
+) vp ON vp.encounter_id = obs.encounter_id
 LEFT JOIN (SELECT
         concept_name_type,
             GROUP_CONCAT(name) AS lab_tests,
