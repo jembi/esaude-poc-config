@@ -602,11 +602,11 @@ Bahmni.ConceptSet.FormConditions.rulesOverride = {
     "Gynecology/Obstetrics" (formName, formFieldValues, patient) {
         if (patient.gender === "F") {
             return {
-                show: ["Gynecology/Obstetrics"],
+                showForm: ["Gynecology/Obstetrics"]
             }
         } else {
             return {
-                hide: ["Gynecology/Obstetrics"],
+                hideForm: ["Gynecology/Obstetrics"]
             }
         }
     },
